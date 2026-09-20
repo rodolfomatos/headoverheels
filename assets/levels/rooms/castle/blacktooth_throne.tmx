@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.10.0" orientation="isometric" renderorder="right-down" width="16" height="16" tilewidth="64" tileheight="32" infinite="0" nextobjectid="100">
+ <tileset firstgid="1" source="../tilesets/castle.tsx"/>
+ <layer id="1" name="Floor" width="16" height="16">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  </data>
+ </layer>
+ <layer id="2" name="Walls" width="16" height="16">
+  <data encoding="csv">
+0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0
+  </data>
+ </layer>
+ <objectgroup id="3" name="Entities" width="16" height="16">
+  <object id="1" name="door_south" type="door" x="512.0" y="480.0" width="64.0" height="32.0">
+   <properties>
+    <property name="exit" type="string" value="{direction: south, room: blacktooth_castle, entrance: north, isLocked: false, keyId: null, oneWay: false}"/>
+    <property name="exit.direction" type="string" value="south"/>
+    <property name="exit.room" type="string" value="blacktooth_castle"/>
+    <property name="exit.entrance" type="string" value="north"/>
+    <property name="exit.isLocked" type="bool" value="false"/>
+    <property name="exit.keyId" type="string" value="null"/>
+    <property name="exit.oneWay" type="bool" value="false"/>
+   </properties>
+  </object>
+  <object id="2" name="guardian_throne" type="guardian" x="512.0" y="256.0" width="128.0" height="64.0">
+   <properties>
+    <property name="properties" type="string" value="{patrolPoints: [[6, 6, 0], [10, 6, 0], [10, 10, 0], [6, 10, 0]]}"/>
+   </properties>
+  </object>
+  <object id="3" name="monster_throne" type="monster" x="256.0" y="128.0" width="64.0" height="32.0">
+   <properties>
+    <property name="properties" type="string" value="{patrolPoints: [[4, 4, 0], [12, 4, 0], [12, 12, 0], [4, 12, 0]], waitTime: 0.3}"/>
+   </properties>
+  </object>
+  <object id="4" name="spring_throne" type="spring" x="128.0" y="64.0" width="64.0" height="32.0">
+   <properties>
+   </properties>
+  </object>
+  <object id="5" name="fish_throne" type="bag" x="896.0" y="448.0" width="64.0" height="32.0">
+   <properties>
+    <property name="properties" type="string" value="{isAlive: true}"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup id="4" name="Triggers" width="16" height="16">
+  <object id="6" name="door_south_trigger" type="door" x="512.0" y="480.0" width="64.0" height="32.0">
+   <properties>
+    <property name="targetRoom" type="string" value="blacktooth_castle"/>
+    <property name="targetEntrance" type="string" value="north"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

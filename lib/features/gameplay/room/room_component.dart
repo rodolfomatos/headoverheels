@@ -1,0 +1,123 @@
+// Room component for Head over Heels.
+
+import 'package:flame/components.dart';
+import 'package:flame_tiled/flame_tiled.dart';
+import 'package:headoverheels/core/isometric.dart';
+import 'package:headoverheels/features/gameplay/entities/character_component.dart';
+import 'package:headoverheels/features/gameplay/entities/entity_factory.dart';
+import 'package:headoverheels/features/gameplay/entities/puzzle_entity.dart';
+import 'package:headoverheels/features/gameplay/room/room_graph.dart';
+
+/// Room component that manages a single room's tilemap and entities.
+class RoomComponent extends PositionComponent with HasGameReference {
+  final RoomId roomId;
+  final RoomDefinition definition;
+  TiledComponent? _tiledComponent;
+  RenderableTiledMap? _tileMap;
+  final List<PuzzleEntity> entities = [];
+  final List<CharacterComponent> characters = [];
+  RoomState _state;
+
+  RoomComponent({
+    required this.roomId,
+    required this.definition,
+    RoomState? initialState,
+  }) : _state = initialState ?? RoomState.initial(roomId);
+
+  @override
+  Future<void> onLoad() async {
+    // Load TMX tilemap
+    _tiledComponent = await TiledComponent.load(
+      definition.tmxFile,
+      Vector2(IsometricCoordinates.tileWidth, IsometricCoordinates.tileHeight),
+    );
+    _tileMap = _tiledComponent!.tileMap;
+    add(_tiledComponent!);
+
+    // Spawn entities from triggers
+    await _spawnEntities();
+
+    super.onLoad();
+  }
+
+  Future<void> _spawnEntities() async {
+    for (final trigger in definition.triggers) {
+      final entity = EntityFactory.create(trigger, roomId);
+      if (entity != null) {
+        entities.add(entity);
+        add(entity);
+      }
+    }
+  }
+
+  /// Get current room state.
+  RoomState get state => _state;
+
+  /// Update room state (called when room is saved).
+  void updateState(RoomState newState) {
+    _state = newState;
+  }
+
+  /// Get entity by ID.
+  PuzzleEntity? getEntity(String id) {
+    for (final entity in entities) {
+      if (entity.id == id) return entity;
+    }
+    return null;
+  }
+
+  /// Get all entities of a specific type.
+  List<T> getEntities<T extends PuzzleEntity>() {
+    return entities.whereType<T>().toList();
+  }
+
+  /// Add character to room.
+  void addCharacter(CharacterComponent character) {
+    characters.add(character);
+    add(character);
+  }
+
+  /// Remove character from room.
+  void removeCharacter(CharacterComponent character) {
+    characters.remove(character);
+    character.removeFromParent();
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    
+    // Update puzzle entities
+    for (final entity in entities) {
+      entity.updatePuzzle(dt);
+    }
+  }
+
+  /// Check if position is walkable (not a wall).
+  bool isWalkable(Vector3 gridPos) {
+    if (_tileMap == null) return true;
+    
+    // Check walls layer (layer index 1 typically)
+    final wallsLayer = _tileMap!.getLayer<TileLayer>('Walls');
+    if (wallsLayer != null && wallsLayer.id != null) {
+      final gid = _tileMap!.getTileData(
+        layerId: wallsLayer.id!,
+        x: gridPos.x.toInt(),
+        y: gridPos.y.toInt(),
+      );
+      return gid == null; // null = no tile = walkable
+    }
+    return true;
+  }
+
+  /// Get tile at grid position from any layer.
+  Gid? getTileAt(String layerName, int x, int y) {
+    final layer = _tileMap?.getLayer<TileLayer>(layerName);
+    if (layer == null || layer.id == null) return null;
+    return _tileMap!.getTileData(
+      layerId: layer.id!,
+      x: x,
+      y: y,
+    );
+  }
+}

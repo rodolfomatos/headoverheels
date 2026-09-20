@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.10.0" orientation="isometric" renderorder="right-down" width="16" height="16" tilewidth="64" tileheight="32" infinite="0" nextobjectid="100">
+ <tileset firstgid="1" source="../tilesets/castle.tsx"/>
+ <layer id="1" name="Floor" width="16" height="16">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  </data>
+ </layer>
+ <layer id="2" name="Walls" width="16" height="16">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0
+0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0
+  </data>
+ </layer>
+ <objectgroup id="3" name="Entities" width="16" height="16">
+  <object id="1" name="switch_1" type="switchTrigger" x="320" y="160" width="64" height="32">
+   <properties>
+    <property name="targetId" value="door_1"/>
+   </properties>
+  </object>
+  <object id="2" name="door_1" type="door" x="480" y="0" width="64" height="32">
+   <properties>
+    <property name="targetRoom" value="test_room_2"/>
+    <property name="targetEntrance" value="south"/>
+    <property name="isLocked" value="true"/>
+    <property name="keyId" value="key_1"/>
+   </properties>
+  </object>
+  <object id="3" name="conveyor_1" type="conveyor" x="0" y="160" width="1024" height="32">
+   <properties>
+    <property name="conveyorDirection" value="east"/>
+    <property name="conveyorSpeed" value="2"/>
+   </properties>
+  </object>
+  <object id="4" name="spring_1" type="springItem" x="320" y="320" width="64" height="32"/>
+  <object id="5" name="fish_1" type="bag" x="640" y="320" width="64" height="32">
+   <properties>
+    <property name="isAlive" value="true"/>
+   </properties>
+  </object>
+  <object id="6" name="crown_1" type="crown" x="960" y="160" width="64" height="32">
+   <properties>
+    <property name="planetId" value="castle"/>
+   </properties>
+  </object>
+  <object id="7" name="bag_1" type="bag" x="160" y="480" width="64" height="32"/>
+  <object id="8" name="hushpuppy_1" type="hushPuppy" x="800" y="320" width="64" height="32"/>
+  <object id="9" name="monster_1" type="monster" x="0" y="0" width="64" height="32">
+   <properties>
+    <property name="patrolPoints" value="[(10,5,0),(15,5,0)]"/>
+    <property name="waitTime" value="0.5"/>
+   </properties>
+  </object>
+  <object id="10" name="guardian_1" type="guardian" x="1024" y="160" width="64" height="64">
+   <properties>
+    <property name="patrolPoints" value="[(16,2,0)]"/>
+   </properties>
+  </object>
+  <object id="11" name="teleport_1" type="teleport" x="512" y="512" width="64" height="32">
+   <properties>
+    <property name="targetRoom" value="test_room_2"/>
+    <property name="targetEntrance" value="south"/>
+    <property name="oneWay" value="false"/>
+   </properties>
+  </object>
+  <object id="12" name="key_1" type="key" x="160" y="480" width="64" height="32"/>
+  <object id="13" name="spring_1" type="springItem" x="320" y="320" width="64" height="32"/>
+  <object id="14" name="doughnut_1" type="key" x="480" y="480" width="64" height="32">
+   <properties>
+    <property name="itemType" value="doughnut"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup id="4" name="Triggers" width="16" height="16">
+  <object id="15" name="door_trigger_1" type="door" x="480" y="0" width="64" height="32">
+   <properties>
+    <property name="targetRoom" value="test_room_2"/>
+    <property name="targetEntrance" value="south"/>
+   </properties>
+  </object>
+  <object id="16" name="teleport_trigger_1" type="teleport" x="512" y="512" width="64" height="32">
+   <properties>
+    <property name="targetRoom" value="test_room_2"/>
+    <property name="targetEntrance" value="south"/>
+    <property name="oneWay" value="false"/>
+   </properties>
+  </object>
+  <object id="17" name="ladder_up_1" type="ladderUp" x="320" y="0" width="64" height="32">
+   <properties>
+    <property name="targetLevel" value="1"/>
+   </properties>
+  </object>
+  <object id="18" name="ladder_down_1" type="ladderDown" x="320" y="480" width="64" height="32">
+   <properties>
+    <property name="targetLevel" value="0"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

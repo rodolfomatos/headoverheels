@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.10.0" orientation="isometric" renderorder="right-down" width="16" height="16" tilewidth="64" tileheight="32" infinite="0" nextobjectid="100">
+ <tileset firstgid="1" source="../tilesets/castle.tsx"/>
+ <layer id="1" name="Floor" width="16" height="16">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  </data>
+ </layer>
+ <layer id="2" name="Walls" width="16" height="16">
+  <data encoding="csv">
+0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0
+  </data>
+ </layer>
+ <objectgroup id="3" name="Entities" width="16" height="16">
+  <object id="1" name="door_south" type="door" x="512.0" y="480.0" width="64.0" height="32.0">
+   <properties>
+    <property name="exit" type="string" value="{direction: south, room: egyptus_entrance, entrance: north, isLocked: false, keyId: null, oneWay: false}"/>
+    <property name="exit.direction" type="string" value="south"/>
+    <property name="exit.room" type="string" value="egyptus_entrance"/>
+    <property name="exit.entrance" type="string" value="north"/>
+    <property name="exit.isLocked" type="bool" value="false"/>
+    <property name="exit.keyId" type="string" value="null"/>
+    <property name="exit.oneWay" type="bool" value="false"/>
+   </properties>
+  </object>
+  <object id="2" name="door_north_locked" type="door" x="512.0" y="32.0" width="64.0" height="32.0">
+   <properties>
+    <property name="exit" type="string" value="{direction: north, room: egyptus_pyramid_2, entrance: south, isLocked: true, keyId: key_pyramid, oneWay: false}"/>
+    <property name="exit.direction" type="string" value="north"/>
+    <property name="exit.room" type="string" value="egyptus_pyramid_2"/>
+    <property name="exit.entrance" type="string" value="south"/>
+    <property name="exit.isLocked" type="bool" value="true"/>
+    <property name="exit.keyId" type="string" value="key_pyramid"/>
+    <property name="exit.oneWay" type="bool" value="false"/>
+   </properties>
+  </object>
+  <object id="3" name="door_east" type="door" x="960.0" y="256.0" width="64.0" height="32.0">
+   <properties>
+    <property name="exit" type="string" value="{direction: east, room: egyptus_tomb, entrance: west, isLocked: false, keyId: null, oneWay: false}"/>
+    <property name="exit.direction" type="string" value="east"/>
+    <property name="exit.room" type="string" value="egyptus_tomb"/>
+    <property name="exit.entrance" type="string" value="west"/>
+    <property name="exit.isLocked" type="bool" value="false"/>
+    <property name="exit.keyId" type="string" value="null"/>
+    <property name="exit.oneWay" type="bool" value="false"/>
+   </properties>
+  </object>
+  <object id="4" name="switch_pyramid" type="switch" x="192.0" y="224.0" width="64.0" height="32.0">
+   <properties>
+    <property name="properties" type="string" value="{targetId: door_secret_pyramid}"/>
+   </properties>
+  </object>
+  <object id="5" name="door_secret_pyramid" type="door" x="768.0" y="96.0" width="64.0" height="32.0">
+   <properties>
+    <property name="exit" type="string" value="{direction: north, room: egyptus_pyramid_2, entrance: south, isLocked: true, keyId: null, oneWay: false}"/>
+    <property name="properties" type="string" value="{requiresSwitch: switch_pyramid}"/>
+    <property name="exit.direction" type="string" value="north"/>
+    <property name="exit.room" type="string" value="egyptus_pyramid_2"/>
+    <property name="exit.entrance" type="string" value="south"/>
+    <property name="exit.isLocked" type="bool" value="true"/>
+    <property name="exit.keyId" type="string" value="null"/>
+    <property name="exit.oneWay" type="bool" value="false"/>
+   </properties>
+  </object>
+  <object id="6" name="conveyor_pyramid" type="conveyor" x="128.0" y="320.0" width="768.0" height="32.0">
+   <properties>
+    <property name="properties" type="string" value="{conveyorDirection: east, conveyorSpeed: 2.5}"/>
+   </properties>
+  </object>
+  <object id="7" name="crown_pyramid" type="crown" x="320.0" y="96.0" width="64.0" height="32.0">
+   <properties>
+    <property name="properties" type="string" value="{planetId: egyptus}"/>
+   </properties>
+  </object>
+  <object id="8" name="key_pyramid" type="key" x="896.0" y="448.0" width="64.0" height="32.0">
+   <properties>
+   </properties>
+  </object>
+  <object id="9" name="hushpuppy_pyramid" type="hushPuppy" x="640.0" y="320.0" width="64.0" height="32.0">
+   <properties>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup id="4" name="Triggers" width="16" height="16">
+  <object id="10" name="door_south_trigger" type="door" x="512.0" y="480.0" width="64.0" height="32.0">
+   <properties>
+    <property name="targetRoom" type="string" value="egyptus_entrance"/>
+    <property name="targetEntrance" type="string" value="north"/>
+   </properties>
+  </object>
+  <object id="11" name="door_north_locked_trigger" type="door" x="512.0" y="32.0" width="64.0" height="32.0">
+   <properties>
+    <property name="targetRoom" type="string" value="egyptus_pyramid_2"/>
+    <property name="targetEntrance" type="string" value="south"/>
+   </properties>
+  </object>
+  <object id="12" name="door_east_trigger" type="door" x="960.0" y="256.0" width="64.0" height="32.0">
+   <properties>
+    <property name="targetRoom" type="string" value="egyptus_tomb"/>
+    <property name="targetEntrance" type="string" value="west"/>
+   </properties>
+  </object>
+  <object id="13" name="door_secret_pyramid_trigger" type="door" x="768.0" y="96.0" width="64.0" height="32.0">
+   <properties>
+    <property name="targetRoom" type="string" value="egyptus_pyramid_2"/>
+    <property name="targetEntrance" type="string" value="south"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

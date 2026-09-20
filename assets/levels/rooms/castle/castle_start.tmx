@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.10.0" orientation="isometric" renderorder="right-down" width="16" height="16" tilewidth="64" tileheight="32" infinite="0" nextobjectid="100">
+ <tileset firstgid="1" source="../tilesets/castle.tsx"/>
+ <layer id="1" name="Floor" width="16" height="16">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  </data>
+ </layer>
+ <layer id="2" name="Walls" width="16" height="16">
+  <data encoding="csv">
+0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0
+  </data>
+ </layer>
+ <objectgroup id="3" name="Entities" width="16" height="16">
+  <object id="1" name="door_east" type="door" x="960.0" y="256.0" width="64.0" height="32.0">
+   <properties>
+    <property name="exit" type="string" value="{direction: east, room: castle_cell, entrance: west, isLocked: false, keyId: null, oneWay: false}"/>
+    <property name="exit.direction" type="string" value="east"/>
+    <property name="exit.room" type="string" value="castle_cell"/>
+    <property name="exit.entrance" type="string" value="west"/>
+    <property name="exit.isLocked" type="bool" value="false"/>
+    <property name="exit.keyId" type="string" value="null"/>
+    <property name="exit.oneWay" type="bool" value="false"/>
+   </properties>
+  </object>
+  <object id="2" name="door_north" type="door" x="512.0" y="32.0" width="64.0" height="32.0">
+   <properties>
+    <property name="exit" type="string" value="{direction: north, room: castle_hall, entrance: south, isLocked: false, keyId: null, oneWay: false}"/>
+    <property name="exit.direction" type="string" value="north"/>
+    <property name="exit.room" type="string" value="castle_hall"/>
+    <property name="exit.entrance" type="string" value="south"/>
+    <property name="exit.isLocked" type="bool" value="false"/>
+    <property name="exit.keyId" type="string" value="null"/>
+    <property name="exit.oneWay" type="bool" value="false"/>
+   </properties>
+  </object>
+  <object id="3" name="switch_1" type="switch" x="192.0" y="96.0" width="64.0" height="32.0">
+   <properties>
+    <property name="properties" type="string" value="{targetId: door_secret_1}"/>
+   </properties>
+  </object>
+  <object id="4" name="door_secret_1" type="door" x="640.0" y="320.0" width="64.0" height="32.0">
+   <properties>
+    <property name="exit" type="string" value="{direction: north, room: castle_market, entrance: south, isLocked: true, keyId: null, oneWay: false}"/>
+    <property name="properties" type="string" value="{requiresSwitch: switch_1}"/>
+    <property name="exit.direction" type="string" value="north"/>
+    <property name="exit.room" type="string" value="castle_market"/>
+    <property name="exit.entrance" type="string" value="south"/>
+    <property name="exit.isLocked" type="bool" value="true"/>
+    <property name="exit.keyId" type="string" value="null"/>
+    <property name="exit.oneWay" type="bool" value="false"/>
+   </properties>
+  </object>
+  <object id="5" name="conveyor_1" type="conveyor" x="0.0" y="5120.0" width="1024.0" height="32.0">
+   <properties>
+    <property name="properties" type="string" value="{conveyorDirection: east, conveyorSpeed: 2}"/>
+   </properties>
+  </object>
+  <object id="6" name="spring_1" type="spring" x="320.0" y="160.0" width="64.0" height="32.0">
+   <properties>
+   </properties>
+  </object>
+  <object id="7" name="fish_1" type="bag" x="640.0" y="320.0" width="64.0" height="32.0">
+   <properties>
+    <property name="properties" type="string" value="{isAlive: true}"/>
+   </properties>
+  </object>
+  <object id="8" name="crown_1" type="crown" x="768.0" y="96.0" width="64.0" height="32.0">
+   <properties>
+    <property name="properties" type="string" value="{planetId: castle}"/>
+   </properties>
+  </object>
+  <object id="9" name="bag_1" type="bag" x="128.0" y="448.0" width="64.0" height="32.0">
+   <properties>
+   </properties>
+  </object>
+  <object id="10" name="hushpuppy_1" type="hushPuppy" x="832.0" y="160.0" width="64.0" height="32.0">
+   <properties>
+   </properties>
+  </object>
+  <object id="11" name="monster_1" type="monster" x="64.0" y="32.0" width="64.0" height="32.0">
+   <properties>
+    <property name="properties" type="string" value="{patrolPoints: [[10, 5, 0], [15, 5, 0]], waitTime: 0.5}"/>
+   </properties>
+  </object>
+  <object id="12" name="guardian_1" type="guardian" x="896.0" y="96.0" width="64.0" height="32.0">
+   <properties>
+    <property name="properties" type="string" value="{patrolPoints: [[16, 2, 0]]}"/>
+   </properties>
+  </object>
+  <object id="13" name="teleport_1" type="teleport" x="512.0" y="256.0" width="64.0" height="32.0">
+   <properties>
+    <property name="properties" type="string" value="{targetRoom: egyptus_entrance, targetEntrance: south, oneWay: false}"/>
+   </properties>
+  </object>
+  <object id="14" name="key_1" type="key" x="128.0" y="448.0" width="64.0" height="32.0">
+   <properties>
+   </properties>
+  </object>
+  <object id="15" name="doughnut_1" type="key" x="448.0" y="224.0" width="64.0" height="32.0">
+   <properties>
+    <property name="properties" type="string" value="{itemType: doughnut}"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup id="4" name="Triggers" width="16" height="16">
+  <object id="16" name="door_east_trigger" type="door" x="960.0" y="256.0" width="64.0" height="32.0">
+   <properties>
+    <property name="targetRoom" type="string" value="castle_cell"/>
+    <property name="targetEntrance" type="string" value="west"/>
+   </properties>
+  </object>
+  <object id="17" name="door_north_trigger" type="door" x="512.0" y="32.0" width="64.0" height="32.0">
+   <properties>
+    <property name="targetRoom" type="string" value="castle_hall"/>
+    <property name="targetEntrance" type="string" value="south"/>
+   </properties>
+  </object>
+  <object id="18" name="door_secret_1_trigger" type="door" x="640.0" y="320.0" width="64.0" height="32.0">
+   <properties>
+    <property name="targetRoom" type="string" value="castle_market"/>
+    <property name="targetEntrance" type="string" value="south"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

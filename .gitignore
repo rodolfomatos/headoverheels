@@ -1,18 +1,48 @@
-node_modules/
-__pycache__/
-*.pyc
-.coverage
-coverage.xml
-coverage.out
-target/
-dist/
+# Build outputs
 build/
-.venv/
-env/
+.dart_tool/
+*.iml
+
+# IDE
 .idea/
 .vscode/
-*.log
+*.swp
+*.swo
+
+# OS
 .DS_Store
-.tmp/
+Thumbs.db
+
+# Logs
+*.log
+
+# Coverage
+coverage/
+*.lcov
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+env/
+
+# Node
+node_modules/
+package-lock.json
+yarn.lock
+
+# CI
 aes/verification/
+
+# Local config
+.local.properties
+*.local
+
+# Temporary
+.tmp/
+temp/
+
+# Misc
+*.iml
 .llm_venv/

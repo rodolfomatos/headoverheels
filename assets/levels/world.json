@@ -1,0 +1,1172 @@
+{
+  "rooms": {
+    "castle_start": {
+      "file": "castle/castle_start.tmx",
+      "theme": "castle",
+      "exits": [
+        { "direction": "east", "room": "castle_cell", "entrance": "west", "isLocked": false, "keyId": null, "oneWay": false },
+        { "direction": "north", "room": "castle_hall", "entrance": "south", "isLocked": false, "keyId": null, "oneWay": false }
+      ],
+      "spawnPoint": { "x": 1, "y": 1, "z": 0 },
+      "triggers": [
+        {
+          "id": "door_east",
+          "type": "door",
+          "position": { "x": 15, "y": 8, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "east", "room": "castle_cell", "entrance": "west", "isLocked": false, "keyId": null, "oneWay": false }
+        },
+        {
+          "id": "door_north",
+          "type": "door",
+          "position": { "x": 8, "y": 1, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "north", "room": "castle_hall", "entrance": "south", "isLocked": false, "keyId": null, "oneWay": false }
+        },
+        {
+          "id": "switch_1",
+          "type": "switch",
+          "position": { "x": 3, "y": 3, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "targetId": "door_secret_1" }
+        },
+        {
+          "id": "door_secret_1",
+          "type": "door",
+          "position": { "x": 10, "y": 10, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "north", "room": "castle_market", "entrance": "south", "isLocked": true, "keyId": null, "oneWay": false },
+          "properties": { "requiresSwitch": "switch_1" }
+        },
+        {
+          "id": "conveyor_1",
+          "type": "conveyor",
+          "position": { "x": 0, "y": 160, "z": 0 },
+          "size": { "width": 16, "height": 1 },
+          "properties": { "conveyorDirection": "east", "conveyorSpeed": 2 }
+        },
+        {
+          "id": "spring_1",
+          "type": "spring",
+          "position": { "x": 5, "y": 5, "z": 0 },
+          "size": { "width": 1, "height": 1 }
+        },
+        {
+          "id": "fish_1",
+          "type": "bag",
+          "position": { "x": 10, "y": 10, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "isAlive": true }
+        },
+        {
+          "id": "crown_1",
+          "type": "crown",
+          "position": { "x": 12, "y": 3, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "planetId": "castle" }
+        },
+        {
+          "id": "bag_1",
+          "type": "bag",
+          "position": { "x": 2, "y": 14, "z": 0 },
+          "size": { "width": 1, "height": 1 }
+        },
+        {
+          "id": "hushpuppy_1",
+          "type": "hushPuppy",
+          "position": { "x": 13, "y": 5, "z": 0 },
+          "size": { "width": 1, "height": 1 }
+        },
+        {
+          "id": "monster_1",
+          "type": "monster",
+          "position": { "x": 1, "y": 1, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "patrolPoints": [[10,5,0],[15,5,0]], "waitTime": 0.5 }
+        },
+        {
+          "id": "guardian_1",
+          "type": "guardian",
+          "position": { "x": 14, "y": 3, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "patrolPoints": [[16,2,0]] }
+        },
+        {
+          "id": "teleport_1",
+          "type": "teleport",
+          "position": { "x": 8, "y": 8, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "targetRoom": "egyptus_entrance", "targetEntrance": "south", "oneWay": false }
+        },
+        {
+          "id": "key_1",
+          "type": "key",
+          "position": { "x": 2, "y": 14, "z": 0 },
+          "size": { "width": 1, "height": 1 }
+        },
+        {
+          "id": "doughnut_1",
+          "type": "key",
+          "position": { "x": 7, "y": 7, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "itemType": "doughnut" }
+        }
+      ],
+      "properties": {}
+    },
+    "castle_cell": {
+      "file": "castle/castle_cell.tmx",
+      "theme": "castle",
+      "exits": [
+        { "direction": "west", "room": "castle_start", "entrance": "east", "isLocked": false, "keyId": null, "oneWay": false },
+        { "direction": "north", "room": "castle_hall", "entrance": "west", "isLocked": true, "keyId": "key_1", "oneWay": false }
+      ],
+      "spawnPoint": { "x": 14, "y": 8, "z": 0 },
+      "triggers": [
+        {
+          "id": "door_west",
+          "type": "door",
+          "position": { "x": 1, "y": 8, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "west", "room": "castle_start", "entrance": "east", "isLocked": false, "keyId": null, "oneWay": false }
+        },
+        {
+          "id": "door_north_locked",
+          "type": "door",
+          "position": { "x": 8, "y": 1, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "north", "room": "castle_hall", "entrance": "west", "isLocked": true, "keyId": "key_1", "oneWay": false }
+        },
+        {
+          "id": "teleport_return",
+          "type": "teleport",
+          "position": { "x": 8, "y": 8, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "targetRoom": "castle_start", "targetEntrance": "east", "oneWay": false }
+        },
+        {
+          "id": "spring_2",
+          "type": "spring",
+          "position": { "x": 5, "y": 5, "z": 0 },
+          "size": { "width": 1, "height": 1 }
+        },
+        {
+          "id": "monster_2",
+          "type": "monster",
+          "position": { "x": 10, "y": 10, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "patrolPoints": [[10,10,0],[15,10,0],[15,5,0],[10,5,0]], "waitTime": 1.0 }
+        },
+        {
+          "id": "hushpuppy_2",
+          "type": "hushPuppy",
+          "position": { "x": 3, "y": 12, "z": 0 },
+          "size": { "width": 1, "height": 1 }
+        }
+      ],
+      "properties": {}
+    },
+    "castle_hall": {
+      "file": "castle/castle_hall.tmx",
+      "theme": "castle",
+      "exits": [
+        { "direction": "south", "room": "castle_start", "entrance": "north", "isLocked": false, "keyId": null, "oneWay": false },
+        { "direction": "east", "room": "castle_market", "entrance": "west", "isLocked": false, "keyId": null, "oneWay": false },
+        { "direction": "west", "room": "castle_cell", "entrance": "east", "isLocked": false, "keyId": null, "oneWay": false }
+      ],
+      "spawnPoint": { "x": 8, "y": 14, "z": 0 },
+      "triggers": [
+        {
+          "id": "door_south",
+          "type": "door",
+          "position": { "x": 8, "y": 15, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "south", "room": "castle_start", "entrance": "north", "isLocked": false, "keyId": null, "oneWay": false }
+        },
+        {
+          "id": "door_east",
+          "type": "door",
+          "position": { "x": 15, "y": 8, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "east", "room": "castle_market", "entrance": "west", "isLocked": false, "keyId": null, "oneWay": false }
+        },
+        {
+          "id": "door_west",
+          "type": "door",
+          "position": { "x": 1, "y": 8, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "west", "room": "castle_cell", "entrance": "east", "isLocked": false, "keyId": null, "oneWay": false }
+        },
+        {
+          "id": "conveyor_2",
+          "type": "conveyor",
+          "position": { "x": 3, "y": 3, "z": 0 },
+          "size": { "width": 10, "height": 1 },
+          "properties": { "conveyorDirection": "north", "conveyorSpeed": 1.5 }
+        },
+        {
+          "id": "switch_hall",
+          "type": "switch",
+          "position": { "x": 12, "y": 12, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "targetId": "door_market_secret" }
+        },
+        {
+          "id": "door_market_secret",
+          "type": "door",
+          "position": { "x": 10, "y": 2, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "north", "room": "castle_market", "entrance": "south", "isLocked": true, "keyId": null, "oneWay": false },
+          "properties": { "requiresSwitch": "switch_hall" }
+        },
+        {
+          "id": "fish_hall",
+          "type": "bag",
+          "position": { "x": 5, "y": 5, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "isAlive": true }
+        },
+        {
+          "id": "crown_hall",
+          "type": "crown",
+          "position": { "x": 13, "y": 13, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "planetId": "castle" }
+        }
+      ],
+      "properties": {}
+    },
+    "castle_market": {
+      "file": "castle/castle_market.tmx",
+      "theme": "castle",
+      "exits": [
+        { "direction": "west", "room": "castle_hall", "entrance": "east", "isLocked": false, "keyId": null, "oneWay": false },
+        { "direction": "north", "room": "castle_teleport", "entrance": "south", "isLocked": false, "keyId": null, "oneWay": false }
+      ],
+      "spawnPoint": { "x": 1, "y": 8, "z": 0 },
+      "triggers": [
+        {
+          "id": "door_west",
+          "type": "door",
+          "position": { "x": 1, "y": 8, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "west", "room": "castle_hall", "entrance": "east", "isLocked": false, "keyId": null, "oneWay": false }
+        },
+        {
+          "id": "door_north",
+          "type": "door",
+          "position": { "x": 8, "y": 1, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "north", "room": "castle_teleport", "entrance": "south", "isLocked": false, "keyId": null, "oneWay": false }
+        },
+        {
+          "id": "spring_market",
+          "type": "spring",
+          "position": { "x": 7, "y": 7, "z": 0 },
+          "size": { "width": 1, "height": 1 }
+        },
+        {
+          "id": "monster_market",
+          "type": "monster",
+          "position": { "x": 12, "y": 4, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "patrolPoints": [[12,4,0],[12,12,0]], "waitTime": 0.8 }
+        },
+        {
+          "id": "hushpuppy_market",
+          "type": "hushPuppy",
+          "position": { "x": 5, "y": 12, "z": 0 },
+          "size": { "width": 1, "height": 1 }
+        },
+        {
+          "id": "bag_market",
+          "type": "bag",
+          "position": { "x": 14, "y": 14, "z": 0 },
+          "size": { "width": 1, "height": 1 }
+        },
+        {
+          "id": "key_market",
+          "type": "key",
+          "position": { "x": 3, "y": 3, "z": 0 },
+          "size": { "width": 1, "height": 1 }
+        }
+      ],
+      "properties": {}
+    },
+    "castle_teleport": {
+      "file": "castle/castle_teleport.tmx",
+      "theme": "castle",
+      "exits": [
+        { "direction": "south", "room": "castle_market", "entrance": "north", "isLocked": false, "keyId": null, "oneWay": false },
+        { "direction": "up", "room": "egyptus_entrance", "entrance": "south", "isLocked": false, "keyId": null, "oneWay": false }
+      ],
+      "spawnPoint": { "x": 8, "y": 14, "z": 0 },
+      "triggers": [
+        {
+          "id": "door_south",
+          "type": "door",
+          "position": { "x": 8, "y": 15, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "south", "room": "castle_market", "entrance": "north", "isLocked": false, "keyId": null, "oneWay": false }
+        },
+        {
+          "id": "teleport_egyptus",
+          "type": "teleport",
+          "position": { "x": 8, "y": 1, "z": 0 },
+          "size": { "width": 2, "height": 2 },
+          "properties": { "targetRoom": "egyptus_entrance", "targetEntrance": "south", "oneWay": false }
+        },
+        {
+          "id": "guardian_teleport",
+          "type": "guardian",
+          "position": { "x": 5, "y": 5, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "patrolPoints": [[5,5,0],[11,5,0],[11,11,0],[5,11,0]] }
+        },
+        {
+          "id": "crown_teleport",
+          "type": "crown",
+          "position": { "x": 12, "y": 12, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "planetId": "castle" }
+        }
+      ],
+      "properties": {}
+    },
+    "egyptus_entrance": {
+      "file": "egyptus/egyptus_entrance.tmx",
+      "theme": "egyptus",
+      "exits": [
+        { "direction": "north", "room": "egyptus_pyramid_1", "entrance": "south", "isLocked": false, "keyId": null, "oneWay": false },
+        { "direction": "down", "room": "castle_teleport", "entrance": "up", "isLocked": false, "keyId": null, "oneWay": false }
+      ],
+      "spawnPoint": { "x": 8, "y": 14, "z": 0 },
+      "triggers": [
+        {
+          "id": "door_north",
+          "type": "door",
+          "position": { "x": 8, "y": 1, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "north", "room": "egyptus_pyramid_1", "entrance": "south", "isLocked": false, "keyId": null, "oneWay": false }
+        },
+        {
+          "id": "teleport_castle",
+          "type": "teleport",
+          "position": { "x": 8, "y": 15, "z": 0 },
+          "size": { "width": 2, "height": 2 },
+          "properties": { "targetRoom": "castle_teleport", "targetEntrance": "up", "oneWay": false }
+        },
+        {
+          "id": "spring_egyptus",
+          "type": "spring",
+          "position": { "x": 4, "y": 7, "z": 0 },
+          "size": { "width": 1, "height": 1 }
+        },
+        {
+          "id": "fish_egyptus",
+          "type": "bag",
+          "position": { "x": 12, "y": 12, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "isAlive": true }
+        },
+        {
+          "id": "monster_egyptus",
+          "type": "monster",
+          "position": { "x": 2, "y": 2, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "patrolPoints": [[2,2,0],[14,2,0]], "waitTime": 1.0 }
+        }
+      ],
+      "properties": {}
+    },
+    "egyptus_pyramid_1": {
+      "file": "egyptus/egyptus_pyramid_1.tmx",
+      "theme": "egyptus",
+      "exits": [
+        { "direction": "south", "room": "egyptus_entrance", "entrance": "north", "isLocked": false, "keyId": null, "oneWay": false },
+        { "direction": "north", "room": "egyptus_pyramid_2", "entrance": "south", "isLocked": true, "keyId": "key_pyramid", "oneWay": false },
+        { "direction": "east", "room": "egyptus_tomb", "entrance": "west", "isLocked": false, "keyId": null, "oneWay": false }
+      ],
+      "spawnPoint": { "x": 8, "y": 14, "z": 0 },
+      "triggers": [
+        {
+          "id": "door_south",
+          "type": "door",
+          "position": { "x": 8, "y": 15, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "south", "room": "egyptus_entrance", "entrance": "north", "isLocked": false, "keyId": null, "oneWay": false }
+        },
+        {
+          "id": "door_north_locked",
+          "type": "door",
+          "position": { "x": 8, "y": 1, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "north", "room": "egyptus_pyramid_2", "entrance": "south", "isLocked": true, "keyId": "key_pyramid", "oneWay": false }
+        },
+        {
+          "id": "door_east",
+          "type": "door",
+          "position": { "x": 15, "y": 8, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "east", "room": "egyptus_tomb", "entrance": "west", "isLocked": false, "keyId": null, "oneWay": false }
+        },
+        {
+          "id": "switch_pyramid",
+          "type": "switch",
+          "position": { "x": 3, "y": 7, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "targetId": "door_secret_pyramid" }
+        },
+        {
+          "id": "door_secret_pyramid",
+          "type": "door",
+          "position": { "x": 12, "y": 3, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "north", "room": "egyptus_pyramid_2", "entrance": "south", "isLocked": true, "keyId": null, "oneWay": false },
+          "properties": { "requiresSwitch": "switch_pyramid" }
+        },
+        {
+          "id": "conveyor_pyramid",
+          "type": "conveyor",
+          "position": { "x": 2, "y": 10, "z": 0 },
+          "size": { "width": 12, "height": 1 },
+          "properties": { "conveyorDirection": "east", "conveyorSpeed": 2.5 }
+        },
+        {
+          "id": "crown_pyramid",
+          "type": "crown",
+          "position": { "x": 5, "y": 3, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "planetId": "egyptus" }
+        },
+        {
+          "id": "key_pyramid",
+          "type": "key",
+          "position": { "x": 14, "y": 14, "z": 0 },
+          "size": { "width": 1, "height": 1 }
+        },
+        {
+          "id": "hushpuppy_pyramid",
+          "type": "hushPuppy",
+          "position": { "x": 10, "y": 10, "z": 0 },
+          "size": { "width": 1, "height": 1 }
+        }
+      ],
+      "properties": {}
+    },
+    "egyptus_pyramid_2": {
+      "file": "egyptus/egyptus_pyramid_2.tmx",
+      "theme": "egyptus",
+      "exits": [
+        { "direction": "south", "room": "egyptus_pyramid_1", "entrance": "north", "isLocked": false, "keyId": null, "oneWay": false },
+        { "direction": "north", "room": "egyptus_tomb", "entrance": "south", "isLocked": false, "keyId": null, "oneWay": false }
+      ],
+      "spawnPoint": { "x": 8, "y": 14, "z": 0 },
+      "triggers": [
+        {
+          "id": "door_south",
+          "type": "door",
+          "position": { "x": 8, "y": 15, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "south", "room": "egyptus_pyramid_1", "entrance": "north", "isLocked": false, "keyId": null, "oneWay": false }
+        },
+        {
+          "id": "door_north",
+          "type": "door",
+          "position": { "x": 8, "y": 1, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "north", "room": "egyptus_tomb", "entrance": "south", "isLocked": false, "keyId": null, "oneWay": false }
+        },
+        {
+          "id": "ladder_up",
+          "type": "ladderUp",
+          "position": { "x": 4, "y": 4, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "targetLevel": 1 }
+        },
+        {
+          "id": "ladder_down",
+          "type": "ladderDown",
+          "position": { "x": 12, "y": 12, "z": 1 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "targetLevel": 0 }
+        },
+        {
+          "id": "monster_pyramid2",
+          "type": "monster",
+          "position": { "x": 10, "y": 10, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "patrolPoints": [[10,10,0],[10,5,0]], "waitTime": 0.5 }
+        },
+        {
+          "id": "crown_pyramid2",
+          "type": "crown",
+          "position": { "x": 3, "y": 13, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "planetId": "egyptus" }
+        }
+      ],
+      "properties": {}
+    },
+    "egyptus_tomb": {
+      "file": "egyptus/egyptus_tomb.tmx",
+      "theme": "egyptus",
+      "exits": [
+        { "direction": "west", "room": "egyptus_pyramid_1", "entrance": "east", "isLocked": false, "keyId": null, "oneWay": false },
+        { "direction": "south", "room": "egyptus_pyramid_2", "entrance": "north", "isLocked": false, "keyId": null, "oneWay": false },
+        { "direction": "up", "room": "penitentiary_entrance", "entrance": "south", "isLocked": false, "keyId": null, "oneWay": false }
+      ],
+      "spawnPoint": { "x": 1, "y": 8, "z": 0 },
+      "triggers": [
+        {
+          "id": "door_west",
+          "type": "door",
+          "position": { "x": 1, "y": 8, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "west", "room": "egyptus_pyramid_1", "entrance": "east", "isLocked": false, "keyId": null, "oneWay": false }
+        },
+        {
+          "id": "door_south",
+          "type": "door",
+          "position": { "x": 8, "y": 15, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "south", "room": "egyptus_pyramid_2", "entrance": "north", "isLocked": false, "keyId": null, "oneWay": false }
+        },
+        {
+          "id": "teleport_penitentiary",
+          "type": "teleport",
+          "position": { "x": 8, "y": 1, "z": 0 },
+          "size": { "width": 2, "height": 2 },
+          "properties": { "targetRoom": "penitentiary_entrance", "targetEntrance": "south", "oneWay": false }
+        },
+        {
+          "id": "guardian_tomb",
+          "type": "guardian",
+          "position": { "x": 5, "y": 5, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "patrolPoints": [[5,5,0],[11,5,0],[11,11,0],[5,11,0]] }
+        },
+        {
+          "id": "spring_tomb",
+          "type": "spring",
+          "position": { "x": 12, "y": 3, "z": 0 },
+          "size": { "width": 1, "height": 1 }
+        },
+        {
+          "id": "fish_tomb",
+          "type": "bag",
+          "position": { "x": 13, "y": 13, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "isAlive": true }
+        },
+        {
+          "id": "crown_tomb",
+          "type": "crown",
+          "position": { "x": 14, "y": 2, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "planetId": "egyptus" }
+        }
+      ],
+      "properties": {}
+    },
+    "penitentiary_entrance": {
+      "file": "penitentiary/penitentiary_entrance.tmx",
+      "theme": "penitentiary",
+      "exits": [
+        { "direction": "north", "room": "penitentiary_cell_block", "entrance": "south", "isLocked": false, "keyId": null, "oneWay": false },
+        { "direction": "down", "room": "egyptus_tomb", "entrance": "up", "isLocked": false, "keyId": null, "oneWay": false }
+      ],
+      "spawnPoint": { "x": 8, "y": 14, "z": 0 },
+      "triggers": [
+        {
+          "id": "door_north",
+          "type": "door",
+          "position": { "x": 8, "y": 1, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "north", "room": "penitentiary_cell_block", "entrance": "south", "isLocked": false, "keyId": null, "oneWay": false }
+        },
+        {
+          "id": "teleport_egyptus",
+          "type": "teleport",
+          "position": { "x": 8, "y": 15, "z": 0 },
+          "size": { "width": 2, "height": 2 },
+          "properties": { "targetRoom": "egyptus_tomb", "targetEntrance": "up", "oneWay": false }
+        },
+        {
+          "id": "conveyor_pen",
+          "type": "conveyor",
+          "position": { "x": 0, "y": 8, "z": 0 },
+          "size": { "width": 16, "height": 1 },
+          "properties": { "conveyorDirection": "east", "conveyorSpeed": 3 }
+        },
+        {
+          "id": "spring_pen",
+          "type": "spring",
+          "position": { "x": 4, "y": 4, "z": 0 },
+          "size": { "width": 1, "height": 1 }
+        },
+        {
+          "id": "monster_pen",
+          "type": "monster",
+          "position": { "x": 14, "y": 14, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "patrolPoints": [[14,14,0],[2,14,0]], "waitTime": 1.2 }
+        }
+      ],
+      "properties": {}
+    },
+    "penitentiary_cell_block": {
+      "file": "penitentiary/penitentiary_cell_block.tmx",
+      "theme": "penitentiary",
+      "exits": [
+        { "direction": "south", "room": "penitentiary_entrance", "entrance": "north", "isLocked": false, "keyId": null, "oneWay": false },
+        { "direction": "north", "room": "penitentiary_the_pit", "entrance": "south", "isLocked": true, "keyId": "key_cell", "oneWay": false }
+      ],
+      "spawnPoint": { "x": 8, "y": 14, "z": 0 },
+      "triggers": [
+        {
+          "id": "door_south",
+          "type": "door",
+          "position": { "x": 8, "y": 15, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "south", "room": "penitentiary_entrance", "entrance": "north", "isLocked": false, "keyId": null, "oneWay": false }
+        },
+        {
+          "id": "door_north_locked",
+          "type": "door",
+          "position": { "x": 8, "y": 1, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "north", "room": "penitentiary_the_pit", "entrance": "south", "isLocked": true, "keyId": "key_cell", "oneWay": false }
+        },
+        {
+          "id": "switch_cell",
+          "type": "switch",
+          "position": { "x": 3, "y": 7, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "targetId": "door_cell_secret" }
+        },
+        {
+          "id": "door_cell_secret",
+          "type": "door",
+          "position": { "x": 13, "y": 3, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "north", "room": "penitentiary_the_pit", "entrance": "south", "isLocked": true, "keyId": null, "oneWay": false },
+          "properties": { "requiresSwitch": "switch_cell" }
+        },
+        {
+          "id": "key_cell",
+          "type": "key",
+          "position": { "x": 2, "y": 2, "z": 0 },
+          "size": { "width": 1, "height": 1 }
+        },
+        {
+          "id": "hushpuppy_pen",
+          "type": "hushPuppy",
+          "position": { "x": 10, "y": 10, "z": 0 },
+          "size": { "width": 1, "height": 1 }
+        },
+        {
+          "id": "crown_pen",
+          "type": "crown",
+          "position": { "x": 12, "y": 12, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "planetId": "penitentiary" }
+        }
+      ],
+      "properties": {}
+    },
+    "penitentiary_the_pit": {
+      "file": "penitentiary/penitentiary_the_pit.tmx",
+      "theme": "penitentiary",
+      "exits": [
+        { "direction": "south", "room": "penitentiary_cell_block", "entrance": "north", "isLocked": false, "keyId": null, "oneWay": false },
+        { "direction": "up", "room": "safari_entrance", "entrance": "south", "isLocked": false, "keyId": null, "oneWay": false }
+      ],
+      "spawnPoint": { "x": 8, "y": 14, "z": 0 },
+      "triggers": [
+        {
+          "id": "door_south",
+          "type": "door",
+          "position": { "x": 8, "y": 15, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "south", "room": "penitentiary_cell_block", "entrance": "north", "isLocked": false, "keyId": null, "oneWay": false }
+        },
+        {
+          "id": "teleport_safari",
+          "type": "teleport",
+          "position": { "x": 8, "y": 1, "z": 0 },
+          "size": { "width": 2, "height": 2 },
+          "properties": { "targetRoom": "safari_entrance", "targetEntrance": "south", "oneWay": false }
+        },
+        {
+          "id": "guardian_pit",
+          "type": "guardian",
+          "position": { "x": 4, "y": 4, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "patrolPoints": [[4,4,0],[12,4,0],[12,12,0],[4,12,0]] }
+        },
+        {
+          "id": "spring_pit",
+          "type": "spring",
+          "position": { "x": 12, "y": 12, "z": 0 },
+          "size": { "width": 1, "height": 1 }
+        },
+        {
+          "id": "fish_pit",
+          "type": "bag",
+          "position": { "x": 5, "y": 5, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "isAlive": true }
+        },
+        {
+          "id": "crown_pit",
+          "type": "crown",
+          "position": { "x": 2, "y": 14, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "planetId": "penitentiary" }
+        }
+      ],
+      "properties": {}
+    },
+    "safari_entrance": {
+      "file": "safari/safari_entrance.tmx",
+      "theme": "safari",
+      "exits": [
+        { "direction": "north", "room": "safari_jungle_1", "entrance": "south", "isLocked": false, "keyId": null, "oneWay": false },
+        { "direction": "down", "room": "penitentiary_the_pit", "entrance": "up", "isLocked": false, "keyId": null, "oneWay": false }
+      ],
+      "spawnPoint": { "x": 8, "y": 14, "z": 0 },
+      "triggers": [
+        {
+          "id": "door_north",
+          "type": "door",
+          "position": { "x": 8, "y": 1, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "north", "room": "safari_jungle_1", "entrance": "south", "isLocked": false, "keyId": null, "oneWay": false }
+        },
+        {
+          "id": "teleport_pen",
+          "type": "teleport",
+          "position": { "x": 8, "y": 15, "z": 0 },
+          "size": { "width": 2, "height": 2 },
+          "properties": { "targetRoom": "penitentiary_the_pit", "targetEntrance": "up", "oneWay": false }
+        },
+        {
+          "id": "conveyor_safari",
+          "type": "conveyor",
+          "position": { "x": 3, "y": 8, "z": 0 },
+          "size": { "width": 10, "height": 1 },
+          "properties": { "conveyorDirection": "north", "conveyorSpeed": 2 }
+        },
+        {
+          "id": "spring_safari",
+          "type": "spring",
+          "position": { "x": 12, "y": 12, "z": 0 },
+          "size": { "width": 1, "height": 1 }
+        },
+        {
+          "id": "monster_safari",
+          "type": "monster",
+          "position": { "x": 2, "y": 2, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "patrolPoints": [[2,2,0],[2,14,0]], "waitTime": 1.0 }
+        }
+      ],
+      "properties": {}
+    },
+    "safari_jungle_1": {
+      "file": "safari/safari_jungle_1.tmx",
+      "theme": "safari",
+      "exits": [
+        { "direction": "south", "room": "safari_entrance", "entrance": "north", "isLocked": false, "keyId": null, "oneWay": false },
+        { "direction": "north", "room": "safari_fort", "entrance": "south", "isLocked": true, "keyId": "key_jungle", "oneWay": false },
+        { "direction": "east", "room": "safari_jungle_2", "entrance": "west", "isLocked": false, "keyId": null, "oneWay": false }
+      ],
+      "spawnPoint": { "x": 8, "y": 14, "z": 0 },
+      "triggers": [
+        {
+          "id": "door_south",
+          "type": "door",
+          "position": { "x": 8, "y": 15, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "south", "room": "safari_entrance", "entrance": "north", "isLocked": false, "keyId": null, "oneWay": false }
+        },
+        {
+          "id": "door_north_locked",
+          "type": "door",
+          "position": { "x": 8, "y": 1, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "north", "room": "safari_fort", "entrance": "south", "isLocked": true, "keyId": "key_jungle", "oneWay": false }
+        },
+        {
+          "id": "door_east",
+          "type": "door",
+          "position": { "x": 15, "y": 8, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "east", "room": "safari_jungle_2", "entrance": "west", "isLocked": false, "keyId": null, "oneWay": false }
+        },
+        {
+          "id": "switch_jungle",
+          "type": "switch",
+          "position": { "x": 3, "y": 3, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "targetId": "door_jungle_secret" }
+        },
+        {
+          "id": "door_jungle_secret",
+          "type": "door",
+          "position": { "x": 10, "y": 10, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "north", "room": "safari_fort", "entrance": "south", "isLocked": true, "keyId": null, "oneWay": false },
+          "properties": { "requiresSwitch": "switch_jungle" }
+        },
+        {
+          "id": "fish_jungle",
+          "type": "bag",
+          "position": { "x": 5, "y": 5, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "isAlive": true }
+        },
+        {
+          "id": "key_jungle",
+          "type": "key",
+          "position": { "x": 14, "y": 14, "z": 0 },
+          "size": { "width": 1, "height": 1 }
+        },
+        {
+          "id": "crown_jungle",
+          "type": "crown",
+          "position": { "x": 2, "y": 13, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "planetId": "safari" }
+        }
+      ],
+      "properties": {}
+    },
+    "safari_fort": {
+      "file": "safari/safari_fort.tmx",
+      "theme": "safari",
+      "exits": [
+        { "direction": "south", "room": "safari_jungle_1", "entrance": "north", "isLocked": false, "keyId": null, "oneWay": false },
+        { "direction": "up", "room": "bookworld_entrance", "entrance": "south", "isLocked": false, "keyId": null, "oneWay": false }
+      ],
+      "spawnPoint": { "x": 8, "y": 14, "z": 0 },
+      "triggers": [
+        {
+          "id": "door_south",
+          "type": "door",
+          "position": { "x": 8, "y": 15, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "south", "room": "safari_jungle_1", "entrance": "north", "isLocked": false, "keyId": null, "oneWay": false }
+        },
+        {
+          "id": "teleport_bookworld",
+          "type": "teleport",
+          "position": { "x": 8, "y": 1, "z": 0 },
+          "size": { "width": 2, "height": 2 },
+          "properties": { "targetRoom": "bookworld_entrance", "targetEntrance": "south", "oneWay": false }
+        },
+        {
+          "id": "guardian_fort",
+          "type": "guardian",
+          "position": { "x": 5, "y": 5, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "patrolPoints": [[5,5,0],[11,5,0],[11,11,0],[5,11,0]] }
+        },
+        {
+          "id": "spring_fort",
+          "type": "spring",
+          "position": { "x": 12, "y": 3, "z": 0 },
+          "size": { "width": 1, "height": 1 }
+        },
+        {
+          "id": "hushpuppy_fort",
+          "type": "hushPuppy",
+          "position": { "x": 3, "y": 13, "z": 0 },
+          "size": { "width": 1, "height": 1 }
+        },
+        {
+          "id": "crown_fort",
+          "type": "crown",
+          "position": { "x": 13, "y": 13, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "planetId": "safari" }
+        }
+      ],
+      "properties": {}
+    },
+    "bookworld_entrance": {
+      "file": "bookworld/bookworld_entrance.tmx",
+      "theme": "bookworld",
+      "exits": [
+        { "direction": "north", "room": "bookworld_library_1", "entrance": "south", "isLocked": false, "keyId": null, "oneWay": false },
+        { "direction": "down", "room": "safari_fort", "entrance": "up", "isLocked": false, "keyId": null, "oneWay": false }
+      ],
+      "spawnPoint": { "x": 8, "y": 14, "z": 0 },
+      "triggers": [
+        {
+          "id": "door_north",
+          "type": "door",
+          "position": { "x": 8, "y": 1, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "north", "room": "bookworld_library_1", "entrance": "south", "isLocked": false, "keyId": null, "oneWay": false }
+        },
+        {
+          "id": "teleport_safari",
+          "type": "teleport",
+          "position": { "x": 8, "y": 15, "z": 0 },
+          "size": { "width": 2, "height": 2 },
+          "properties": { "targetRoom": "safari_fort", "targetEntrance": "up", "oneWay": false }
+        },
+        {
+          "id": "spring_book",
+          "type": "spring",
+          "position": { "x": 4, "y": 7, "z": 0 },
+          "size": { "width": 1, "height": 1 }
+        },
+        {
+          "id": "monster_book",
+          "type": "monster",
+          "position": { "x": 14, "y": 2, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "patrolPoints": [[14,2,0],[2,2,0]], "waitTime": 1.5 }
+        },
+        {
+          "id": "fish_book",
+          "type": "bag",
+          "position": { "x": 10, "y": 10, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "isAlive": true }
+        }
+      ],
+      "properties": {}
+    },
+    "bookworld_library_1": {
+      "file": "bookworld/bookworld_library_1.tmx",
+      "theme": "bookworld",
+      "exits": [
+        { "direction": "south", "room": "bookworld_entrance", "entrance": "north", "isLocked": false, "keyId": null, "oneWay": false },
+        { "direction": "north", "room": "bookworld_library_2", "entrance": "south", "isLocked": true, "keyId": "key_library", "oneWay": false }
+      ],
+      "spawnPoint": { "x": 8, "y": 14, "z": 0 },
+      "triggers": [
+        {
+          "id": "door_south",
+          "type": "door",
+          "position": { "x": 8, "y": 15, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "south", "room": "bookworld_entrance", "entrance": "north", "isLocked": false, "keyId": null, "oneWay": false }
+        },
+        {
+          "id": "door_north_locked",
+          "type": "door",
+          "position": { "x": 8, "y": 1, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "north", "room": "bookworld_library_2", "entrance": "south", "isLocked": true, "keyId": "key_library", "oneWay": false }
+        },
+        {
+          "id": "switch_library",
+          "type": "switch",
+          "position": { "x": 12, "y": 3, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "targetId": "door_library_secret" }
+        },
+        {
+          "id": "door_library_secret",
+          "type": "door",
+          "position": { "x": 3, "y": 13, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "north", "room": "bookworld_library_2", "entrance": "south", "isLocked": true, "keyId": null, "oneWay": false },
+          "properties": { "requiresSwitch": "switch_library" }
+        },
+        {
+          "id": "key_library",
+          "type": "key",
+          "position": { "x": 2, "y": 2, "z": 0 },
+          "size": { "width": 1, "height": 1 }
+        },
+        {
+          "id": "crown_library",
+          "type": "crown",
+          "position": { "x": 14, "y": 14, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "planetId": "bookworld" }
+        }
+      ],
+      "properties": {}
+    },
+    "bookworld_library_2": {
+      "file": "bookworld/bookworld_library_2.tmx",
+      "theme": "bookworld",
+      "exits": [
+        { "direction": "south", "room": "bookworld_library_1", "entrance": "north", "isLocked": false, "keyId": null, "oneWay": false },
+        { "direction": "north", "room": "blacktooth_castle", "entrance": "south", "isLocked": false, "keyId": null, "oneWay": false }
+      ],
+      "spawnPoint": { "x": 8, "y": 14, "z": 0 },
+      "triggers": [
+        {
+          "id": "door_south",
+          "type": "door",
+          "position": { "x": 8, "y": 15, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "south", "room": "bookworld_library_1", "entrance": "north", "isLocked": false, "keyId": null, "oneWay": false }
+        },
+        {
+          "id": "door_north",
+          "type": "door",
+          "position": { "x": 8, "y": 1, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "north", "room": "blacktooth_castle", "entrance": "south", "isLocked": false, "keyId": null, "oneWay": false }
+        },
+        {
+          "id": "ladder_up",
+          "type": "ladderUp",
+          "position": { "x": 4, "y": 4, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "targetLevel": 1 }
+        },
+        {
+          "id": "ladder_down",
+          "type": "ladderDown",
+          "position": { "x": 12, "y": 12, "z": 1 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "targetLevel": 0 }
+        },
+        {
+          "id": "guardian_library",
+          "type": "guardian",
+          "position": { "x": 5, "y": 5, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "patrolPoints": [[5,5,0],[11,5,0],[11,11,0],[5,11,0]] }
+        },
+        {
+          "id": "spring_library2",
+          "type": "spring",
+          "position": { "x": 12, "y": 12, "z": 0 },
+          "size": { "width": 1, "height": 1 }
+        },
+        {
+          "id": "crown_library2",
+          "type": "crown",
+          "position": { "x": 3, "y": 3, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "planetId": "bookworld" }
+        }
+      ],
+      "properties": {}
+    },
+    "blacktooth_castle": {
+      "file": "castle/blacktooth_castle.tmx",
+      "theme": "castle",
+      "exits": [
+        { "direction": "south", "room": "bookworld_library_2", "entrance": "north", "isLocked": false, "keyId": null, "oneWay": false },
+        { "direction": "north", "room": "blacktooth_throne", "entrance": "south", "isLocked": true, "keyId": "key_final", "oneWay": false }
+      ],
+      "spawnPoint": { "x": 8, "y": 14, "z": 0 },
+      "triggers": [
+        {
+          "id": "door_south",
+          "type": "door",
+          "position": { "x": 8, "y": 15, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "south", "room": "bookworld_library_2", "entrance": "north", "isLocked": false, "keyId": null, "oneWay": false }
+        },
+        {
+          "id": "door_north_final",
+          "type": "door",
+          "position": { "x": 8, "y": 1, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "north", "room": "blacktooth_throne", "entrance": "south", "isLocked": true, "keyId": "key_final", "oneWay": false }
+        },
+        {
+          "id": "switch_final",
+          "type": "switch",
+          "position": { "x": 3, "y": 7, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "targetId": "door_final_secret" }
+        },
+        {
+          "id": "door_final_secret",
+          "type": "door",
+          "position": { "x": 13, "y": 3, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "north", "room": "blacktooth_throne", "entrance": "south", "isLocked": true, "keyId": null, "oneWay": false },
+          "properties": { "requiresSwitch": "switch_final" }
+        },
+        {
+          "id": "key_final",
+          "type": "key",
+          "position": { "x": 2, "y": 2, "z": 0 },
+          "size": { "width": 1, "height": 1 }
+        },
+        {
+          "id": "hushpuppy_final",
+          "type": "hushPuppy",
+          "position": { "x": 14, "y": 14, "z": 0 },
+          "size": { "width": 1, "height": 1 }
+        },
+        {
+          "id": "crown_final",
+          "type": "crown",
+          "position": { "x": 12, "y": 12, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "planetId": "castle" }
+        }
+      ],
+      "properties": {}
+    },
+    "blacktooth_throne": {
+      "file": "castle/blacktooth_throne.tmx",
+      "theme": "castle",
+      "exits": [
+        { "direction": "south", "room": "blacktooth_castle", "entrance": "north", "isLocked": false, "keyId": null, "oneWay": false }
+      ],
+      "spawnPoint": { "x": 8, "y": 14, "z": 0 },
+      "triggers": [
+        {
+          "id": "door_south",
+          "type": "door",
+          "position": { "x": 8, "y": 15, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "exit": { "direction": "south", "room": "blacktooth_castle", "entrance": "north", "isLocked": false, "keyId": null, "oneWay": false }
+        },
+        {
+          "id": "guardian_throne",
+          "type": "guardian",
+          "position": { "x": 8, "y": 8, "z": 0 },
+          "size": { "width": 2, "height": 2 },
+          "properties": { "patrolPoints": [[6,6,0],[10,6,0],[10,10,0],[6,10,0]] }
+        },
+        {
+          "id": "monster_throne",
+          "type": "monster",
+          "position": { "x": 4, "y": 4, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "patrolPoints": [[4,4,0],[12,4,0],[12,12,0],[4,12,0]], "waitTime": 0.3 }
+        },
+        {
+          "id": "spring_throne",
+          "type": "spring",
+          "position": { "x": 2, "y": 2, "z": 0 },
+          "size": { "width": 1, "height": 1 }
+        },
+        {
+          "id": "fish_throne",
+          "type": "bag",
+          "position": { "x": 14, "y": 14, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "isAlive": true }
+        }
+      ],
+      "properties": {}
+    }
+  },
+  "startRoom": "castle_start",
+  "planets": [
+    { "id": "castle", "name": "Blacktooth Castle", "crownCollected": false },
+    { "id": "egyptus", "name": "Egyptus", "crownCollected": false },
+    { "id": "penitentiary", "name": "Penitentiary", "crownCollected": false },
+    { "id": "safari", "name": "Safari", "crownCollected": false },
+    { "id": "bookworld", "name": "Book World", "crownCollected": false }
+  ]
+}

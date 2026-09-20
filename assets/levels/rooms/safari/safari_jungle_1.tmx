@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.10.0" orientation="isometric" renderorder="right-down" width="16" height="16" tilewidth="64" tileheight="32" infinite="0" nextobjectid="100">
+ <tileset firstgid="1" source="../tilesets/castle.tsx"/>
+ <layer id="1" name="Floor" width="16" height="16">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  </data>
+ </layer>
+ <layer id="2" name="Walls" width="16" height="16">
+  <data encoding="csv">
+0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0
+  </data>
+ </layer>
+ <objectgroup id="3" name="Entities" width="16" height="16">
+  <object id="1" name="door_south" type="door" x="512.0" y="480.0" width="64.0" height="32.0">
+   <properties>
+    <property name="exit" type="string" value="{direction: south, room: safari_entrance, entrance: north, isLocked: false, keyId: null, oneWay: false}"/>
+    <property name="exit.direction" type="string" value="south"/>
+    <property name="exit.room" type="string" value="safari_entrance"/>
+    <property name="exit.entrance" type="string" value="north"/>
+    <property name="exit.isLocked" type="bool" value="false"/>
+    <property name="exit.keyId" type="string" value="null"/>
+    <property name="exit.oneWay" type="bool" value="false"/>
+   </properties>
+  </object>
+  <object id="2" name="door_north_locked" type="door" x="512.0" y="32.0" width="64.0" height="32.0">
+   <properties>
+    <property name="exit" type="string" value="{direction: north, room: safari_fort, entrance: south, isLocked: true, keyId: key_jungle, oneWay: false}"/>
+    <property name="exit.direction" type="string" value="north"/>
+    <property name="exit.room" type="string" value="safari_fort"/>
+    <property name="exit.entrance" type="string" value="south"/>
+    <property name="exit.isLocked" type="bool" value="true"/>
+    <property name="exit.keyId" type="string" value="key_jungle"/>
+    <property name="exit.oneWay" type="bool" value="false"/>
+   </properties>
+  </object>
+  <object id="3" name="door_east" type="door" x="960.0" y="256.0" width="64.0" height="32.0">
+   <properties>
+    <property name="exit" type="string" value="{direction: east, room: safari_jungle_2, entrance: west, isLocked: false, keyId: null, oneWay: false}"/>
+    <property name="exit.direction" type="string" value="east"/>
+    <property name="exit.room" type="string" value="safari_jungle_2"/>
+    <property name="exit.entrance" type="string" value="west"/>
+    <property name="exit.isLocked" type="bool" value="false"/>
+    <property name="exit.keyId" type="string" value="null"/>
+    <property name="exit.oneWay" type="bool" value="false"/>
+   </properties>
+  </object>
+  <object id="4" name="switch_jungle" type="switch" x="192.0" y="96.0" width="64.0" height="32.0">
+   <properties>
+    <property name="properties" type="string" value="{targetId: door_jungle_secret}"/>
+   </properties>
+  </object>
+  <object id="5" name="door_jungle_secret" type="door" x="640.0" y="320.0" width="64.0" height="32.0">
+   <properties>
+    <property name="exit" type="string" value="{direction: north, room: safari_fort, entrance: south, isLocked: true, keyId: null, oneWay: false}"/>
+    <property name="properties" type="string" value="{requiresSwitch: switch_jungle}"/>
+    <property name="exit.direction" type="string" value="north"/>
+    <property name="exit.room" type="string" value="safari_fort"/>
+    <property name="exit.entrance" type="string" value="south"/>
+    <property name="exit.isLocked" type="bool" value="true"/>
+    <property name="exit.keyId" type="string" value="null"/>
+    <property name="exit.oneWay" type="bool" value="false"/>
+   </properties>
+  </object>
+  <object id="6" name="fish_jungle" type="bag" x="320.0" y="160.0" width="64.0" height="32.0">
+   <properties>
+    <property name="properties" type="string" value="{isAlive: true}"/>
+   </properties>
+  </object>
+  <object id="7" name="key_jungle" type="key" x="896.0" y="448.0" width="64.0" height="32.0">
+   <properties>
+   </properties>
+  </object>
+  <object id="8" name="crown_jungle" type="crown" x="128.0" y="416.0" width="64.0" height="32.0">
+   <properties>
+    <property name="properties" type="string" value="{planetId: safari}"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup id="4" name="Triggers" width="16" height="16">
+  <object id="9" name="door_south_trigger" type="door" x="512.0" y="480.0" width="64.0" height="32.0">
+   <properties>
+    <property name="targetRoom" type="string" value="safari_entrance"/>
+    <property name="targetEntrance" type="string" value="north"/>
+   </properties>
+  </object>
+  <object id="10" name="door_north_locked_trigger" type="door" x="512.0" y="32.0" width="64.0" height="32.0">
+   <properties>
+    <property name="targetRoom" type="string" value="safari_fort"/>
+    <property name="targetEntrance" type="string" value="south"/>
+   </properties>
+  </object>
+  <object id="11" name="door_east_trigger" type="door" x="960.0" y="256.0" width="64.0" height="32.0">
+   <properties>
+    <property name="targetRoom" type="string" value="safari_jungle_2"/>
+    <property name="targetEntrance" type="string" value="west"/>
+   </properties>
+  </object>
+  <object id="12" name="door_jungle_secret_trigger" type="door" x="640.0" y="320.0" width="64.0" height="32.0">
+   <properties>
+    <property name="targetRoom" type="string" value="safari_fort"/>
+    <property name="targetEntrance" type="string" value="south"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

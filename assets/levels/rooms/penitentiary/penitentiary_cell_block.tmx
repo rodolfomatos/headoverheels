@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.10.0" orientation="isometric" renderorder="right-down" width="16" height="16" tilewidth="64" tileheight="32" infinite="0" nextobjectid="100">
+ <tileset firstgid="1" source="../tilesets/castle.tsx"/>
+ <layer id="1" name="Floor" width="16" height="16">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  </data>
+ </layer>
+ <layer id="2" name="Walls" width="16" height="16">
+  <data encoding="csv">
+0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0
+  </data>
+ </layer>
+ <objectgroup id="3" name="Entities" width="16" height="16">
+  <object id="1" name="door_south" type="door" x="512.0" y="480.0" width="64.0" height="32.0">
+   <properties>
+    <property name="exit" type="string" value="{direction: south, room: penitentiary_entrance, entrance: north, isLocked: false, keyId: null, oneWay: false}"/>
+    <property name="exit.direction" type="string" value="south"/>
+    <property name="exit.room" type="string" value="penitentiary_entrance"/>
+    <property name="exit.entrance" type="string" value="north"/>
+    <property name="exit.isLocked" type="bool" value="false"/>
+    <property name="exit.keyId" type="string" value="null"/>
+    <property name="exit.oneWay" type="bool" value="false"/>
+   </properties>
+  </object>
+  <object id="2" name="door_north_locked" type="door" x="512.0" y="32.0" width="64.0" height="32.0">
+   <properties>
+    <property name="exit" type="string" value="{direction: north, room: penitentiary_the_pit, entrance: south, isLocked: true, keyId: key_cell, oneWay: false}"/>
+    <property name="exit.direction" type="string" value="north"/>
+    <property name="exit.room" type="string" value="penitentiary_the_pit"/>
+    <property name="exit.entrance" type="string" value="south"/>
+    <property name="exit.isLocked" type="bool" value="true"/>
+    <property name="exit.keyId" type="string" value="key_cell"/>
+    <property name="exit.oneWay" type="bool" value="false"/>
+   </properties>
+  </object>
+  <object id="3" name="switch_cell" type="switch" x="192.0" y="224.0" width="64.0" height="32.0">
+   <properties>
+    <property name="properties" type="string" value="{targetId: door_cell_secret}"/>
+   </properties>
+  </object>
+  <object id="4" name="door_cell_secret" type="door" x="832.0" y="96.0" width="64.0" height="32.0">
+   <properties>
+    <property name="exit" type="string" value="{direction: north, room: penitentiary_the_pit, entrance: south, isLocked: true, keyId: null, oneWay: false}"/>
+    <property name="properties" type="string" value="{requiresSwitch: switch_cell}"/>
+    <property name="exit.direction" type="string" value="north"/>
+    <property name="exit.room" type="string" value="penitentiary_the_pit"/>
+    <property name="exit.entrance" type="string" value="south"/>
+    <property name="exit.isLocked" type="bool" value="true"/>
+    <property name="exit.keyId" type="string" value="null"/>
+    <property name="exit.oneWay" type="bool" value="false"/>
+   </properties>
+  </object>
+  <object id="5" name="key_cell" type="key" x="128.0" y="64.0" width="64.0" height="32.0">
+   <properties>
+   </properties>
+  </object>
+  <object id="6" name="hushpuppy_pen" type="hushPuppy" x="640.0" y="320.0" width="64.0" height="32.0">
+   <properties>
+   </properties>
+  </object>
+  <object id="7" name="crown_pen" type="crown" x="768.0" y="384.0" width="64.0" height="32.0">
+   <properties>
+    <property name="properties" type="string" value="{planetId: penitentiary}"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup id="4" name="Triggers" width="16" height="16">
+  <object id="8" name="door_south_trigger" type="door" x="512.0" y="480.0" width="64.0" height="32.0">
+   <properties>
+    <property name="targetRoom" type="string" value="penitentiary_entrance"/>
+    <property name="targetEntrance" type="string" value="north"/>
+   </properties>
+  </object>
+  <object id="9" name="door_north_locked_trigger" type="door" x="512.0" y="32.0" width="64.0" height="32.0">
+   <properties>
+    <property name="targetRoom" type="string" value="penitentiary_the_pit"/>
+    <property name="targetEntrance" type="string" value="south"/>
+   </properties>
+  </object>
+  <object id="10" name="door_cell_secret_trigger" type="door" x="832.0" y="96.0" width="64.0" height="32.0">
+   <properties>
+    <property name="targetRoom" type="string" value="penitentiary_the_pit"/>
+    <property name="targetEntrance" type="string" value="south"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

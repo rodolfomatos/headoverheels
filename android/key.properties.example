@@ -1,0 +1,7 @@
+# Key.properties - Copy to android/key.properties and fill in your values
+# This file should NOT be committed to version control!
+
+storeFile=../release.keystore
+storePassword=YOUR_STORE_PASSWORD
+keyAlias=headoverheels
+keyPassword=YOUR_KEY_PASSWORD

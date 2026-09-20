@@ -1,0 +1,43 @@
+Generate a complete isometric tileset for **bookworld** theme.
+
+STYLE CONTEXT:
+- Original: ZX Spectrum castle.tsx (256 tiles, 16×16 grid, 64×32 iso)
+- Modern: "Spectrum+" palette, clean at 4×, power-of-2 atlas packing
+- Lighting: Top-left (315°), subtle ambient occlusion on vertical faces, consistent across tiles
+
+THEME: bookworld
+Library world - towering shelves, scrolls, western library aesthetic.
+Intellectual, vertical, paper/wood textures, warm tones.
+
+
+SPECS:
+- Tile size: 64×32 px (isometric)
+- Grid: 16×16 = 256 tiles
+- Source image: 1024×512 (power of 2)
+- Categories: floor, wall, conveyor, spring, switch, door, teleport, prop, stair, water, hush_puppy, fish, rabbit, crown, monster, guardian, key, bag, decal
+
+TILE BREAKDOWN:
+
+TECHNICAL:
+- Output: Single PNG 1024×512 + JSON manifest
+- Tile naming: tileset_bookworld_{id:03d}.png
+- Variants: @1x (64×32), @2x (128×64), @4x (256×128)
+- Packing: TexturePacker, max 2048×2048
+- Background: Transparent
+
+PALETTE: bookworld
+THEME PALETTE OVERRIDE:
+Shelf Dark: #3E2723
+Shelf Mid: #5D4037
+Shelf Light: #8D6E63
+Paper Cream: #FFF8E1
+Paper Yellow: #FFF9C4
+Ink Black: #212121
+Ink Blue: #1565C0
+Ink Red: #B71C1C
+Leather Brown: #3E2723
+Gold Leaf: #FDD835
+Dust Grey: #9E9E9E
+
+
+REFERENCE: Based on map4.png library architecture, manual Book World section

@@ -1,0 +1,44 @@
+Generate a complete isometric tileset for **egyptus** theme.
+
+STYLE CONTEXT:
+- Original: ZX Spectrum castle.tsx (256 tiles, 16×16 grid, 64×32 iso)
+- Modern: "Spectrum+" palette, clean at 4×, power-of-2 atlas packing
+- Lighting: Top-left (315°), subtle ambient occlusion on vertical faces, consistent across tiles
+
+THEME: egyptus
+Ancient Egypt - pyramids, sand, hieroglyphs, tombs.
+Warm, golden, mystical with ancient mystery.
+
+
+SPECS:
+- Tile size: 64×32 px (isometric)
+- Grid: 16×16 = 256 tiles
+- Source image: 1024×512 (power of 2)
+- Categories: floor, wall, conveyor, spring, switch, door, teleport, prop, stair, water, hush_puppy, fish, rabbit, crown, monster, guardian, key, bag, decal
+
+TILE BREAKDOWN:
+
+TECHNICAL:
+- Output: Single PNG 1024×512 + JSON manifest
+- Tile naming: tileset_egyptus_{id:03d}.png
+- Variants: @1x (64×32), @2x (128×64), @4x (256×128)
+- Packing: TexturePacker, max 2048×2048
+- Background: Transparent
+
+PALETTE: egyptus
+THEME PALETTE OVERRIDE:
+Sand Dark: #4E342E
+Sand Mid: #8D6E63
+Sand Light: #D7CCC8
+Stone Dark: #3E2723
+Stone Mid: #5D4037
+Stone Light: #8D6E63
+Gold: #FDD835
+Hieroglyph Blue: #1565C0
+Hieroglyph Green: #2E7D32
+Torch Orange: #FF6D00
+Water Blue: #0277BD
+Palm Green: #2E7D32
+
+
+REFERENCE: Based on map2.jpg pyramid architecture, manual Egyptus section

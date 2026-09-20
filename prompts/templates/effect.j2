@@ -1,0 +1,31 @@
+Generate visual effect sprite for **{{ effect_name }}**.
+
+STYLE CONTEXT:
+- Original: ZX Spectrum 48K, 8-color palette, 2:1 dimetric isometric
+- Modern: "Spectrum+" 16-color palette, clean at 4× scale, additive blending
+- Lighting: Additive/glow effects, top-left lighting
+- Legal: Inspired by 1987 design — NOT a copy
+
+EFFECT: {{ effect_id }}
+{{ description }}
+
+SPECS:
+- Size: {{ size }}×{{ size }} px
+- Frames: {{ frames }}
+- Loop: {{ loop }}
+- Blend mode: {{ blend_mode }}
+
+ANIMATION:
+- Duration: {{ duration }}ms
+- Timing: {{ timing }}
+
+TECHNICAL:
+- Output: PNG with alpha (premultiplied for additive)
+- Naming: {{ naming_pattern }}
+- Variants: @1x, @2x, @4x
+- Background: Transparent
+- Constraints: {{ constraints }}
+
+PALETTE: {{ palette_ref }}
+
+REFERENCE: {{ reference_notes }}

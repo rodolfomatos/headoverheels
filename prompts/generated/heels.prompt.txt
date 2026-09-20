@@ -1,0 +1,45 @@
+Generate a character sprite sheet for **Heels** from "Head over Heels" reimagining.
+
+STYLE CONTEXT:
+- Original: ZX Spectrum 48K, 8-color palette, 2:1 dimetric isometric
+- Modern: "Spectrum+" 16-color palette, clean at 4× scale, no attribute clash
+- Lighting: Top-left (315°), subtle ambient occlusion on vertical faces
+- Legal: Inspired by Jon Ritman/Bernie Drummond's 1987 design — NOT a copy
+
+CHARACTER: heels
+Footus Underium - arms disappeared, powerful legs.
+Energetic, fast, practical. No arms, oversized feet/legs, confident posture.
+Colors: Orange/red body (Spectrum bright red), yellow accents.
+
+
+SPECS:
+- Frame size: 48×56 px
+- Directions: 8 (N, NE, E, SE, S, SW, W, NW)
+- Animations: ['idle', 'walk', 'run', 'jump', 'carry', 'combined']
+- Frame counts: {'idle': 4, 'walk': 8, 'run': 8, 'jump': 4, 'carry': 4, 'combined': 6}
+- Canvas layout: 8×4 (384×224)
+
+ANIMATION DETAILS:
+- idle: 4 frames, 200ms/frame, subtle bounce, leg stretch, confident stance
+- walk: 8 frames, 100ms/frame, smooth 8-dir, powerful leg drive
+- run: 8 frames, 75ms/frame, faster cycle, motion blur legs
+- jump: 4 frames, 150ms/frame, lower arc, crouch, launch, peak, landing
+- carry: 4 frames, 200ms/frame, bag/item held, balanced walk
+- combined: 6 frames, 200ms/frame, Heels carries Head, shared anim
+
+TECHNICAL:
+- Output: PNG with alpha, power-of-2 texture preferred
+- Naming: character_heels_{dir}_{frame:02d}.png
+- Variants: @1x, @2x, @4x for Flutter
+- Background: Transparent
+- Constraints: transparent_bg, isometric_grid, loopable_walk
+
+PALETTE: spectrum_plus
+OVERRIDE PALETTE:
+Primary: #E53935 (orange-red body)
+Accent: #FDD835 (yellow accents)
+Outline: #B71C1C (dark red)
+Highlight: #EF9A9A (light red)
+
+
+REFERENCE: Based on map1.jpg castle entrance character, manual page 3 illustration

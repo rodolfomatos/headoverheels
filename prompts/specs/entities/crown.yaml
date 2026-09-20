@@ -1,0 +1,37 @@
+id: crown
+category: entity
+template: entity.j2
+entity_id: crown
+entity_name: "Crown"
+description: |
+  Win condition collectible. 5 total (one per planet).
+  Rotating, glowing, majestic. Planet-specific color accent.
+
+base_w: 32
+base_h: 32
+animations: ["rotate", "collected"]
+frame_counts: {"rotate": 8, "collected": 8}
+directions: 1
+
+animation_details:
+  - name: rotate
+    frames: 8
+    loop: true
+    timing: "200ms/frame"
+  - name: collected
+    frames: 8
+    loop: false
+    timing: "100ms/frame, burst"
+
+naming_pattern: "entity_crown_{planet}_{anim}_{frame:02d}.png"
+constraints: "transparent_bg, isometric_grid"
+palette_ref: "spectrum_plus"
+palette_override: |
+  Base Gold: #FDD835
+  Gem Red: #C62828 (Castle)
+  Gem Blue: #1565C0 (Egyptus)
+  Gem Green: #2E7D32 (Penitentiary)
+  Gem Orange: #FF9800 (Safari)
+  Gem Purple: #7B1FA2 (Bookworld)
+
+reference_notes: "Based on TSX tile 74, manual page 9 crown illustration"

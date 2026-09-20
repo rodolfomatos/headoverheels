@@ -1,0 +1,32 @@
+Generate entity sprite for **Crown**.
+
+STYLE CONTEXT:
+- Original: ZX Spectrum 48K, 8-color palette, 2:1 dimetric isometric
+- Modern: "Spectrum+" 16-color palette, clean at 4× scale, no attribute clash
+- Lighting: Top-left (315°), subtle ambient occlusion on vertical faces
+- Legal: Inspired by Jon Ritman/Bernie Drummond's 1987 design — NOT a copy
+
+ENTITY: crown
+Win condition collectible. 5 total (one per planet).
+Rotating, glowing, majestic. Planet-specific color accent.
+
+
+SPECS:
+- Base size: 32×32 px
+- Animations: ['rotate', 'collected']
+- Frames per anim: {'rotate': 8, 'collected': 8}
+- Directions: 1
+
+ANIMATION DETAILS:
+- rotate: 8 frames, True, 200ms/frame
+- collected: 8 frames, False, 100ms/frame, burst
+
+TECHNICAL:
+- Output: PNG with alpha
+- Naming: entity_crown_{planet}_{anim}_{frame:02d}.png
+- Variants: @1x, @2x, @4x
+- Constraints: transparent_bg, isometric_grid
+
+PALETTE: spectrum_plus
+
+REFERENCE: Based on TSX tile 74, manual page 9 crown illustration

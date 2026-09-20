@@ -1,0 +1,45 @@
+Generate a character sprite sheet for **Head** from "Head over Heels" reimagining.
+
+STYLE CONTEXT:
+- Original: ZX Spectrum 48K, 8-color palette, 2:1 dimetric isometric
+- Modern: "Spectrum+" 16-color palette, clean at 4× scale, no attribute clash
+- Lighting: Top-left (315°), subtle ambient occlusion on vertical faces
+- Legal: Inspired by Jon Ritman/Bernie Drummond's 1987 design — NOT a copy
+
+CHARACTER: head
+Headus Mouthion - descended from flying reptile, rudimentary wings.
+Proud, curious, vulnerable alone. Rounded head, small wings, expressive eyes.
+Colors: Green body (Spectrum bright green), yellow wings.
+
+
+SPECS:
+- Frame size: 48×48 px
+- Directions: 8 (N, NE, E, SE, S, SW, W, NW)
+- Animations: ['idle', 'walk', 'jump', 'climb', 'fire', 'combined']
+- Frame counts: {'idle': 4, 'walk': 8, 'jump': 4, 'climb': 4, 'fire': 3, 'combined': 6}
+- Canvas layout: 8×4 (384×192)
+
+ANIMATION DETAILS:
+- idle: 4 frames, 200ms/frame, subtle breathing, subtle wing flutter, eye blink
+- walk: 8 frames, 100ms/frame, smooth 8-dir, wing-assisted steps
+- jump: 4 frames, 150ms/frame, parabolic arc, rising, peak, falling, landing
+- climb: 4 frames, 200ms/frame, wing-assisted ladder climb
+- fire: 3 frames, 100ms/frame, doughnut throw, recoil
+- combined: 6 frames, 200ms/frame, Head on Heels shoulders, shared anim
+
+TECHNICAL:
+- Output: PNG with alpha, power-of-2 texture preferred
+- Naming: character_head_{dir}_{frame:02d}.png
+- Variants: @1x, @2x, @4x for Flutter
+- Background: Transparent
+- Constraints: transparent_bg, isometric_grid, loopable_walk
+
+PALETTE: spectrum_plus
+OVERRIDE PALETTE:
+Primary: #43A047 (green body)
+Accent: #FDD835 (yellow wings)
+Outline: #1B5E20 (dark green)
+Highlight: #81C784 (light green)
+
+
+REFERENCE: Based on map1.jpg castle entrance character, manual page 3 illustration

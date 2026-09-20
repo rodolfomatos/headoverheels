@@ -1,0 +1,28 @@
+id: moonbase
+category: tileset
+template: tileset.j2
+theme: moonbase
+theme_description: |
+  Lunar base - sterile metal, glowing panels, low gravity aesthetic.
+  Cold blue/grey, high-tech, modular, clean lines.
+
+tileset_w: 1024
+tileset_h: 512
+categories: "floor, wall, conveyor, spring, switch, door, teleport, prop, stair, water, hush_puppy, fish, rabbit, crown, monster, guardian, key, bag, decal"
+
+naming_pattern: "tileset_moonbase_{id:03d}.png"
+theme_palette: "moonbase"
+palette_override: |
+  Metal Dark: #263238
+  Metal Mid: #37474F
+  Metal Light: #546E7A
+  Panel Blue: #1565C0
+  Panel Cyan: #00BCD4
+  Panel White: #ECEFF1
+  Glow Cyan: #00BCD4
+  Glow Blue: #2979FF
+  Warning Red: #D32F2F
+  Regolith Grey: #78909C
+  Glass: #81D4FA
+
+reference_notes: "Based on map2.jpg moonbase architecture, manual Moonbase section"

@@ -1,0 +1,40 @@
+id: fish
+category: entity
+template: entity.j2
+entity_id: fish
+entity_name: "Reincarnation Fish"
+description: |
+  Checkpoint creature - alive = save point, dead = poison.
+  Alive: swimming, glowing, friendly. Dead: floating, bones, toxic.
+
+base_w: 64
+base_h: 32
+animations: ["alive", "dead", "eaten"]
+frame_counts: {"alive": 8, "dead": 1, "eaten": 6}
+directions: 1
+
+animation_details:
+  - name: alive
+    frames: 8
+    loop: true
+    timing: "100ms/frame"
+  - name: dead
+    frames: 1
+    loop: false
+    timing: "static"
+  - name: eaten
+    frames: 6
+    loop: false
+    timing: "150ms/frame, sparkle burst"
+
+naming_pattern: "entity_fish_{anim}_{frame:02d}.png"
+constraints: "transparent_bg, isometric_grid"
+palette_ref: "spectrum_plus"
+palette_override: |
+  Alive Body: #00BCD4 (cyan)
+  Alive Glow: #4DD0E1 (light cyan)
+  Dead Body: #795548 (brown)
+  Dead Bones: #D7CCC8 (pale)
+  Eaten Sparkle: #FFD600 (gold)
+
+reference_notes: "Based on TSX tile 72-73, manual page 8 fish illustration"

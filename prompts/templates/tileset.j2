@@ -1,0 +1,37 @@
+Generate a complete isometric tileset for **{{ theme }}** theme.
+
+STYLE CONTEXT:
+- Original: ZX Spectrum castle.tsx (256 tiles, 16×16 grid, 64×32 iso)
+- Modern: "Spectrum+" palette, clean at 4×, power-of-2 atlas packing
+- Lighting: Top-left (315°), subtle ambient occlusion on vertical faces, consistent across tiles
+
+THEME: {{ theme }}
+{{ theme_description }}
+
+SPECS:
+- Tile size: 64×32 px (isometric)
+- Grid: 16×16 = 256 tiles
+- Source image: {{ tileset_w }}×{{ tileset_h }} (power of 2)
+- Categories: {{ categories }}
+
+TILE BREAKDOWN:
+{% for cat in tile_categories %}
+- {{ cat.name }} (IDs {{ cat.id_range }}): {{ cat.count }} tiles
+  {{ cat.description }}
+  {{ cat.animation_notes }}
+{% endfor %}
+
+TECHNICAL:
+- Output: Single PNG {{ tileset_w }}×{{ tileset_h }} + JSON manifest
+- Tile naming: {{ naming_pattern }}
+- Variants: @1x (64×32), @2x (128×64), @4x (256×128)
+- Packing: TexturePacker, max 2048×2048
+- Background: Transparent
+
+PALETTE: {{ theme_palette }}
+{% if palette_override %}
+THEME PALETTE OVERRIDE:
+{{ palette_override }}
+{% endif %}
+
+REFERENCE: {{ reference_notes }}

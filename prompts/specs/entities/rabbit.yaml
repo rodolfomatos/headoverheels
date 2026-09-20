@@ -1,0 +1,35 @@
+id: rabbit
+category: entity
+template: entity.j2
+entity_id: rabbit
+entity_name: "Cuddly Rabbit (Power-up)"
+description: |
+  Four types of power-up rabbits. Small, cute, hopping.
+  Types: Life (1UP), Shield (Invuln), Spring (Jump), Speed (Run).
+
+base_w: 32
+base_h: 32
+animations: ["hop", "collected"]
+frame_counts: {"hop": 4, "collected": 6}
+directions: 1
+
+animation_details:
+  - name: hop
+    frames: 4
+    loop: true
+    timing: "200ms/frame"
+  - name: collected
+    frames: 6
+    loop: false
+    timing: "100ms/frame, burst"
+
+naming_pattern: "entity_rabbit_{type}_{anim}_{frame:02d}.png"
+constraints: "transparent_bg, isometric_grid"
+palette_ref: "spectrum_plus"
+palette_override: |
+  Life Rabbit: #4CAF50 (green) + #FFD600 (gold)
+  Shield Rabbit: #2196F3 (blue) + #FFFFFF (white)
+  Spring Rabbit: #FF9800 (orange) + #FFD600 (gold)
+  Speed Rabbit: #F44336 (red) + #FFD600 (gold)
+
+reference_notes: "Based on TSX tile 160-175, manual page 7 rabbit types"

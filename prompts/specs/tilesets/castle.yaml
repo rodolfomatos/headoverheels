@@ -1,0 +1,121 @@
+id: castle
+category: tileset
+template: tileset.j2
+theme: castle
+theme_description: |
+  Medieval castle - stone walls, torches, banners, dungeons.
+  Cold, imposing, vertical architecture with gothic details.
+
+tileset_w: 1024
+tileset_h: 512
+categories: "floor, wall, conveyor, spring, switch, door, teleport, prop, stair, water, hush_puppy, fish, rabbit, crown, monster, guardian, key, bag, decal"
+
+tile_categories:
+  - name: "Floors"
+    id_range: "0-15"
+    count: 16
+    description: "Stone floor variations, cracks, wear patterns, moss"
+    animation_notes: "Static"
+  - name: "Walls"
+    id_range: "16-31"
+    count: 16
+    description: "Straight, corner, end-cap, crack variants, arrow slits"
+    animation_notes: "Static"
+  - name: "Conveyors"
+    id_range: "32-47"
+    count: 16
+    description: "4 directions × 4 frames animated belt"
+    animation_notes: "4-frame loop, belt movement texture"
+  - name: "Springs"
+    id_range: "48-55"
+    count: 8
+    description: "Compressed, extended, mid-compression"
+    animation_notes: "3-frame bounce when triggered"
+  - name: "Switches"
+    id_range: "56-63"
+    count: 8
+    description: "Off state (up), on state (down, glowing)"
+    animation_notes: "2-frame toggle, glow pulse when on"
+  - name: "Doors"
+    id_range: "64-71"
+    count: 8
+    description: "Locked (bars), unlocked (open), secret (hidden)"
+    animation_notes: "2-frame open/close"
+  - name: "Teleports"
+    id_range: "72-79"
+    count: 8
+    description: "Pad + particle swirl, inactive/active"
+    animation_notes: "4-frame particle swirl loop"
+  - name: "Props"
+    id_range: "80-95"
+    count: 16
+    description: "Crates, torches, banners, chains, skulls"
+    animation_notes: "Torch flicker 4-frame, banner sway 8-frame"
+  - name: "Stairs/Ladders"
+    id_range: "96-111"
+    count: 16
+    description: "Up/down variants, climbable indicators"
+    animation_notes: "Static"
+  - name: "Water/Lava Pits"
+    id_range: "112-127"
+    count: 16
+    description: "Animated water, deadly lava variants"
+    animation_notes: "8-frame water ripple, 4-frame lava bubble"
+  - name: "Hush Puppies"
+    id_range: "128-143"
+    count: 16
+    description: "Sleeping (zzz), teleporting (fade), awake (alert)"
+    animation_notes: "Sleep 8-frame, teleport 6-frame dissolve"
+  - name: "Fish"
+    id_range: "144-159"
+    count: 16
+    description: "Alive (swim), dead (float, bones), eaten (sparkle)"
+    animation_notes: "Alive 8-frame swim, dead static"
+  - name: "Rabbits"
+    id_range: "160-175"
+    count: 16
+    description: "4 types × 4 frames: life, shield, spring, speed"
+    animation_notes: "4-frame hop cycle, glow pulse"
+  - name: "Crowns/Items"
+    id_range: "176-191"
+    count: 16
+    description: "5 crowns + doughnut tray + bag + key + iron pill"
+    animation_notes: "Crown rotate 8-frame, items static"
+  - name: "Monsters"
+    id_range: "192-207"
+    count: 16
+    description: "Patrol walk 8-dir, freeze (blue), death"
+    animation_notes: "Walk 8-frame, freeze shimmer, death 4-frame"
+  - name: "Guardians"
+    id_range: "208-223"
+    count: 16
+    description: "Large, imposing, patrol, attack windup"
+    animation_notes: "Walk 8-frame, attack 6-frame"
+  - name: "Keys/Bags"
+    id_range: "224-239"
+    count: 16
+    description: "Various key designs, bag open/closed"
+    animation_notes: "Key sparkle, bag open/close 3-frame"
+  - name: "Decals/Overlays"
+    id_range: "240-255"
+    count: 16
+    description: "Blood splatter, cracks, moss, graffiti, arrows"
+    animation_notes: "Static overlays"
+
+naming_pattern: "tileset_castle_{id:03d}.png"
+theme_palette: "castle"
+palette_override: |
+  Stone Dark: #2D2D2D
+  Stone Mid: #4A4A4A
+  Stone Light: #757575
+  Mortar: #3E3E3E
+  Torch Orange: #FF6D00
+  Torch Yellow: #FFD600
+  Banner Red: #B71C1C
+  Iron Grey: #37474F
+  Moss Green: #2E7D32
+  Water Blue: #1565C0
+  Lava Red: #D32F2F
+  Gold: #FDD835
+
+reference_notes: "Based on castle.tsx (256 tiles), map1.jpg castle architecture, manual castle maps"

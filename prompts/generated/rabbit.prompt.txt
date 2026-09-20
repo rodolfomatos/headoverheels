@@ -1,0 +1,32 @@
+Generate entity sprite for **Cuddly Rabbit (Power-up)**.
+
+STYLE CONTEXT:
+- Original: ZX Spectrum 48K, 8-color palette, 2:1 dimetric isometric
+- Modern: "Spectrum+" 16-color palette, clean at 4× scale, no attribute clash
+- Lighting: Top-left (315°), subtle ambient occlusion on vertical faces
+- Legal: Inspired by Jon Ritman/Bernie Drummond's 1987 design — NOT a copy
+
+ENTITY: rabbit
+Four types of power-up rabbits. Small, cute, hopping.
+Types: Life (1UP), Shield (Invuln), Spring (Jump), Speed (Run).
+
+
+SPECS:
+- Base size: 32×32 px
+- Animations: ['hop', 'collected']
+- Frames per anim: {'hop': 4, 'collected': 6}
+- Directions: 1
+
+ANIMATION DETAILS:
+- hop: 4 frames, True, 200ms/frame
+- collected: 6 frames, False, 100ms/frame, burst
+
+TECHNICAL:
+- Output: PNG with alpha
+- Naming: entity_rabbit_{type}_{anim}_{frame:02d}.png
+- Variants: @1x, @2x, @4x
+- Constraints: transparent_bg, isometric_grid
+
+PALETTE: spectrum_plus
+
+REFERENCE: Based on TSX tile 160-175, manual page 7 rabbit types

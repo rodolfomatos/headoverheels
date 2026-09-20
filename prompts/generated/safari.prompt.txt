@@ -1,0 +1,43 @@
+Generate a complete isometric tileset for **safari** theme.
+
+STYLE CONTEXT:
+- Original: ZX Spectrum castle.tsx (256 tiles, 16×16 grid, 64×32 iso)
+- Modern: "Spectrum+" palette, clean at 4×, power-of-2 atlas packing
+- Lighting: Top-left (315°), subtle ambient occlusion on vertical faces, consistent across tiles
+
+THEME: safari
+Jungle safari - dense vegetation, wooden forts, traps, wildlife.
+Lush green, organic shapes, natural chaos.
+
+
+SPECS:
+- Tile size: 64×32 px (isometric)
+- Grid: 16×16 = 256 tiles
+- Source image: 1024×512 (power of 2)
+- Categories: floor, wall, conveyor, spring, switch, door, teleport, prop, stair, water, hush_puppy, fish, rabbit, crown, monster, guardian, key, bag, decal
+
+TILE BREAKDOWN:
+
+TECHNICAL:
+- Output: Single PNG 1024×512 + JSON manifest
+- Tile naming: tileset_safari_{id:03d}.png
+- Variants: @1x (64×32), @2x (128×64), @4x (256×128)
+- Packing: TexturePacker, max 2048×2048
+- Background: Transparent
+
+PALETTE: safari
+THEME PALETTE OVERRIDE:
+Jungle Dark: #1B5E20
+Jungle Mid: #2E7D32
+Jungle Light: #4CAF50
+Wood Dark: #3E2723
+Wood Mid: #5D4037
+Wood Light: #8D6E63
+Vine Green: #1B5E20
+Flower Red: #C62828
+Flower Yellow: #FDD835
+Water Blue: #0277BD
+Earth Brown: #4E342E
+
+
+REFERENCE: Based on map3.jpg jungle/fort architecture, manual Safari section

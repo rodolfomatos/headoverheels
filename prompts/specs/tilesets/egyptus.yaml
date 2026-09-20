@@ -1,0 +1,29 @@
+id: egyptus
+category: tileset
+template: tileset.j2
+theme: egyptus
+theme_description: |
+  Ancient Egypt - pyramids, sand, hieroglyphs, tombs.
+  Warm, golden, mystical with ancient mystery.
+
+tileset_w: 1024
+tileset_h: 512
+categories: "floor, wall, conveyor, spring, switch, door, teleport, prop, stair, water, hush_puppy, fish, rabbit, crown, monster, guardian, key, bag, decal"
+
+naming_pattern: "tileset_egyptus_{id:03d}.png"
+theme_palette: "egyptus"
+palette_override: |
+  Sand Dark: #4E342E
+  Sand Mid: #8D6E63
+  Sand Light: #D7CCC8
+  Stone Dark: #3E2723
+  Stone Mid: #5D4037
+  Stone Light: #8D6E63
+  Gold: #FDD835
+  Hieroglyph Blue: #1565C0
+  Hieroglyph Green: #2E7D32
+  Torch Orange: #FF6D00
+  Water Blue: #0277BD
+  Palm Green: #2E7D32
+
+reference_notes: "Based on map2.jpg pyramid architecture, manual Egyptus section"

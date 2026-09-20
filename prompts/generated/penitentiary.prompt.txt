@@ -1,0 +1,43 @@
+Generate a complete isometric tileset for **penitentiary** theme.
+
+STYLE CONTEXT:
+- Original: ZX Spectrum castle.tsx (256 tiles, 16×16 grid, 64×32 iso)
+- Modern: "Spectrum+" palette, clean at 4×, power-of-2 atlas packing
+- Lighting: Top-left (315°), subtle ambient occlusion on vertical faces, consistent across tiles
+
+THEME: penitentiary
+High-security prison - cold metal, concrete, bars, surveillance.
+Oppressive, grey, industrial with harsh lighting.
+
+
+SPECS:
+- Tile size: 64×32 px (isometric)
+- Grid: 16×16 = 256 tiles
+- Source image: 1024×512 (power of 2)
+- Categories: floor, wall, conveyor, spring, switch, door, teleport, prop, stair, water, hush_puppy, fish, rabbit, crown, monster, guardian, key, bag, decal
+
+TILE BREAKDOWN:
+
+TECHNICAL:
+- Output: Single PNG 1024×512 + JSON manifest
+- Tile naming: tileset_penitentiary_{id:03d}.png
+- Variants: @1x (64×32), @2x (128×64), @4x (256×128)
+- Packing: TexturePacker, max 2048×2048
+- Background: Transparent
+
+PALETTE: penitentiary
+THEME PALETTE OVERRIDE:
+Concrete Dark: #212121
+Concrete Mid: #424242
+Concrete Light: #616161
+Metal Dark: #263238
+Metal Mid: #37474F
+Metal Light: #546E7A
+Bar Grey: #455A64
+Warning Red: #C62828
+Warning Yellow: #F9A825
+Glass: #81D4FA
+Rust: #BF360C
+
+
+REFERENCE: Based on map3.jpg prison architecture, manual Penitentiary section

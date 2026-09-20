@@ -1,0 +1,28 @@
+id: penitentiary
+category: tileset
+template: tileset.j2
+theme: penitentiary
+theme_description: |
+  High-security prison - cold metal, concrete, bars, surveillance.
+  Oppressive, grey, industrial with harsh lighting.
+
+tileset_w: 1024
+tileset_h: 512
+categories: "floor, wall, conveyor, spring, switch, door, teleport, prop, stair, water, hush_puppy, fish, rabbit, crown, monster, guardian, key, bag, decal"
+
+naming_pattern: "tileset_penitentiary_{id:03d}.png"
+theme_palette: "penitentiary"
+palette_override: |
+  Concrete Dark: #212121
+  Concrete Mid: #424242
+  Concrete Light: #616161
+  Metal Dark: #263238
+  Metal Mid: #37474F
+  Metal Light: #546E7A
+  Bar Grey: #455A64
+  Warning Red: #C62828
+  Warning Yellow: #F9A825
+  Glass: #81D4FA
+  Rust: #BF360C
+
+reference_notes: "Based on map3.jpg prison architecture, manual Penitentiary section"

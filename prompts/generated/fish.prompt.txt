@@ -1,0 +1,33 @@
+Generate entity sprite for **Reincarnation Fish**.
+
+STYLE CONTEXT:
+- Original: ZX Spectrum 48K, 8-color palette, 2:1 dimetric isometric
+- Modern: "Spectrum+" 16-color palette, clean at 4× scale, no attribute clash
+- Lighting: Top-left (315°), subtle ambient occlusion on vertical faces
+- Legal: Inspired by Jon Ritman/Bernie Drummond's 1987 design — NOT a copy
+
+ENTITY: fish
+Checkpoint creature - alive = save point, dead = poison.
+Alive: swimming, glowing, friendly. Dead: floating, bones, toxic.
+
+
+SPECS:
+- Base size: 64×32 px
+- Animations: ['alive', 'dead', 'eaten']
+- Frames per anim: {'alive': 8, 'dead': 1, 'eaten': 6}
+- Directions: 1
+
+ANIMATION DETAILS:
+- alive: 8 frames, True, 100ms/frame
+- dead: 1 frames, False, static
+- eaten: 6 frames, False, 150ms/frame, sparkle burst
+
+TECHNICAL:
+- Output: PNG with alpha
+- Naming: entity_fish_{anim}_{frame:02d}.png
+- Variants: @1x, @2x, @4x
+- Constraints: transparent_bg, isometric_grid
+
+PALETTE: spectrum_plus
+
+REFERENCE: Based on TSX tile 72-73, manual page 8 fish illustration

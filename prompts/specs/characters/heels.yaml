@@ -1,0 +1,56 @@
+id: heels
+category: character
+template: character.j2
+name: "Heels"
+character_id: heels
+description: |
+  Footus Underium - arms disappeared, powerful legs.
+  Energetic, fast, practical. No arms, oversized feet/legs, confident posture.
+  Colors: Orange/red body (Spectrum bright red), yellow accents.
+
+frame_width: 48
+frame_height: 56
+directions: 8
+dir_list: "N, NE, E, SE, S, SW, W, NW"
+animations: ["idle", "walk", "run", "jump", "carry", "combined"]
+frame_counts: {"idle": 4, "walk": 8, "run": 8, "jump": 4, "carry": 4, "combined": 6}
+canvas_grid: "8×4"
+total_w: 384
+total_h: 224
+
+animation_details:
+  - name: idle
+    frames: 4
+    timing: "200ms/frame, subtle bounce"
+    notes: "leg stretch, confident stance"
+  - name: walk
+    frames: 8
+    timing: "100ms/frame"
+    notes: "smooth 8-dir, powerful leg drive"
+  - name: run
+    frames: 8
+    timing: "75ms/frame"
+    notes: "faster cycle, motion blur legs"
+  - name: jump
+    frames: 4
+    timing: "150ms/frame, lower arc"
+    notes: "crouch, launch, peak, landing"
+  - name: carry
+    frames: 4
+    timing: "200ms/frame"
+    notes: "bag/item held, balanced walk"
+  - name: combined
+    frames: 6
+    timing: "200ms/frame"
+    notes: "Heels carries Head, shared anim"
+
+naming_pattern: "character_heels_{dir}_{frame:02d}.png"
+constraints: "transparent_bg, isometric_grid, loopable_walk"
+palette_ref: "spectrum_plus"
+palette_override: |
+  Primary: #E53935 (orange-red body)
+  Accent: #FDD835 (yellow accents)
+  Outline: #B71C1C (dark red)
+  Highlight: #EF9A9A (light red)
+
+reference_notes: "Based on map1.jpg castle entrance character, manual page 3 illustration"

@@ -1,0 +1,43 @@
+Generate a complete isometric tileset for **moonbase** theme.
+
+STYLE CONTEXT:
+- Original: ZX Spectrum castle.tsx (256 tiles, 16×16 grid, 64×32 iso)
+- Modern: "Spectrum+" palette, clean at 4×, power-of-2 atlas packing
+- Lighting: Top-left (315°), subtle ambient occlusion on vertical faces, consistent across tiles
+
+THEME: moonbase
+Lunar base - sterile metal, glowing panels, low gravity aesthetic.
+Cold blue/grey, high-tech, modular, clean lines.
+
+
+SPECS:
+- Tile size: 64×32 px (isometric)
+- Grid: 16×16 = 256 tiles
+- Source image: 1024×512 (power of 2)
+- Categories: floor, wall, conveyor, spring, switch, door, teleport, prop, stair, water, hush_puppy, fish, rabbit, crown, monster, guardian, key, bag, decal
+
+TILE BREAKDOWN:
+
+TECHNICAL:
+- Output: Single PNG 1024×512 + JSON manifest
+- Tile naming: tileset_moonbase_{id:03d}.png
+- Variants: @1x (64×32), @2x (128×64), @4x (256×128)
+- Packing: TexturePacker, max 2048×2048
+- Background: Transparent
+
+PALETTE: moonbase
+THEME PALETTE OVERRIDE:
+Metal Dark: #263238
+Metal Mid: #37474F
+Metal Light: #546E7A
+Panel Blue: #1565C0
+Panel Cyan: #00BCD4
+Panel White: #ECEFF1
+Glow Cyan: #00BCD4
+Glow Blue: #2979FF
+Warning Red: #D32F2F
+Regolith Grey: #78909C
+Glass: #81D4FA
+
+
+REFERENCE: Based on map2.jpg moonbase architecture, manual Moonbase section

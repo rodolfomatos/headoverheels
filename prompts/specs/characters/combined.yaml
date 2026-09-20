@@ -1,0 +1,57 @@
+id: combined
+category: character
+template: character.j2
+name: "Combined (Head on Heels)"
+character_id: combined
+description: |
+  Head riding on Heels' shoulders - the ultimate form.
+  Head's upper body visible, Heels' legs carrying both.
+  Merged abilities: high jump + fast walk + fire + carry.
+  Colors: Merged green/orange palette, distinct but unified.
+
+frame_width: 56
+frame_height: 64
+directions: 8
+dir_list: "N, NE, E, SE, S, SW, W, NW"
+animations: ["idle", "walk", "run", "jump", "fire", "carry"]
+frame_counts: {"idle": 4, "walk": 8, "run": 8, "jump": 4, "fire": 3, "carry": 4}
+canvas_grid: "8×4"
+total_w: 448
+total_h: 256
+
+animation_details:
+  - name: idle
+    frames: 4
+    timing: "200ms/frame, subtle synergy"
+    notes: "Head looks around, Heels shifts weight"
+  - name: walk
+    frames: 8
+    timing: "100ms/frame"
+    notes: "smooth 8-dir, Head sways slightly"
+  - name: run
+    frames: 8
+    timing: "75ms/frame"
+    notes: "faster, Head leans forward"
+  - name: jump
+    frames: 4
+    timing: "150ms/frame, highest arc"
+    notes: "full combined height, wings spread"
+  - name: fire
+    frames: 3
+    timing: "100ms/frame"
+    notes: "Head throws, Heels braces"
+  - name: carry
+    frames: 4
+    timing: "200ms/frame"
+    notes: "Heels carries bag, Head guides"
+
+naming_pattern: "character_combined_{dir}_{frame:02d}.png"
+constraints: "transparent_bg, isometric_grid, loopable_walk"
+palette_ref: "spectrum_plus"
+palette_override: |
+  Primary: #43A047 / #E53935 (merged green/orange)
+  Accent: #FDD835 (yellow)
+  Outline: #1B5E20 / #B71C1C
+  Highlight: #81C784 / #EF9A9A
+
+reference_notes: "Based on manual page 5 combined mode illustration"

@@ -1,0 +1,98 @@
+Generate a complete isometric tileset for **castle** theme.
+
+STYLE CONTEXT:
+- Original: ZX Spectrum castle.tsx (256 tiles, 16×16 grid, 64×32 iso)
+- Modern: "Spectrum+" palette, clean at 4×, power-of-2 atlas packing
+- Lighting: Top-left (315°), subtle ambient occlusion on vertical faces, consistent across tiles
+
+THEME: castle
+Medieval castle - stone walls, torches, banners, dungeons.
+Cold, imposing, vertical architecture with gothic details.
+
+
+SPECS:
+- Tile size: 64×32 px (isometric)
+- Grid: 16×16 = 256 tiles
+- Source image: 1024×512 (power of 2)
+- Categories: floor, wall, conveyor, spring, switch, door, teleport, prop, stair, water, hush_puppy, fish, rabbit, crown, monster, guardian, key, bag, decal
+
+TILE BREAKDOWN:
+- Floors (IDs 0-15): 16 tiles
+  Stone floor variations, cracks, wear patterns, moss
+  Static
+- Walls (IDs 16-31): 16 tiles
+  Straight, corner, end-cap, crack variants, arrow slits
+  Static
+- Conveyors (IDs 32-47): 16 tiles
+  4 directions × 4 frames animated belt
+  4-frame loop, belt movement texture
+- Springs (IDs 48-55): 8 tiles
+  Compressed, extended, mid-compression
+  3-frame bounce when triggered
+- Switches (IDs 56-63): 8 tiles
+  Off state (up), on state (down, glowing)
+  2-frame toggle, glow pulse when on
+- Doors (IDs 64-71): 8 tiles
+  Locked (bars), unlocked (open), secret (hidden)
+  2-frame open/close
+- Teleports (IDs 72-79): 8 tiles
+  Pad + particle swirl, inactive/active
+  4-frame particle swirl loop
+- Props (IDs 80-95): 16 tiles
+  Crates, torches, banners, chains, skulls
+  Torch flicker 4-frame, banner sway 8-frame
+- Stairs/Ladders (IDs 96-111): 16 tiles
+  Up/down variants, climbable indicators
+  Static
+- Water/Lava Pits (IDs 112-127): 16 tiles
+  Animated water, deadly lava variants
+  8-frame water ripple, 4-frame lava bubble
+- Hush Puppies (IDs 128-143): 16 tiles
+  Sleeping (zzz), teleporting (fade), awake (alert)
+  Sleep 8-frame, teleport 6-frame dissolve
+- Fish (IDs 144-159): 16 tiles
+  Alive (swim), dead (float, bones), eaten (sparkle)
+  Alive 8-frame swim, dead static
+- Rabbits (IDs 160-175): 16 tiles
+  4 types × 4 frames: life, shield, spring, speed
+  4-frame hop cycle, glow pulse
+- Crowns/Items (IDs 176-191): 16 tiles
+  5 crowns + doughnut tray + bag + key + iron pill
+  Crown rotate 8-frame, items static
+- Monsters (IDs 192-207): 16 tiles
+  Patrol walk 8-dir, freeze (blue), death
+  Walk 8-frame, freeze shimmer, death 4-frame
+- Guardians (IDs 208-223): 16 tiles
+  Large, imposing, patrol, attack windup
+  Walk 8-frame, attack 6-frame
+- Keys/Bags (IDs 224-239): 16 tiles
+  Various key designs, bag open/closed
+  Key sparkle, bag open/close 3-frame
+- Decals/Overlays (IDs 240-255): 16 tiles
+  Blood splatter, cracks, moss, graffiti, arrows
+  Static overlays
+
+TECHNICAL:
+- Output: Single PNG 1024×512 + JSON manifest
+- Tile naming: tileset_castle_{id:03d}.png
+- Variants: @1x (64×32), @2x (128×64), @4x (256×128)
+- Packing: TexturePacker, max 2048×2048
+- Background: Transparent
+
+PALETTE: castle
+THEME PALETTE OVERRIDE:
+Stone Dark: #2D2D2D
+Stone Mid: #4A4A4A
+Stone Light: #757575
+Mortar: #3E3E3E
+Torch Orange: #FF6D00
+Torch Yellow: #FFD600
+Banner Red: #B71C1C
+Iron Grey: #37474F
+Moss Green: #2E7D32
+Water Blue: #1565C0
+Lava Red: #D32F2F
+Gold: #FDD835
+
+
+REFERENCE: Based on castle.tsx (256 tiles), map1.jpg castle architecture, manual castle maps

@@ -1,0 +1,46 @@
+Generate a character sprite sheet for **Combined (Head on Heels)** from "Head over Heels" reimagining.
+
+STYLE CONTEXT:
+- Original: ZX Spectrum 48K, 8-color palette, 2:1 dimetric isometric
+- Modern: "Spectrum+" 16-color palette, clean at 4× scale, no attribute clash
+- Lighting: Top-left (315°), subtle ambient occlusion on vertical faces
+- Legal: Inspired by Jon Ritman/Bernie Drummond's 1987 design — NOT a copy
+
+CHARACTER: combined
+Head riding on Heels' shoulders - the ultimate form.
+Head's upper body visible, Heels' legs carrying both.
+Merged abilities: high jump + fast walk + fire + carry.
+Colors: Merged green/orange palette, distinct but unified.
+
+
+SPECS:
+- Frame size: 56×64 px
+- Directions: 8 (N, NE, E, SE, S, SW, W, NW)
+- Animations: ['idle', 'walk', 'run', 'jump', 'fire', 'carry']
+- Frame counts: {'idle': 4, 'walk': 8, 'run': 8, 'jump': 4, 'fire': 3, 'carry': 4}
+- Canvas layout: 8×4 (448×256)
+
+ANIMATION DETAILS:
+- idle: 4 frames, 200ms/frame, subtle synergy, Head looks around, Heels shifts weight
+- walk: 8 frames, 100ms/frame, smooth 8-dir, Head sways slightly
+- run: 8 frames, 75ms/frame, faster, Head leans forward
+- jump: 4 frames, 150ms/frame, highest arc, full combined height, wings spread
+- fire: 3 frames, 100ms/frame, Head throws, Heels braces
+- carry: 4 frames, 200ms/frame, Heels carries bag, Head guides
+
+TECHNICAL:
+- Output: PNG with alpha, power-of-2 texture preferred
+- Naming: character_combined_{dir}_{frame:02d}.png
+- Variants: @1x, @2x, @4x for Flutter
+- Background: Transparent
+- Constraints: transparent_bg, isometric_grid, loopable_walk
+
+PALETTE: spectrum_plus
+OVERRIDE PALETTE:
+Primary: #43A047 / #E53935 (merged green/orange)
+Accent: #FDD835 (yellow)
+Outline: #1B5E20 / #B71C1C
+Highlight: #81C784 / #EF9A9A
+
+
+REFERENCE: Based on manual page 5 combined mode illustration

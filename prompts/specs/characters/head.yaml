@@ -1,0 +1,56 @@
+id: head
+category: character
+template: character.j2
+name: "Head"
+character_id: head
+description: |
+  Headus Mouthion - descended from flying reptile, rudimentary wings.
+  Proud, curious, vulnerable alone. Rounded head, small wings, expressive eyes.
+  Colors: Green body (Spectrum bright green), yellow wings.
+
+frame_width: 48
+frame_height: 48
+directions: 8
+dir_list: "N, NE, E, SE, S, SW, W, NW"
+animations: ["idle", "walk", "jump", "climb", "fire", "combined"]
+frame_counts: {"idle": 4, "walk": 8, "jump": 4, "climb": 4, "fire": 3, "combined": 6}
+canvas_grid: "8×4"
+total_w: 384
+total_h: 192
+
+animation_details:
+  - name: idle
+    frames: 4
+    timing: "200ms/frame, subtle breathing"
+    notes: "subtle wing flutter, eye blink"
+  - name: walk
+    frames: 8
+    timing: "100ms/frame"
+    notes: "smooth 8-dir, wing-assisted steps"
+  - name: jump
+    frames: 4
+    timing: "150ms/frame, parabolic arc"
+    notes: "rising, peak, falling, landing"
+  - name: climb
+    frames: 4
+    timing: "200ms/frame"
+    notes: "wing-assisted ladder climb"
+  - name: fire
+    frames: 3
+    timing: "100ms/frame"
+    notes: "doughnut throw, recoil"
+  - name: combined
+    frames: 6
+    timing: "200ms/frame"
+    notes: "Head on Heels shoulders, shared anim"
+
+naming_pattern: "character_head_{dir}_{frame:02d}.png"
+constraints: "transparent_bg, isometric_grid, loopable_walk"
+palette_ref: "spectrum_plus"
+palette_override: |
+  Primary: #43A047 (green body)
+  Accent: #FDD835 (yellow wings)
+  Outline: #1B5E20 (dark green)
+  Highlight: #81C784 (light green)
+
+reference_notes: "Based on map1.jpg castle entrance character, manual page 3 illustration"

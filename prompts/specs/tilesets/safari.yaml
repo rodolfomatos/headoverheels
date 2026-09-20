@@ -1,0 +1,28 @@
+id: safari
+category: tileset
+template: tileset.j2
+theme: safari
+theme_description: |
+  Jungle safari - dense vegetation, wooden forts, traps, wildlife.
+  Lush green, organic shapes, natural chaos.
+
+tileset_w: 1024
+tileset_h: 512
+categories: "floor, wall, conveyor, spring, switch, door, teleport, prop, stair, water, hush_puppy, fish, rabbit, crown, monster, guardian, key, bag, decal"
+
+naming_pattern: "tileset_safari_{id:03d}.png"
+theme_palette: "safari"
+palette_override: |
+  Jungle Dark: #1B5E20
+  Jungle Mid: #2E7D32
+  Jungle Light: #4CAF50
+  Wood Dark: #3E2723
+  Wood Mid: #5D4037
+  Wood Light: #8D6E63
+  Vine Green: #1B5E20
+  Flower Red: #C62828
+  Flower Yellow: #FDD835
+  Water Blue: #0277BD
+  Earth Brown: #4E342E
+
+reference_notes: "Based on map3.jpg jungle/fort architecture, manual Safari section"

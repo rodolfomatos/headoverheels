@@ -135,7 +135,11 @@ def main():
     
     errors = []
     for img_file in input_dir.rglob("*.png"):
-        errs = validate_tile(img_file, "")
+        # Skip master tileset images (full tileset images, not individual tile sprites)
+        # Master tileset images are typically named like tileset_*.png, castle.png, egyptus.png, etc.
+        if img_file.stem.startswith("tileset_") or img_file.stem in ["castle", "egyptus", "penitentiary", "safari", "bookworld", "moonbase"]:
+            continue
+        errs = validate_tile(img_file, theme)
         if errs:
             for err in errs:
                 print(f"❌ {img_file.name}: {err}")

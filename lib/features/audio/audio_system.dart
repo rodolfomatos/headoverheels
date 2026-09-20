@@ -1,5 +1,6 @@
 // Audio system for Head over Heels.
 
+import 'package:flutter/foundation.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -48,9 +49,9 @@ class AudioSystem {
   double _sfxVolume = 0.8;
   String? _currentMusic;
 
-  /// Initialize audio system - preload all assets.
+  /// Initialize audio system - preload all assets gracefully.
   Future<void> initialize() async {
-    await FlameAudio.audioCache.loadAll([
+    const assets = [
       _musicMainMenu, _musicCastle, _musicEgyptus, _musicPenitentiary,
       _musicSafari, _musicBookworld, _musicBoss, _musicGameOver,
       _sfxJump, _sfxLand, _sfxPickup, _sfxSwitch, _sfxDoor, _sfxTeleport,
@@ -58,7 +59,16 @@ class AudioSystem {
       _sfxPlayerHit, _sfxPlayerDeath, _sfxFishEat, _sfxFishPoison,
       _sfxCrown, _sfxBag, _sfxHushPuppy, _sfxSwop, _sfxPause,
       _sfxMenuSelect, _sfxMenuNavigate,
-    ]);
+    ];
+    
+    for (final asset in assets) {
+      try {
+        await FlameAudio.audioCache.load(asset);
+      } catch (e) {
+        // Log but don't crash - audio is optional
+        debugPrint('Audio asset not found (non-fatal): $asset - $e');
+      }
+    }
   }
 
   /// Play background music for a specific planet/theme.
@@ -92,7 +102,11 @@ class AudioSystem {
     if (_currentMusic == musicFile) return;
     _currentMusic = musicFile;
 
-    FlameAudio.bgm.play(musicFile, volume: (volume ?? _musicVolume));
+    try {
+      FlameAudio.bgm.play(musicFile, volume: (volume ?? _musicVolume));
+    } catch (e) {
+      debugPrint('Failed to play music $musicFile: $e');
+    }
   }
 
   /// Stop background music.
@@ -114,7 +128,11 @@ class AudioSystem {
   /// Play a sound effect.
   void playSfx(String sfxFile, {double? volume}) {
     if (!_sfxEnabled) return;
-    FlameAudio.play(sfxFile, volume: (volume ?? _sfxVolume));
+    try {
+      FlameAudio.play(sfxFile, volume: (volume ?? _sfxVolume));
+    } catch (e) {
+      debugPrint('Failed to play SFX $sfxFile: $e');
+    }
   }
 
   // Convenience methods for common sound effects

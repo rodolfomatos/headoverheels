@@ -16,7 +16,7 @@ dependencies:
   # Game engine for Flutter - provides game loop, components, input handling
   flame: ^1.17.0
   flame_tiled: ^1.0.0
-  flame_audio: ^1.0.0
+  flame_audio: ^2.12.0
 
   # State management - compile-safe, testable, scoped providers
   flutter_riverpod: ^2.5.1
@@ -28,7 +28,7 @@ dependencies:
   json_annotation: ^4.9.0
 
   # Audio playback
-  just_audio: ^0.9.36
+  just_audio: ^0.10.0
 
   # Vector math for isometric calculations
   vector_math: ^2.1.0

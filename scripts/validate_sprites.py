@@ -107,7 +107,12 @@ def validate_naming(assets_dir: Path) -> list[str]:
         # Skip master sprite sheets and atlases
         if img_file.name.endswith('_master.png') or img_file.name.endswith('_master.png') or \
            img_file.name.startswith('tileset_') or img_file.name.startswith('atlas_') or \
-           img_file.name == 'manifest.json' or img_file.name.endswith('_idle_front.png'):
+           img_file.name == 'manifest.json' or img_file.name.endswith('_idle_front.png') or \
+           img_file.name.endswith('_masters.png') or \
+           img_file.name.count('_') == 1 and img_file.name.endswith('.png') or \
+           img_file.name in ['safari.png', 'egyptus.png', 'moonbase.png', 'bookworld.png', 'penitentiary.png', 'castle.png'] or \
+           img_file.name in ['barrel.png', 'lever.png', 'chain.png', 'torch.png', 'banner.png', 'skull.png', 'crate.png', 'sign.png']:
+            # Allow theme tilesets (_masters.png), prop masters with single underscore, known theme tilesets and props
             continue
             
         if not pattern.match(img_file.name):

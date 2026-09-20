@@ -3,6 +3,8 @@
 import 'package:flame/components.dart';
 import 'package:flame/collisions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:headoverheels/core/assets/sprite_registry.dart';
+import 'package:headoverheels/core/assets/visual_state_resolver.dart';
 import 'package:headoverheels/core/isometric.dart';
 import 'package:headoverheels/entities/character_state.dart';
 import 'package:headoverheels/features/gameplay/state/character_notifier.dart';
@@ -31,9 +33,12 @@ class CharacterComponent extends PositionComponent with CollisionCallbacks {
     // Add hitbox for collision
     add(RectangleHitbox()..collisionType = CollisionType.passive);
 
-    // Placeholder: colored rectangle
+    // Initialize sprite animation component with real sprites from registry
     _animation = SpriteAnimationComponent(size: size, anchor: Anchor.center);
     add(_animation);
+
+    // Initialize sprite registry and load animations
+    await SpriteRegistry().initialize();
 
     // Listen to state changes via Riverpod's ref.listen
     final provider = type == CharacterType.head ? headProvider : heelsProvider;
@@ -54,6 +59,23 @@ class CharacterComponent extends PositionComponent with CollisionCallbacks {
   void _syncFromState(CharacterState state) {
     // Convert grid position to screen
     position = IsometricCoordinates.gridToScreen(state.position);
+
+    // Resolve the correct animation asset ID based on state
+    final assetId = VisualStateResolver.resolveCharacterAssetId(
+      characterType: state.type,
+      animation: state.animation,
+      facing: state.facing,
+      isCombined: state.type == CharacterType.combined,
+    );
+
+    // Load and set the correct animation
+    final animation = SpriteRegistry().getCharacterAnimation(assetId);
+    if (animation != null) {
+      _animation.animation = animation;
+    }
+
+    // Update facing direction if needed (for sprite sheet row selection)
+    // The sprite sheet row is determined by FacingDirection.spriteRow
   }
 
   /// Get the grid position of this character.

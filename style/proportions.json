@@ -1,0 +1,77 @@
+{
+  "description": "Proportional standards for Head over Heels sprites",
+  "version": "1.0",
+  "character_proportions": {
+    "head": {
+      "total_height": 48,
+      "head_height": 28,
+      "head_width": 28,
+      "body_height": 20,
+      "body_width": 24,
+      "wing_span": 16,
+      "eye_size": 6,
+      "eye_offset_y": 10,
+      "wing_offset_y": 8,
+      "anchor": { "x": 24, "y": 43 },
+      "silhouette_ratio": 0.75
+    },
+    "heels": {
+      "total_height": 56,
+      "head_height": 20,
+      "head_width": 28,
+      "body_height": 36,
+      "body_width": 28,
+      "leg_height": 28,
+      "boot_height": 12,
+      "eye_size": 6,
+      "eye_offset_y": 6,
+      "anchor": { "x": 24, "y": 51 },
+      "silhouette_ratio": 0.85
+    },
+    "combined": {
+      "total_height": 64,
+      "head_height": 28,
+      "head_width": 28,
+      "heels_height": 56,
+      "heels_width": 48,
+      "head_offset_y": -8,
+      "anchor": { "x": 28, "y": 59 },
+      "silhouette_ratio": 0.95
+    }
+  },
+  "entity_proportions": {
+    "fish": { "width": 64, "height": 32, "body_ratio": 0.7 },
+    "rabbit": { "width": 32, "height": 32, "ear_height": 12 },
+    "crown": { "width": 32, "height": 32, "gem_size": 8 },
+    "spring": { "width": 48, "height": 48, "compressed_ratio": 0.4 },
+    "switch": { "width": 48, "height": 48, "lever_height": 24 },
+    "conveyor": { "width": 64, "height": 32, "tile_count": 2 },
+    "teleport": { "width": 64, "height": 64, "effect_radius": 24 },
+    "door": { "width": 64, "height": 64, "frame_width": 8 },
+    "monster": { "width": 64, "height": 64 },
+    "guardian": { "width": 96, "height": 96 },
+    "hush_puppy": { "width": 48, "height": 48 },
+    "bag": { "width": 32, "height": 32 },
+    "key": { "width": 24, "height": 24 },
+    "doughnut": { "width": 16, "height": 16 }
+  },
+  "tile_proportions": {
+    "floor": { "variation": "subtle", "seamless": true },
+    "wall": { "height": 32, "top_bevel": 4 },
+    "wall_corner": { "radius": 8 },
+    "stairs": { "step_height": 8, "step_depth": 16 },
+    "ladder": { "rung_spacing": 8, "width": 16 },
+    "conveyor": { "animation_frames": 4, "speed_indicator": true }
+  },
+  "scaling": {
+    "base": 1,
+    "supported": [1, 2, 4],
+    "method": "nearest_neighbor"
+  },
+  "validation": {
+    "baseline_tolerance": 1,
+    "anchor_tolerance": 1,
+    "scale_tolerance": 1,
+    "silhouette_stability": 0.95
+  }
+}

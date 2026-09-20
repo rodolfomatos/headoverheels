@@ -1,0 +1,74 @@
+{
+  "description": "Geometry standards for Head over Heels sprite system",
+  "version": "1.0",
+  "projection": {
+    "type": "dimetric_2_1",
+    "description": "2:1 dimetric isometric projection",
+    "tile_width": 64,
+    "tile_height": 32,
+    "iso_angle_degrees": 26.565,
+    "iso_angle_radians": 0.463648,
+    "grid_snap": true,
+    "snap_tolerance": 1
+  },
+  "tile_geometry": {
+    "logical_width": 64,
+    "logical_height": 32,
+    "diamond_points": [
+      [32, 0],
+      [64, 16],
+      [32, 32],
+      [0, 16]
+    ],
+    "collision_box": {
+      "width": 64,
+      "height": 32,
+      "offset_x": 0,
+      "offset_y": 0
+    }
+  },
+  "character_geometry": {
+    "head": {
+      "width": 48,
+      "height": 48,
+      "anchor": { "x": 24, "y": 43 },
+      "bounding_box": { "x": 0, "y": 0, "width": 48, "height": 48 }
+    },
+    "heels": {
+      "width": 48,
+      "height": 56,
+      "anchor": { "x": 24, "y": 51 },
+      "bounding_box": { "x": 0, "y": 0, "width": 48, "height": 56 }
+    },
+    "combined": {
+      "width": 56,
+      "height": 64,
+      "anchor": { "x": 28, "y": 59 },
+      "bounding_box": { "x": 0, "y": 0, "width": 56, "height": 64 },
+      "head_offset": { "x": 0, "y": -8 },
+      "heels_offset": { "x": 0, "y": 0 }
+    }
+  },
+  "entity_geometry": {
+    "small": { "width": 32, "height": 32, "anchor": { "x": 16, "y": 16 } },
+    "medium": { "width": 48, "height": 48, "anchor": { "x": 24, "y": 24 } },
+    "large": { "width": 64, "height": 64, "anchor": { "x": 32, "y": 32 } }
+  },
+  "ui_geometry": {
+    "icon_small": 24,
+    "icon_medium": 32,
+    "icon_large": 48,
+    "hud_element": 32
+  },
+  "scaling": {
+    "base_resolution": 1,
+    "supported_scales": [1, 2, 4],
+    "scaling_method": "nearest_neighbor",
+    "master_resolution": 1
+  },
+  "enforcement": {
+    "check_on_import": true,
+    "tolerance_pixels": 1,
+    "check_tool": "scripts/validate_sprites.py"
+  }
+}

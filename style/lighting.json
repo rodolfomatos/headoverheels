@@ -1,0 +1,46 @@
+{
+  "description": "Global lighting rules for Head over Heels sprite system",
+  "version": "1.0",
+  "light_source": {
+    "position": "top_left",
+    "angle_degrees": 315,
+    "angle_radians": -0.785398,
+    "elevation": 45
+  },
+  "rules": {
+    "highlights": {
+      "faces": ["top", "left"],
+      "intensity": "strong",
+      "color_shift": "toward_white"
+    },
+    "shadows": {
+      "faces": ["bottom", "right"],
+      "intensity": "medium",
+      "color_shift": "toward_black",
+      "ambient_occlusion": {
+        "enabled": true,
+        "strength": "subtle",
+        "locations": ["corners", "contact_points", "overhangs"]
+      }
+    },
+    "ground_contact": {
+      "shadow_enabled": true,
+      "shadow_blur": 2,
+      "shadow_opacity": 0.3,
+      "shadow_offset": [2, 2]
+    }
+  },
+  "per_theme_overrides": {
+    "castle": { "ambient_temperature": "cool" },
+    "egyptus": { "ambient_temperature": "warm" },
+    "penitentiary": { "ambient_temperature": "cool", "harshness": "high" },
+    "safari": { "ambient_temperature": "warm", "dappled_light": true },
+    "bookworld": { "ambient_temperature": "neutral", "soft_shadows": true },
+    "moonbase": { "ambient_temperature": "cool", "glow_effects": true }
+  },
+  "enforcement": {
+    "check_on_import": true,
+    "max_deviation_degrees": 15,
+    "check_tool": "scripts/validate_lighting.py"
+  }
+}

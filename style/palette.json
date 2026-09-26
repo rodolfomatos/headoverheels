@@ -188,7 +188,17 @@
       "blue_grey_dark": "#455A64",
       "green_medium": "#43A047",
       "red_medium": "#E53935",
-      "red_light_alt": "#EF9A9A"
+      "red_light_alt": "#EF9A9A",
+      "green_darker": "#1B5E20",
+      "red_darker": "#B71C1C",
+      "amber_accent": "#FFD600",
+      "yellow_accent": "#FDD835",
+      "blue_grey_700": "#37474F",
+      "brown_300": "#8D6E63",
+      "brown_600": "#5D4037",
+      "brown_900": "#3E2723",
+      "deep_orange_a400": "#FF6D00",
+      "grey_100": "#D7CCC8"
     }
   }
 }

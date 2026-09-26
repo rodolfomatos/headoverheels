@@ -2,7 +2,7 @@
 project: headoverheels
 created: 2026-09-18
 current_sprint: sprint-08
-current_ticket: "T023"
+current_ticket: "T020"
 ---
 
 # Kanban — headoverheels

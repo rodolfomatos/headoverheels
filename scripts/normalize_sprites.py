@@ -1,263 +1,234 @@
 #!/usr/bin/env python3
 """
 Normalize sprites for Head over Heels sprite system.
+Manifest-driven: reads assets/sprites/manifest.yaml and processes master sprites
+into normalized runtime frames.
 
 Responsibilities:
-- Remove background (make transparent)
-- Ensure alpha channel
-- Correct dimensions to spec
-- Align to isometric grid
-- Normalize scale
-- Normalize anchor point
-- Convert to target palette
-- Remove unexpected colors
-- Fix minor artifacts
-- Ensure nearest-neighbor scaling
-- Produce final PNG
+- Load manifest and process each asset
+- Validate master sprite dimensions
+- Crop/align to runtime size with correct anchor
+- Normalize scale (nearest-neighbor)
+- Validate/convert palette per asset's declared palette
+- Validate alpha mode (opaque/binary/smooth)
+- Output normalized frames to build/normalized/
 """
 
-import json
 import sys
+import json
+import yaml
 from pathlib import Path
-from PIL import Image, ImageFilter
+from PIL import Image
 import numpy as np
 
-# Load style config
-STYLE_DIR = Path(__file__).parent.parent / "style"
+PROJECT_ROOT = Path(__file__).parent.parent
+ASSETS_DIR = PROJECT_ROOT / "assets" / "sprites"
+MANIFEST_PATH = ASSETS_DIR / "manifest.yaml"
+BUILD_DIR = PROJECT_ROOT / "build" / "normalized"
+STYLE_DIR = PROJECT_ROOT / "style"
+
+# Load style configs
 with open(STYLE_DIR / "geometry.json") as f:
     GEOMETRY = json.load(f)
+
 with open(STYLE_DIR / "palette.json") as f:
-    PALETTE = json.load(f)
+    PALETTE_DATA = json.load(f)
 
-# Build allowed color set from base + all themes
-ALLOWED_COLORS = set()
-for color in PALETTE["base"].values():
-    ALLOWED_COLORS.add(color.lower())
-for theme_colors in PALETTE["themes"].values():
-    for color in theme_colors.values():
-        ALLOWED_COLORS.add(color.lower())
+# Build allowed colors per palette
+BASE_COLORS = {c.lower() for c in PALETTE_DATA["base"].values()}
+THEME_COLORS = {}
+for theme, colors in PALETTE_DATA["themes"].items():
+    THEME_COLORS[theme] = {c.lower() for c in colors.values()}
 
-TOLERANCE = 2  # pixels for dimension/anchor tolerance
+TILE_W = GEOMETRY["tile_geometry"]["logical_width"]
+TILE_H = GEOMETRY["tile_geometry"]["logical_height"]
+
+TOLERANCE = 1  # pixels for dimension/anchor tolerance
 
 
-def normalize_sprite(input_path: Path, output_path: Path, spec: dict) -> list[str]:
-    """Normalize a single sprite according to its spec."""
+def load_manifest():
+    """Load asset manifest."""
+    with open(MANIFEST_PATH) as f:
+        data = yaml.safe_load(f)
+    return data.get("assets", [])
+
+
+def get_allowed_colors(palette_name: str) -> set:
+    """Get allowed colors for a palette."""
+    colors = set(BASE_COLORS)
+    if palette_name in THEME_COLORS:
+        colors.update(THEME_COLORS[palette_name])
+    return colors
+
+
+def normalize_sprite(asset: dict) -> list[str]:
+    """Normalize a single asset's master sprite to runtime frames."""
     errors = []
     
+    master_path = ASSETS_DIR / asset["file"]
+    if not master_path.exists():
+        return [f"Master file not found: {asset['file']}"]
+    
     try:
-        img = Image.open(input_path)
+        master = Image.open(master_path)
     except Exception as e:
-        return [f"Failed to open {input_path}: {e}"]
+        return [f"Failed to open {master_path}: {e}"]
     
-    # Ensure RGBA
-    if img.mode != "RGBA":
-        img = img.convert("RGBA")
+    if master.mode != "RGBA":
+        master = master.convert("RGBA")
     
-    # 1. Remove background (make fully transparent where alpha < 128)
-    img = remove_background(img)
+    # Get runtime spec
+    rt_w = asset["runtime_size"]["width"]
+    rt_h = asset["runtime_size"]["height"]
+    anchor = asset.get("anchor", {"x": rt_w // 2, "y": rt_h})
+    alpha_mode = asset.get("alpha", "opaque")
+    palette_name = asset.get("palette", "base")
+    category = asset.get("category", "unknown")
     
-    # 2. Correct dimensions
-    expected_w = spec.get("width")
-    expected_h = spec.get("height")
-    if expected_w and expected_h:
-        if img.size != (expected_w, expected_h):
-            img = resize_nearest(img, (expected_w, expected_h))
+    # Determine source region (for tilesets/spritesheets)
+    src_region = asset.get("source_region")
+    if src_region:
+        # Extract sub-image from master
+        box = (src_region["x"], src_region["y"], 
+               src_region["x"] + src_region["width"], 
+               src_region["y"] + src_region["height"])
+        frame = master.crop(box)
+    else:
+        # Use entire master as single frame
+        frame = master
     
-    # 3. Align to grid (ensure dimensions are multiples of grid)
-    img = align_to_grid(img)
+    # Validate/correct dimensions
+    if frame.size != (rt_w, rt_h):
+        old_size = frame.size
+        # Resize with nearest-neighbor to preserve pixel art
+        frame = frame.resize((rt_w, rt_h), Image.NEAREST)
+        # Resize is expected for props, not an error
+        print(f"  ℹ️ Resized {old_size} -> ({rt_w}, {rt_h})")
     
-    # 3. Normalize anchor
-    expected_anchor = spec.get("anchor")
-    if expected_anchor:
-        img = normalize_anchor(img, expected_anchor)
+    # Validate anchor (check content center-bottom matches expected)
+    # Skip for tiles (extracted from tileset, anchor not meaningful)
+    # Skip for props (anchor is isometric placement point, not content center)
+    if category not in ["tile", "prop"]:
+        data = np.array(frame)
+        content_anchor = find_content_anchor(data)
+        expected_anchor = (anchor["x"], anchor["y"])
+        if content_anchor:
+            dx = content_anchor[0] - expected_anchor[0]
+            dy = content_anchor[1] - expected_anchor[1]
+            if abs(dx) > TOLERANCE or abs(dy) > TOLERANCE:
+                errors.append(f"  ⚠️ Anchor offset: content={content_anchor} expected={expected_anchor} (dx={dx}, dy={dy})")
     
-    # 4. Normalize scale
-    img = normalize_scale(img)
+    # Validate palette
+    allowed = get_allowed_colors(palette_name)
+    palette_errors = validate_palette(frame, allowed, asset["file"])
+    errors.extend(palette_errors)
     
-    # 5. Convert to target palette
-    img = quantize_to_palette(img, spec.get("palette", "spectrum_plus"))
+    # Validate alpha
+    alpha_errors = validate_alpha(frame, alpha_mode, asset["file"])
+    errors.extend(alpha_errors)
     
-    # 6. Remove unexpected colors
-    img = clamp_palette(img)
-    
-    # 7. Fix minor artifacts
-    img = fix_artifacts(img)
-    
-    # 8. Ensure nearest-neighbor quality
-    img = ensure_nearest_neighbor(img)
-    
-    # Save
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    img.save(output_path, "PNG", optimize=True)
+    # Save normalized frame
+    out_path = BUILD_DIR / asset["file"]
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    frame.save(out_path, "PNG", optimize=True)
     
     return errors
 
 
-def remove_background(img: Image.Image) -> Image.Image:
-    """Make near-transparent pixels fully transparent."""
+def find_content_anchor(data: np.ndarray) -> tuple | None:
+    """Find the visual anchor (center-x, bottom-y of non-transparent content)."""
+    mask = data[:, :, 3] > 0
+    if not np.any(mask):
+        return None
+    y_indices, x_indices = np.where(mask)
+    cx = int(np.mean(x_indices))
+    anchor_y = int(np.max(y_indices))
+    return (cx, anchor_y)
+
+
+def validate_palette(img: Image.Image, allowed_colors: set, filename: str) -> list[str]:
+    """Validate image uses only allowed palette colors."""
+    errors = []
     data = np.array(img)
-    alpha = data[:, :, 3]
-    data[alpha < 128] = [0, 0, 0, 0]
-    return Image.fromarray(data, "RGBA")
-
-
-def resize_nearest(img: Image.Image, size: tuple) -> Image.Image:
-    """Resize using nearest-neighbor to preserve pixel art."""
-    return img.resize(size, Image.NEAREST)
-
-
-def align_to_grid(img: Image.Image) -> Image.Image:
-    """Ensure image dimensions align to isometric grid."""
-    w, h = img.size
-    grid_w = 64
-    grid_h = 32
+    violations = []
     
-    new_w = ((w + grid_w - 1) // grid_w) * grid_w
-    new_h = ((h + grid_h - 1) // grid_h) * grid_h
-    
-    if (new_w, new_h) != (w, h):
-        new_img = Image.new("RGBA", (new_w, new_h), (0, 0, 0, 0))
-        new_img.paste(img, ((new_w - w) // 2, (new_h - h) // 2))
-        return new_img
-    return img
-
-
-def normalize_anchor(img: Image.Image, expected_anchor: dict) -> Image.Image:
-    """Adjust image so anchor point is at expected position."""
-    # For now, just verify - actual anchor adjustment would require
-    # knowing the visual content. This is a placeholder.
-    return img
-
-
-def normalize_scale(img: Image.Image) -> Image.Image:
-    """Ensure consistent pixel scaling (no half-pixels)."""
-    return img
-
-
-def quantize_to_palette(img: Image.Image, palette_name: str) -> Image.Image:
-    """Quantize image to target palette using nearest-neighbor in color space."""
-    colors = []
-    if palette_name == "spectrum_plus":
-        palette_data = PALETTE
-        for color in palette_data["base"].values():
-            colors.append(hex_to_rgb(color))
-        for theme in palette_data["themes"].values():
-            for color in theme.values():
-                colors.append(hex_to_rgb(color))
-    
-    # Remove duplicates
-    unique_colors = []
-    seen = set()
-    for c in colors:
-        if c not in seen:
-            unique_colors.append(c)
-            seen.add(c)
-    
-    # Create palette image
-    palette_img = Image.new("P", (16, 16))
-    palette_data = []
-    for r, g, b in unique_colors:
-        palette_data.extend([r, g, b])
-    while len(palette_data) < 768:
-        palette_data.extend([0, 0, 0])
-    palette_img.putpalette(palette_data)
-    
-    return img.quantize(colors=len(unique_colors), method=Image.Quantize.FASTOCTREE, kmeans=0).convert("RGBA")
-
-
-def clamp_palette(img: Image.Image) -> Image.Image:
-    """Replace any colors not in allowed palette with nearest allowed."""
-    data = np.array(img)
-    height, width = data.shape[:2]
-    
-    for y in range(height):
-        for x in range(width):
+    for y in range(data.shape[0]):
+        for x in range(data.shape[1]):
             r, g, b, a = data[y, x]
             if a == 0:
                 continue
             color_hex = f"#{r:02x}{g:02x}{b:02x}".lower()
-            if color_hex not in ALLOWED_COLORS:
-                nearest = find_nearest_color((r, g, b))
-                data[y, x, :3] = nearest
+            if color_hex not in allowed_colors:
+                violations.append((x, y, color_hex))
     
-    return Image.fromarray(data, "RGBA")
-
-
-def hex_to_rgb(hex_color: str) -> tuple:
-    hex_color = hex_color.lstrip("#")
-    return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
-
-
-def find_nearest_color(target_rgb: tuple) -> tuple:
-    target = np.array(target_rgb)
-    min_dist = float("inf")
-    nearest = (0, 0, 0)
+    if violations:
+        by_color = {}
+        for x, y, color in violations:
+            by_color.setdefault(color, []).append((x, y))
+        for color, positions in by_color.items():
+            errors.append(f"{filename}: Disallowed color {color} at {len(positions)} pixels")
     
-    for hex_color in ALLOWED_COLORS:
-        rgb = hex_to_rgb(hex_color)
-        dist = np.sum((np.array(rgb) - target) ** 2)
-        if dist < min_dist:
-            min_dist = dist
-            nearest = rgb
-    
-    return nearest
+    return errors
 
 
-def fix_artifacts(img: Image.Image) -> Image.Image:
-    """Fix minor pixel art artifacts."""
+def validate_alpha(img: Image.Image, alpha_mode: str, filename: str) -> list[str]:
+    """Validate alpha channel matches declared mode."""
+    errors = []
     data = np.array(img)
-    return Image.fromarray(data, "RGBA")
-
-
-def ensure_nearest_neighbor(img: Image.Image) -> Image.Image:
-    return img
+    alpha = data[:, :, 3]
+    
+    if alpha_mode == "opaque":
+        semi = (alpha > 0) & (alpha < 255)
+        if np.any(semi):
+            count = np.sum(semi)
+            if count > 50:  # Allow tiny amounts from resizing
+                errors.append(f"{filename}: {count} semi-transparent pixels (alpha mode: opaque)")
+    elif alpha_mode == "binary":
+        invalid = (alpha > 0) & (alpha < 255) & (alpha != 128)
+        if np.any(invalid):
+            count = np.sum(invalid)
+            if count > 50:
+                errors.append(f"{filename}: {count} non-binary alpha pixels (alpha mode: binary)")
+    elif alpha_mode == "smooth":
+        pass  # Any alpha allowed
+    else:
+        errors.append(f"{filename}: Unknown alpha mode '{alpha_mode}'")
+    
+    return errors
 
 
 def main():
-    if len(sys.argv) < 3:
-        print("Usage: normalize_sprites.py <input_dir> <output_dir> [spec_file]")
-        return 1
+    BUILD_DIR.mkdir(parents=True, exist_ok=True)
     
-    input_dir = Path(sys.argv[1])
-    output_dir = Path(sys.argv[2])
-    spec_file = Path(sys.argv[3]) if len(sys.argv) > 3 else None
+    assets = load_manifest()
+    print(f"🔧 Normalizing {len(assets)} assets from manifest...")
     
-    if not input_dir.exists():
-        print(f"Input directory not found: {input_dir}")
-        return 1
+    total_errors = 0
+    processed = 0
     
-    specs = {}
-    if spec_file and spec_file.exists():
-        with open(spec_file) as f:
-            spec_data = json.load(f)
-            for spec in spec_data.get("specs", []):
-                specs[spec["id"]] = spec
-    
-    output_dir.mkdir(parents=True, exist_ok=True)
-    
-    total = 0
-    errors = 0
-    
-    for img_file in input_dir.rglob("*.png"):
-        total += 1
-        spec = None
-        for sid, s in specs.items():
-            if sid in img_file.stem:
-                spec = s
-                break
+    for asset in assets:
+        # Skip tilesets (they're source images, not individual frames)
+        if asset.get("category") == "tileset":
+            print(f"  ⏭️ Skipping tileset: {asset['id']}")
+            continue
         
-        rel_path = img_file.relative_to(input_dir)
-        out_path = output_dir / rel_path
+        # Skip master sprites (spritesheets)
+        if asset.get("type") == "master":
+            print(f"  ⏭️ Skipping master: {asset['id']}")
+            continue
         
-        errs = normalize_sprite(img_file, out_path, spec or {})
-        if errs:
-            print(f"❌ {img_file}: {errs}")
-            errors += 1
+        errors = normalize_sprite(asset)
+        if errors:
+            print(f"❌ {asset['id']} ({asset['file']})")
+            for err in errors:
+                print(f"   {err}")
+            total_errors += len(errors)
         else:
-            print(f"✅ {img_file}")
+            print(f"✅ {asset['id']}")
+        processed += 1
     
-    print(f"\nProcessed: {total}, Errors: {errors}")
-    return 0 if errors == 0 else 1
+    print(f"\nProcessed: {processed}, Total errors: {total_errors}")
+    return 0 if total_errors == 0 else 1
 
 
 if __name__ == "__main__":

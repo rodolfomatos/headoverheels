@@ -1,8 +1,8 @@
 ---
 project: headoverheels
 created: 2026-09-18
-current_sprint: sprint-07
-current_ticket: "T015"
+current_sprint: sprint-08
+current_ticket: "T023"
 ---
 
 # Kanban — headoverheels
@@ -25,6 +25,20 @@ current_ticket: "T015"
 | T013 | Audio: SFX, music, adaptive audio system | medium | pending |
 | T014 | Polish: animations, transitions, accessibility | low | pending |
 | T015 | Release build & Play Store preparation | low | pending |
+| T016 | Asset & Visual System Audit | high | done |
+| T017 | Visual Design System | high | done |
+| T018 | Character Masters | high | done |
+| T019 | Character Animation Pipeline | high | done |
+| T020 | Environment Masters | high | done |
+| T021 | Castle Tileset | high | done |
+| T022 | Entity Masters | high | in-progress |
+| T023 | Remaining Themes | medium | pending |
+| T024 | Validation Pipeline | medium | done |
+| T025 | Atlas Pipeline | medium | pending |
+| T026 | Flutter Sprite Registry | medium | pending |
+| T027 | Gameplay Integration | medium | pending |
+| T028 | Visual QA | low | pending |
+| T029 | Final Asset Migration | low | pending |
 
 ## Sprint 01 — Foundation & Research
 **Goal**: Understand original game, establish core architecture, prove isometric rendering
@@ -84,8 +98,35 @@ current_ticket: "T015"
 |----|-------|--------|
 | T015 | Release build & Play Store preparation | done |
 
+## Sprint 08 — Asset Production
+**Goal**: Complete all visual assets (tilesets, entities, characters)
+
+| ID | Title | Status |
+|----|-------|--------|
+| T016 | Asset & Visual System Audit | done |
+| T017 | Visual Design System | done |
+| T018 | Character Masters | done |
+| T019 | Character Animation Pipeline | done |
+| T020 | Environment Masters | done |
+| T021 | Castle Tileset | done |
+| T022 | Entity Masters | done |
+| T023 | Remaining Themes | in-progress |
+| T024 | Validation Pipeline | done |
+| T025 | Atlas Pipeline | pending |
+
+## Sprint 09 — Integration & Release
+**Goal**: Integration, QA, Release
+
+| ID | Title | Status |
+|----|-------|--------|
+| T026 | Flutter Sprite Registry | pending |
+| T027 | Gameplay Integration | pending |
+| T023 | Visual QA | pending |
+| T024 | Final Asset Migration | pending |
+| T025 | Release build & Play Store preparation | pending |
+
 ## In Progress
-*None*
+* T023: Remaining Themes
 
 ## Done
 * T001: Research original game mechanics & online MSX version
@@ -103,3 +144,11 @@ current_ticket: "T015"
 * T013: Audio: SFX, music, adaptive audio system
 * T014: Polish: animations, transitions, accessibility
 * T015: Release build & Play Store preparation
+* T016: Asset & Visual System Audit
+* T017: Visual Design System
+* T018: Character Masters
+* T019: Character Animation Pipeline
+* T020: Environment Masters
+* T021: Castle Tileset
+* T022: Entity Masters
+* T024: Validation Pipeline

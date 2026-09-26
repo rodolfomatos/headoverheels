@@ -1,0 +1,994 @@
+version: "1.0"
+description: "Head over Heels 2026 - Asset Manifest"
+
+assets:
+  # ===== CHARACTERS =====
+  # Head - idle (4 frames, 4 directions)
+  - id: "character.head.idle.n"
+    file: "characters/head/frames/head_idle_front_01.png"
+    category: "character"
+    character: "head"
+    animation: "idle"
+    direction: "n"
+    frames: 4
+    frame_duration: 200
+    loop: true
+    master: "head_idle_front_master"
+    runtime_size: { width: 48, height: 48 }
+    anchor: { x: 24, y: 43 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "character.head.idle.ne"
+    file: "characters/head/frames/head_idle_3q_03.png"
+    category: "character"
+    character: "head"
+    animation: "idle"
+    direction: "ne"
+    frames: 4
+    frame_duration: 200
+    loop: true
+    master: "head_idle_3q_master"
+    runtime_size: { width: 48, height: 48 }
+    anchor: { x: 24, y: 43 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "character.head.idle.e"
+    file: "characters/head/frames/head_idle_side_02.png"
+    category: "character"
+    character: "head"
+    animation: "idle"
+    direction: "e"
+    frames: 4
+    frame_duration: 200
+    loop: true
+    master: "head_idle_side_master"
+    runtime_size: { width: 48, height: 48 }
+    anchor: { x: 24, y: 43 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "character.head.idle.s"
+    file: "characters/head/frames/head_idle_back_04.png"
+    category: "character"
+    character: "head"
+    animation: "idle"
+    direction: "s"
+    frames: 4
+    frame_duration: 200
+    loop: true
+    master: "head_idle_back_master"
+    runtime_size: { width: 48, height: 48 }
+    anchor: { x: 24, y: 43 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  # Head - walk (8 frames, 4 directions)
+  - id: "character.head.walk.n"
+    file: "characters/head/frames/head_walk_front_05.png"
+    category: "character"
+    character: "head"
+    animation: "walk"
+    direction: "n"
+    frames: 8
+    frame_duration: 100
+    loop: true
+    master: "head_walk_front_master"
+    runtime_size: { width: 48, height: 48 }
+    anchor: { x: 24, y: 43 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "character.head.walk.ne"
+    file: "characters/head/frames/head_walk_3q_07.png"
+    category: "character"
+    character: "head"
+    animation: "walk"
+    direction: "ne"
+    frames: 8
+    frame_duration: 100
+    loop: true
+    master: "head_walk_3q_master"
+    runtime_size: { width: 48, height: 48 }
+    anchor: { x: 24, y: 43 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "character.head.walk.e"
+    file: "characters/head/frames/head_walk_side_06.png"
+    category: "character"
+    character: "head"
+    animation: "walk"
+    direction: "e"
+    frames: 8
+    frame_duration: 100
+    loop: true
+    master: "head_walk_side_master"
+    runtime_size: { width: 48, height: 48 }
+    anchor: { x: 24, y: 43 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "character.head.walk.s"
+    file: "characters/head/frames/head_walk_back_08.png"
+    category: "character"
+    character: "head"
+    animation: "walk"
+    direction: "s"
+    frames: 8
+    frame_duration: 100
+    loop: true
+    master: "head_walk_back_master"
+    runtime_size: { width: 48, height: 48 }
+    anchor: { x: 24, y: 43 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  # Head - jump (4 frames, 4 directions)
+  - id: "character.head.jump.n"
+    file: "characters/head/frames/head_jump_front_09.png"
+    category: "character"
+    character: "head"
+    animation: "jump"
+    direction: "n"
+    frames: 4
+    frame_duration: 150
+    loop: false
+    master: "head_jump_front_master"
+    runtime_size: { width: 48, height: 48 }
+    anchor: { x: 24, y: 43 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "character.head.jump.ne"
+    file: "characters/head/frames/head_jump_3q_11.png"
+    category: "character"
+    character: "head"
+    animation: "jump"
+    direction: "ne"
+    frames: 4
+    frame_duration: 150
+    loop: false
+    master: "head_jump_3q_master"
+    runtime_size: { width: 48, height: 48 }
+    anchor: { x: 24, y: 43 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "character.head.jump.e"
+    file: "characters/head/frames/head_jump_side_10.png"
+    category: "character"
+    character: "head"
+    animation: "jump"
+    direction: "e"
+    frames: 4
+    frame_duration: 150
+    loop: false
+    master: "head_jump_side_master"
+    runtime_size: { width: 48, height: 48 }
+    anchor: { x: 24, y: 43 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "character.head.jump.s"
+    file: "characters/head/frames/head_jump_back_12.png"
+    category: "character"
+    character: "head"
+    animation: "jump"
+    direction: "s"
+    frames: 4
+    frame_duration: 150
+    loop: false
+    master: "head_jump_back_master"
+    runtime_size: { width: 48, height: 48 }
+    anchor: { x: 24, y: 43 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  # Heels - idle (4 frames, 4 directions)
+  - id: "character.heels.idle.n"
+    file: "characters/heels/frames/heels_idle_front_01.png"
+    category: "character"
+    character: "heels"
+    animation: "idle"
+    direction: "n"
+    frames: 4
+    frame_duration: 200
+    loop: true
+    master: "heels_idle_front_master"
+    runtime_size: { width: 48, height: 56 }
+    anchor: { x: 24, y: 51 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "character.heels.idle.ne"
+    file: "characters/heels/frames/heels_idle_3q_03.png"
+    category: "character"
+    character: "heels"
+    animation: "idle"
+    direction: "ne"
+    frames: 4
+    frame_duration: 200
+    loop: true
+    master: "heels_idle_3q_master"
+    runtime_size: { width: 48, height: 56 }
+    anchor: { x: 24, y: 51 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "character.heels.idle.e"
+    file: "characters/heels/frames/heels_idle_side_02.png"
+    category: "character"
+    character: "heels"
+    animation: "idle"
+    direction: "e"
+    frames: 4
+    frame_duration: 200
+    loop: true
+    master: "heels_idle_side_master"
+    runtime_size: { width: 48, height: 56 }
+    anchor: { x: 24, y: 51 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "character.heels.idle.s"
+    file: "characters/heels/frames/heels_idle_back_04.png"
+    category: "character"
+    character: "heels"
+    animation: "idle"
+    direction: "s"
+    frames: 4
+    frame_duration: 200
+    loop: true
+    master: "heels_idle_back_master"
+    runtime_size: { width: 48, height: 56 }
+    anchor: { x: 24, y: 51 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  # Heels - walk (8 frames, 4 directions)
+  - id: "character.heels.walk.n"
+    file: "characters/heels/frames/heels_walk_front_05.png"
+    category: "character"
+    character: "heels"
+    animation: "walk"
+    direction: "n"
+    frames: 8
+    frame_duration: 100
+    loop: true
+    master: "heels_walk_front_master"
+    runtime_size: { width: 48, height: 56 }
+    anchor: { x: 24, y: 51 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "character.heels.walk.ne"
+    file: "characters/heels/frames/heels_walk_3q_07.png"
+    category: "character"
+    character: "heels"
+    animation: "walk"
+    direction: "ne"
+    frames: 8
+    frame_duration: 100
+    loop: true
+    master: "heels_walk_3q_master"
+    runtime_size: { width: 48, height: 56 }
+    anchor: { x: 24, y: 51 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "character.heels.walk.e"
+    file: "characters/heels/frames/heels_walk_side_06.png"
+    category: "character"
+    character: "heels"
+    animation: "walk"
+    direction: "e"
+    frames: 8
+    frame_duration: 100
+    loop: true
+    master: "heels_walk_side_master"
+    runtime_size: { width: 48, height: 56 }
+    anchor: { x: 24, y: 51 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "character.heels.walk.s"
+    file: "characters/heels/frames/heels_walk_back_08.png"
+    category: "character"
+    character: "heels"
+    animation: "walk"
+    direction: "s"
+    frames: 8
+    frame_duration: 100
+    loop: true
+    master: "heels_walk_back_master"
+    runtime_size: { width: 48, height: 56 }
+    anchor: { x: 24, y: 51 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  # Heels - run (8 frames, 4 directions)
+  - id: "character.heels.run.n"
+    file: "characters/heels/frames/heels_run_front_09.png"
+    category: "character"
+    character: "heels"
+    animation: "run"
+    direction: "n"
+    frames: 8
+    frame_duration: 75
+    loop: true
+    master: "heels_run_front_master"
+    runtime_size: { width: 48, height: 56 }
+    anchor: { x: 24, y: 51 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "character.heels.run.ne"
+    file: "characters/heels/frames/heels_run_3q_11.png"
+    category: "character"
+    character: "heels"
+    animation: "run"
+    direction: "ne"
+    frames: 8
+    frame_duration: 75
+    loop: true
+    master: "heels_run_3q_master"
+    runtime_size: { width: 48, height: 56 }
+    anchor: { x: 24, y: 51 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "character.heels.run.e"
+    file: "characters/heels/frames/heels_run_side_10.png"
+    category: "character"
+    character: "heels"
+    animation: "run"
+    direction: "e"
+    frames: 8
+    frame_duration: 75
+    loop: true
+    master: "heels_run_side_master"
+    runtime_size: { width: 48, height: 56 }
+    anchor: { x: 24, y: 51 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "character.heels.run.s"
+    file: "characters/heels/frames/heels_run_back_12.png"
+    category: "character"
+    character: "heels"
+    animation: "run"
+    direction: "s"
+    frames: 8
+    frame_duration: 75
+    loop: true
+    master: "heels_run_back_master"
+    runtime_size: { width: 48, height: 56 }
+    anchor: { x: 24, y: 51 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  # Heels - jump (4 frames, 4 directions)
+  - id: "character.heels.jump.n"
+    file: "characters/heels/frames/heels_jump_front_13.png"
+    category: "character"
+    character: "heels"
+    animation: "jump"
+    direction: "n"
+    frames: 4
+    frame_duration: 150
+    loop: false
+    master: "heels_jump_front_master"
+    runtime_size: { width: 48, height: 56 }
+    anchor: { x: 24, y: 51 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "character.heels.jump.ne"
+    file: "characters/heels/frames/heels_jump_3q_15.png"
+    category: "character"
+    character: "heels"
+    animation: "jump"
+    direction: "ne"
+    frames: 4
+    frame_duration: 150
+    loop: false
+    master: "heels_jump_3q_master"
+    runtime_size: { width: 48, height: 56 }
+    anchor: { x: 24, y: 51 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "character.heels.jump.e"
+    file: "characters/heels/frames/heels_jump_side_14.png"
+    category: "character"
+    character: "heels"
+    animation: "jump"
+    direction: "e"
+    frames: 4
+    frame_duration: 150
+    loop: false
+    master: "heels_jump_side_master"
+    runtime_size: { width: 48, height: 56 }
+    anchor: { x: 24, y: 51 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "character.heels.jump.s"
+    file: "characters/heels/frames/heels_jump_back_16.png"
+    category: "character"
+    character: "heels"
+    animation: "jump"
+    direction: "s"
+    frames: 4
+    frame_duration: 150
+    loop: false
+    master: "heels_jump_back_master"
+    runtime_size: { width: 48, height: 56 }
+    anchor: { x: 24, y: 51 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  # Heels - carry (4 frames, 4 directions)
+  - id: "character.heels.carry.n"
+    file: "characters/heels/frames/heels_carry_front_17.png"
+    category: "character"
+    character: "heels"
+    animation: "carry"
+    direction: "n"
+    frames: 4
+    frame_duration: 200
+    loop: true
+    master: "heels_carry_front_master"
+    runtime_size: { width: 48, height: 56 }
+    anchor: { x: 24, y: 51 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "character.heels.carry.ne"
+    file: "characters/heels/frames/heels_carry_3q_19.png"
+    category: "character"
+    character: "heels"
+    animation: "carry"
+    direction: "ne"
+    frames: 4
+    frame_duration: 200
+    loop: true
+    master: "heels_carry_3q_master"
+    runtime_size: { width: 48, height: 56 }
+    anchor: { x: 24, y: 51 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "character.heels.carry.e"
+    file: "characters/heels/frames/heels_carry_side_18.png"
+    category: "character"
+    character: "heels"
+    animation: "carry"
+    direction: "e"
+    frames: 4
+    frame_duration: 200
+    loop: true
+    master: "heels_carry_side_master"
+    runtime_size: { width: 48, height: 56 }
+    anchor: { x: 24, y: 51 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "character.heels.carry.s"
+    file: "characters/heels/frames/heels_carry_back_20.png"
+    category: "character"
+    character: "heels"
+    animation: "carry"
+    direction: "s"
+    frames: 4
+    frame_duration: 200
+    loop: true
+    master: "heels_carry_back_master"
+    runtime_size: { width: 48, height: 56 }
+    anchor: { x: 24, y: 51 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  # Duo - idle front (composed)
+  - id: "character.duo.idle.s"
+    file: "characters/duo/duo_idle_front.png"
+    category: "character"
+    character: "duo"
+    animation: "idle"
+    direction: "s"
+    frames: 4
+    frame_duration: 200
+    loop: true
+    master: "duo_idle_front_master"
+    runtime_size: { width: 56, height: 64 }
+    anchor: { x: 28, y: 59 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  # ===== ENTITIES =====
+  - id: "entity.fish.swim"
+    file: "entities/fish/fish_master.png"
+    category: "entity"
+    entity: "fish"
+    animation: "swim"
+    frames: 8
+    frame_duration: 100
+    loop: true
+    master: "fish_swim_master"
+    runtime_size: { width: 64, height: 32 }
+    anchor: { x: 32, y: 16 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "entity.rabbit.hop"
+    file: "entities/rabbit/rabbit_master.png"
+    category: "entity"
+    entity: "rabbit"
+    animation: "hop"
+    frames: 4
+    frame_duration: 200
+    loop: true
+    master: "rabbit_hop_master"
+    runtime_size: { width: 32, height: 32 }
+    anchor: { x: 16, y: 16 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "entity.crown.rotate"
+    file: "entities/crown/crown_master.png"
+    category: "entity"
+    entity: "crown"
+    animation: "rotate"
+    frames: 8
+    frame_duration: 150
+    loop: true
+    master: "crown_rotate_master"
+    runtime_size: { width: 32, height: 32 }
+    anchor: { x: 16, y: 16 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "entity.spring.idle"
+    file: "entities/spring/spring_master.png"
+    category: "entity"
+    entity: "spring"
+    animation: "idle"
+    frames: 3
+    frame_duration: 200
+    loop: true
+    master: "spring_master"
+    runtime_size: { width: 48, height: 48 }
+    anchor: { x: 24, y: 24 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "entity.switch.off"
+    file: "entities/switch/switch_master.png"
+    category: "entity"
+    entity: "switch"
+    animation: "off"
+    frames: 1
+    frame_duration: 0
+    loop: false
+    master: "switch_off_master"
+    runtime_size: { width: 48, height: 48 }
+    anchor: { x: 24, y: 24 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "entity.conveyor.belt"
+    file: "entities/conveyor/conveyor_master.png"
+    category: "entity"
+    entity: "conveyor"
+    animation: "belt"
+    frames: 4
+    frame_duration: 100
+    loop: true
+    master: "conveyor_belt_master"
+    runtime_size: { width: 64, height: 32 }
+    anchor: { x: 32, y: 16 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "entity.teleport.swirl"
+    file: "entities/teleport/teleport_master.png"
+    category: "entity"
+    entity: "teleport"
+    animation: "swirl"
+    frames: 4
+    frame_duration: 150
+    loop: true
+    master: "teleport_swirl_master"
+    runtime_size: { width: 64, height: 64 }
+    anchor: { x: 32, y: 32 }
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "entity.door.closed"
+    file: "entities/door/door_master.png"
+    category: "entity"
+    entity: "door"
+    animation: "closed"
+    frames: 1
+    frame_duration: 0
+    loop: false
+    master: "door_closed_master"
+    runtime_size: { width: 64, height: 64 }
+    anchor: { x: 32, y: 32 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "entity.monster.walk"
+    file: "entities/monster/monster_master.png"
+    category: "entity"
+    entity: "monster"
+    animation: "walk"
+    frames: 8
+    frame_duration: 100
+    loop: true
+    master: "monster_walk_master"
+    runtime_size: { width: 64, height: 64 }
+    anchor: { x: 32, y: 32 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "entity.guardian.patrol"
+    file: "entities/guardian/guardian_master.png"
+    category: "entity"
+    entity: "guardian"
+    animation: "patrol"
+    frames: 8
+    frame_duration: 100
+    loop: true
+    master: "guardian_patrol_master"
+    runtime_size: { width: 96, height: 96 }
+    anchor: { x: 48, y: 48 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "entity.hush_puppy.sleep"
+    file: "entities/hush_puppy/hush_puppy_master.png"
+    category: "entity"
+    entity: "hush_puppy"
+    animation: "sleep"
+    frames: 8
+    frame_duration: 200
+    loop: true
+    master: "hush_puppy_sleep_master"
+    runtime_size: { width: 48, height: 48 }
+    anchor: { x: 24, y: 24 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "entity.bag.idle"
+    file: "entities/bag/bag_master.png"
+    category: "entity"
+    entity: "bag"
+    animation: "idle"
+    frames: 1
+    frame_duration: 0
+    loop: false
+    master: "bag_idle_master"
+    runtime_size: { width: 32, height: 32 }
+    anchor: { x: 16, y: 16 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "entity.key.idle"
+    file: "entities/key/key_master.png"
+    category: "entity"
+    entity: "key"
+    animation: "idle"
+    frames: 1
+    frame_duration: 0
+    loop: false
+    master: "key_idle_master"
+    runtime_size: { width: 24, height: 24 }
+    anchor: { x: 12, y: 12 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "entity.doughnut.idle"
+    file: "entities/doughnut/doughnut_master.png"
+    category: "entity"
+    entity: "doughnut"
+    animation: "idle"
+    frames: 1
+    frame_duration: 0
+    loop: false
+    master: "doughnut_idle_master"
+    runtime_size: { width: 16, height: 16 }
+    anchor: { x: 8, y: 8 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  # ===== TILES (Castle) =====
+  - id: "tile.castle.floor.clean"
+    file: "tiles/castle/castle_masters.png"
+    category: "tile"
+    theme: "castle"
+    family: "floor"
+    variant: "clean"
+    tile_id: 0
+    runtime_size: { width: 64, height: 32 }
+    anchor: { x: 0, y: 0 }
+    alpha: "opaque"
+    palette: "castle"
+    scale: 1
+    source_region: { x: 0, y: 0, width: 64, height: 32 }
+
+  - id: "tile.castle.wall.straight"
+    file: "tiles/castle/castle_masters.png"
+    category: "tile"
+    theme: "castle"
+    family: "wall"
+    variant: "straight"
+    tile_id: 1
+    runtime_size: { width: 64, height: 32 }
+    anchor: { x: 0, y: 0 }
+    alpha: "opaque"
+    palette: "castle"
+    scale: 1
+    source_region: { x: 64, y: 0, width: 64, height: 32 }
+
+  # ===== THEME TILESETS =====
+  - id: "tileset.castle"
+    file: "tiles/castle/castle_masters.png"
+    category: "tileset"
+    theme: "castle"
+    runtime_size: { width: 1024, height: 512 }
+    alpha: "opaque"
+    palette: "castle"
+    scale: 1
+
+  - id: "tileset.egyptus"
+    file: "tiles/egyptus.png"
+    category: "tileset"
+    theme: "egyptus"
+    runtime_size: { width: 1024, height: 512 }
+    alpha: "opaque"
+    palette: "egyptus"
+    scale: 1
+
+  - id: "tileset.penitentiary"
+    file: "tiles/penitentiary.png"
+    category: "tileset"
+    theme: "penitentiary"
+    runtime_size: { width: 1024, height: 512 }
+    alpha: "opaque"
+    palette: "penitentiary"
+    scale: 1
+
+  - id: "tileset.safari"
+    file: "tiles/safari.png"
+    category: "tileset"
+    theme: "safari"
+    runtime_size: { width: 1024, height: 512 }
+    alpha: "opaque"
+    palette: "safari"
+    scale: 1
+
+  - id: "tileset.bookworld"
+    file: "tiles/bookworld.png"
+    category: "tileset"
+    theme: "bookworld"
+    runtime_size: { width: 1024, height: 512 }
+    alpha: "opaque"
+    palette: "bookworld"
+    scale: 1
+
+  - id: "tileset.moonbase"
+    file: "tiles/moonbase.png"
+    category: "tileset"
+    theme: "moonbase"
+    runtime_size: { width: 1024, height: 512 }
+    alpha: "opaque"
+    palette: "moonbase"
+    scale: 1
+
+  # ===== PROPS =====
+  - id: "prop.barrel"
+    file: "props/barrel/barrel.png"
+    category: "prop"
+    prop: "barrel"
+    runtime_size: { width: 64, height: 32 }
+    anchor: { x: 32, y: 16 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "prop.lever"
+    file: "props/lever/lever.png"
+    category: "prop"
+    prop: "lever"
+    runtime_size: { width: 32, height: 32 }
+    anchor: { x: 16, y: 16 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "prop.chain"
+    file: "props/chain/chain.png"
+    category: "prop"
+    prop: "chain"
+    runtime_size: { width: 32, height: 64 }
+    anchor: { x: 16, y: 32 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "prop.torch"
+    file: "props/torch/torch.png"
+    category: "prop"
+    prop: "torch"
+    runtime_size: { width: 32, height: 64 }
+    anchor: { x: 16, y: 32 }
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "prop.crate"
+    file: "props/crate/crate.png"
+    category: "prop"
+    prop: "crate"
+    runtime_size: { width: 64, height: 32 }
+    anchor: { x: 32, y: 16 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "prop.crate_broken"
+    file: "props/crate_broken/crate_broken.png"
+    category: "prop"
+    prop: "crate_broken"
+    runtime_size: { width: 64, height: 32 }
+    anchor: { x: 32, y: 16 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "prop.banner"
+    file: "props/banner/banner.png"
+    category: "prop"
+    prop: "banner"
+    runtime_size: { width: 64, height: 64 }
+    anchor: { x: 32, y: 32 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "prop.skull"
+    file: "props/skull/skull.png"
+    category: "prop"
+    prop: "skull"
+    runtime_size: { width: 32, height: 32 }
+    anchor: { x: 16, y: 16 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "prop.sign"
+    file: "props/sign/sign.png"
+    category: "prop"
+    prop: "sign"
+    runtime_size: { width: 64, height: 32 }
+    anchor: { x: 32, y: 16 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+
+  - id: "prop.pressure_plate"
+    file: "props/pressure_plate/pressure_plate.png"
+    category: "prop"
+    prop: "pressure_plate"
+    runtime_size: { width: 64, height: 32 }
+    anchor: { x: 32, y: 16 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"

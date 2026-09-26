@@ -1,205 +1,237 @@
 #!/usr/bin/env python3
 """
 Master validation script for all sprites.
-Runs all validation checks and reports summary.
+Metadata-driven via assets/sprites/manifest.yaml.
+Reconciled with 2026 Visual Design System.
 """
 
-import json
 import sys
-import subprocess
+import json
+import yaml
 from pathlib import Path
+from PIL import Image
+import numpy as np
 
 SCRIPTS_DIR = Path(__file__).parent
+PROJECT_ROOT = SCRIPTS_DIR.parent
+ASSETS_DIR = PROJECT_ROOT / "assets" / "sprites"
+MANIFEST_PATH = ASSETS_DIR / "manifest.yaml"
+STYLE_DIR = PROJECT_ROOT / "style"
 
-def run_script(script_name: str, args: list[str]) -> tuple[int, str, str]:
-    """Run a validation script and return (exit_code, stdout, stderr)."""
-    script_path = SCRIPTS_DIR / script_name
-    cmd = [sys.executable, str(script_path)] + args
-    result = subprocess.run(cmd, capture_output=True, text=True, cwd=SCRIPTS_DIR.parent)
-    return result.returncode, result.stdout, result.stderr
+# Load palettes
+with open(STYLE_DIR / "palette.json") as f:
+    PALETTE_DATA = json.load(f)
 
+with open(STYLE_DIR / "geometry.json") as f:
+    GEOMETRY = json.load(f)
 
-def validate_all_sprites(assets_dir: Path, strict: bool = False) -> dict:
-    """Run all validation checks."""
-    results = {
-        "tiles": {"passed": 0, "failed": 0, "errors": []},
-        "palette": {"passed": 0, "failed": 0, "errors": []},
-        "animations": {"passed": 0, "failed": 0, "errors": []},
-        "naming": {"passed": 0, "failed": 0, "errors": []},
-        "dimensions": {"passed": 0, "failed": 0, "errors": []},
-        "alpha": {"passed": 0, "failed": 0, "errors": []},
-    }
-    
-    assets_dir = Path(assets_dir)
-    if not assets_dir.exists():
-        print(f"Assets directory not found: {assets_dir}")
-        return results
-    
-    print("🔍 Running sprite validation...\n")
-    
-    # 1. Validate tiles
-    print("📐 Validating tiles...")
-    code, stdout, stderr = run_script("validate_tiles.py", [str(assets_dir / "tiles")])
-    if code == 0:
-        results["tiles"]["passed"] = 1
-        print("  ✅ Tiles valid")
-    else:
-        results["tiles"]["failed"] = 1
-        results["tiles"]["errors"].append(stderr or stdout)
-        print("  ❌ Tiles validation failed")
-    
-# 2. Validate palette (skip for generated assets - will be validated after normalization)
-    print("🎨 Validating palette... (skipped for generated assets)")
-    results["palette"]["passed"] = 1
-    print("  ✅ Palette valid (skipped for generated assets)")
-    
-    # 3. Validate naming
-    print("📝 Validating naming convention...")
-    naming_errors = validate_naming(assets_dir)
-    if not naming_errors:
-        results["naming"]["passed"] = 1
-        print("  ✅ Naming valid")
-    else:
-        results["naming"]["failed"] = 1
-        results["naming"]["errors"] = naming_errors
-        print("  ❌ Naming validation failed")
-        for err in naming_errors:
-            print(f"  {err}")
-    
-    # 4. Validate dimensions
-    print("📏 Validating dimensions...")
-    dim_errors = validate_dimensions(assets_dir)
-    if not dim_errors:
-        results["dimensions"]["passed"] = 1
-        print("  ✅ Dimensions valid")
-    else:
-        results["dimensions"]["failed"] = 1
-        results["dimensions"]["errors"] = dim_errors
-        print("  ❌ Dimension validation failed")
-        for err in dim_errors:
-            print(f"  {err}")
-    
-    # 5. Validate alpha
-    print("🔍 Validating alpha channel...")
-    alpha_errors = validate_alpha(assets_dir)
-    if not alpha_errors:
-        results["alpha"]["passed"] = 1
-        print("  ✅ Alpha valid")
-    else:
-        results["alpha"]["failed"] = 1
-        results["alpha"]["errors"] = alpha_errors
-        print("  ❌ Alpha validation failed")
-        for err in alpha_errors:
-            print(f"  {err}")
-    
-    return results
+# Build allowed colors per palette
+BASE_COLORS = set(c.lower() for c in PALETTE_DATA["base"].values())
+THEME_COLORS = {}
+for theme, colors in PALETTE_DATA["themes"].items():
+    THEME_COLORS[theme] = set(c.lower() for c in colors.values())
+
+TILE_W = GEOMETRY["tile_geometry"]["logical_width"]
+TILE_H = GEOMETRY["tile_geometry"]["logical_height"]
 
 
-def validate_naming(assets_dir: Path) -> list[str]:
-    """Validate naming convention for all sprites."""
+def load_manifest():
+    """Load asset manifest."""
+    if not MANIFEST_PATH.exists():
+        print(f"Manifest not found: {MANIFEST_PATH}")
+        return []
+    with open(MANIFEST_PATH) as f:
+        data = yaml.safe_load(f)
+    return data.get("assets", [])
+
+
+def get_allowed_colors(palette_name: str) -> set:
+    """Get allowed colors for a palette."""
+    colors = set(BASE_COLORS)
+    if palette_name in THEME_COLORS:
+        colors.update(THEME_COLORS[palette_name])
+    if palette_name == "extended":
+        colors.update(THEME_COLORS.get("extended", set()))
+    return colors
+
+
+def validate_tiles(assets) -> list[str]:
+    """Validate tile geometry."""
+    errors = []
+    for asset in assets:
+        if asset.get("category") != "tile":
+            continue
+        file_path = ASSETS_DIR / asset["file"]
+        if not file_path.exists():
+            errors.append(f"Tile file not found: {asset['file']}")
+            continue
+        try:
+            img = Image.open(file_path)
+            if img.mode != "RGBA":
+                img = img.convert("RGBA")
+            # Check dimensions
+            expected = (asset["runtime_size"]["width"], asset["runtime_size"]["height"])
+            if img.size != expected:
+                errors.append(f"{asset['file']}: {img.size} != expected {expected}")
+            # Check diamond mask for 64x32 tiles
+            if img.size == (64, 32):
+                data = np.array(img)
+                y, x = np.mgrid[0:32, 0:64]
+                in_diamond = (np.abs(x - 32) / 32 + np.abs(y - 16) / 16) <= 1.0
+                alpha = data[:, :, 3]
+                outside = (~in_diamond) & (alpha > 0)
+                if np.any(outside):
+                    coords = np.where(outside)
+                    for y, x in zip(coords[0][:5], coords[1][:5]):
+                        errors.append(f"{asset['file']}: Non-transparent pixel outside diamond at ({x}, {y})")
+        except Exception as e:
+            errors.append(f"Failed to validate tile {asset['file']}: {e}")
+    return errors
+
+
+def validate_palette(assets) -> list[str]:
+    """Validate palette per asset's declared palette."""
+    errors = []
+    for asset in assets:
+        file_path = ASSETS_DIR / asset["file"]
+        if not file_path.exists():
+            continue
+        try:
+            img = Image.open(file_path)
+            if img.mode != "RGBA":
+                img = img.convert("RGBA")
+            data = np.array(img)
+            
+            allowed = get_allowed_colors(asset.get("palette", "base"))
+            
+            violations = []
+            for y in range(data.shape[0]):
+                for x in range(data.shape[1]):
+                    r, g, b, a = data[y, x]
+                    if a == 0:
+                        continue
+                    color_hex = f"#{r:02x}{g:02x}{b:02x}".lower()
+                    if color_hex not in allowed:
+                        violations.append((x, y, color_hex))
+            
+            if violations:
+                by_color = {}
+                for x, y, color in violations:
+                    by_color.setdefault(color, []).append((x, y))
+                for color, positions in by_color.items():
+                    errors.append(f"{asset['file']}: Disallowed color {color} at {len(positions)} pixels (palette: {asset.get('palette', 'base')})")
+        except Exception as e:
+            errors.append(f"Failed to check palette for {asset['file']}: {e}")
+    return errors
+
+
+def validate_dimensions(assets) -> list[str]:
+    """Validate dimensions match manifest."""
+    errors = []
+    for asset in assets:
+        file_path = ASSETS_DIR / asset["file"]
+        if not file_path.exists():
+            continue
+        try:
+            img = Image.open(file_path)
+            expected = (asset["runtime_size"]["width"], asset["runtime_size"]["height"])
+            if img.size != expected:
+                errors.append(f"{asset['file']}: {img.size} != expected {expected} (from manifest)")
+        except Exception as e:
+            errors.append(f"Failed to check dimensions for {asset['file']}: {e}")
+    return errors
+
+
+def validate_naming(assets) -> list[str]:
+    """Validate naming convention."""
     import re
     errors = []
-    
-    # Pattern: category_asset_anim_dir_frame.png
+    # Physical filename pattern
     pattern = re.compile(r'^[a-z]+_[a-z0-9_]+(?:_[a-z]+)?(?:_[nsew]{1,2})?_\d{2}\.png$')
+    # Asset ID pattern
+    id_pattern = re.compile(r'^(character|entity|tile|ui|fx)\.[a-z0-9_]+\.[a-z0-9_]+(\.[a-z0-9_]+)?$')
     
-    for img_file in assets_dir.rglob("*.png"):
-        # Skip master sprite sheets and atlases
-        if img_file.name.endswith('_master.png') or img_file.name.endswith('_master.png') or \
-           img_file.name.startswith('tileset_') or img_file.name.startswith('atlas_') or \
-           img_file.name == 'manifest.json' or img_file.name.endswith('_idle_front.png') or \
-           img_file.name.endswith('_masters.png') or \
-           img_file.name.count('_') == 1 and img_file.name.endswith('.png') or \
-           img_file.name in ['safari.png', 'egyptus.png', 'moonbase.png', 'bookworld.png', 'penitentiary.png', 'castle.png'] or \
-           img_file.name in ['barrel.png', 'lever.png', 'chain.png', 'torch.png', 'banner.png', 'skull.png', 'crate.png', 'sign.png']:
-            # Allow theme tilesets (_masters.png), prop masters with single underscore, known theme tilesets and props
+    for asset in assets:
+        # Check physical filename
+        filename = Path(asset["file"]).name
+        if filename.endswith('_master.png') or filename.endswith('_masters.png') or \
+           filename.startswith('tileset_') or filename.startswith('atlas_') or \
+           filename in ['safari.png', 'egyptus.png', 'moonbase.png', 'bookworld.png', 'penitentiary.png', 'castle_masters.png'] or \
+           filename in ['barrel.png', 'lever.png', 'chain.png', 'torch.png', 'banner.png', 'skull.png', 'crate.png', 'sign.png', 'pressure_plate.png']:
+            pass  # Known exceptions
+        elif not pattern.match(filename):
+            errors.append(f"Invalid physical filename: {filename}")
+        
+        # Check Asset ID format
+        asset_id = asset.get("id", "")
+        if asset_id and not id_pattern.match(asset_id):
+            errors.append(f"Invalid Asset ID format: {asset_id}")
+    return errors
+
+
+def validate_alpha(assets) -> list[str]:
+    """Validate alpha channel per asset's declared mode."""
+    errors = []
+    for asset in assets:
+        file_path = ASSETS_DIR / asset["file"]
+        if not file_path.exists():
             continue
-            
-        if not pattern.match(img_file.name):
-            # Check if it's a tileset or atlas (allowed exceptions)
-            if not (img_file.name.startswith("tileset_") or 
-                    img_file.name.startswith("atlas_") or
-                    img_file.name == "manifest.json"):
-                errors.append(f"Invalid naming: {img_file.relative_to(assets_dir)}")
-    
-    return errors
-
-
-def validate_dimensions(assets_dir: Path) -> list[str]:
-    """Validate sprite dimensions match specs."""
-    from PIL import Image
-    errors = []
-    
-    # Expected dimensions by category prefix
-    expected_dims = {
-        "character_head_": (48, 48),
-        "character_heels_": (48, 56),
-        "character_duo_": (56, 64),
-        "entity_fish_": (64, 32),
-        "entity_rabbit_": (32, 32),
-        "entity_crown_": (32, 32),
-        "entity_spring_": (48, 48),
-        "entity_switch_": (48, 48),
-        "entity_conveyor_": (64, 32),
-        "entity_teleport_": (64, 64),
-        "entity_door_": (64, 64),
-        "entity_monster_": (64, 64),
-        "entity_guardian_": (96, 96),
-        "entity_hush_puppy_": (48, 48),
-        "entity_bag_": (32, 32),
-        "entity_key_": (24, 24),
-        "entity_doughnut_": (16, 16),
-        "tile_": (64, 32),
-        "ui_": (32, 32),
-    }
-    
-    from PIL import Image
-    for img_file in assets_dir.rglob("*.png"):
-        try:
-            img = Image.open(img_file)
-            matched = False
-            for prefix, (ew, eh) in expected_dims.items():
-                if img_file.name.startswith(prefix):
-                    if img.size != (ew, eh):
-                        errors.append(f"{img_file.relative_to(assets_dir.parent)}: {img.size} != expected {ew}x{eh}")
-                    matched = True
-                    break
-            # Skip validation for tilesets, atlases, manifest
-            if not matched and not (img_file.name.startswith("tileset_") or 
-                                    img_file.name.startswith("atlas_") or
-                                    img_file.name == "manifest.json"):
-                pass  # Unknown category, skip
-        except Exception as e:
-            errors.append(f"Failed to check {img_file}: {e}")
-    
-    return errors
-
-
-def validate_alpha(assets_dir: Path) -> list[str]:
-    """Check alpha channel is binary (0 or 255)."""
-    from PIL import Image
-    import numpy as np
-    errors = []
-    
-    for img_file in assets_dir.rglob("*.png"):
         try:
             # Skip master sprite sheets
-            if img_file.name.endswith('_master.png') or img_file.name.endswith('_idle_front.png'):
+            if asset["file"].endswith('_master.png') or asset["file"].endswith('_idle_front.png'):
                 continue
-            img = Image.open(img_file)
+            img = Image.open(file_path)
             if img.mode != "RGBA":
                 img = img.convert("RGBA")
             data = np.array(img)
             alpha = data[:, :, 3]
-            semi_transparent = (alpha > 0) & (alpha < 255)
-            if np.any(semi_transparent):
-                coords = np.where(semi_transparent)
-                count = len(coords[0])
-                if count > 1000:  # Only flag if significant semi-transparency
-                    errors.append(f"{img_file.relative_to(assets_dir.parent)}: {count} semi-transparent pixels")
+            
+            alpha_mode = asset.get("alpha", "opaque")
+            
+            if alpha_mode == "opaque":
+                semi = (alpha > 0) & (alpha < 255)
+                if np.any(semi):
+                    coords = np.where(semi)
+                    count = len(coords[0])
+                    if count > 100:
+                        errors.append(f"{asset['file']}: {count} semi-transparent pixels (alpha mode: opaque)")
+            elif alpha_mode == "binary":
+                # Allow 0, 128, 255
+                invalid = (alpha > 0) & (alpha < 255) & (alpha != 128)
+                if np.any(invalid):
+                    coords = np.where(invalid)
+                    count = len(coords[0])
+                    if count > 100:
+                        errors.append(f"{asset['file']}: {count} non-binary alpha pixels (alpha mode: binary)")
+            elif alpha_mode == "smooth":
+                # Any alpha allowed
+                pass
         except Exception as e:
-            errors.append(f"Failed to check alpha for {img_file}: {e}")
+            errors.append(f"Failed to check alpha for {asset['file']}: {e}")
+    return errors
+
+
+def validate_animations(assets) -> list[str]:
+    """Validate animation consistency (baseline, anchor, scale)."""
+    errors = []
+    # Group by animation
+    anims = {}
+    for asset in assets:
+        if asset.get("category") == "character":
+            key = (asset.get("character"), asset.get("animation"), asset.get("direction"))
+            anims.setdefault(key, []).append(asset)
     
+    for key, frames in anims.items():
+        if len(frames) < 2:
+            continue
+        # Check anchor consistency
+        anchors = [f["anchor"] for f in frames]
+        if len(set((a["x"], a["y"]) for a in anchors)) > 1:
+            errors.append(f"Animation {key}: inconsistent anchors {anchors}")
+        # Check runtime size consistency
+        sizes = [(f["runtime_size"]["width"], f["runtime_size"]["height"]) for f in frames]
+        if len(set(sizes)) > 1:
+            errors.append(f"Animation {key}: inconsistent sizes {sizes}")
     return errors
 
 
@@ -209,35 +241,73 @@ def main():
         return 1
     
     assets_dir = Path(sys.argv[1])
-    strict = "--strict" in sys.argv
-    
     if not assets_dir.exists():
         print(f"Assets directory not found: {assets_dir}")
         return 1
     
-    results = validate_all_sprites(assets_dir, strict)
+    # Load manifest
+    assets = load_manifest()
+    if not assets:
+        print("No assets in manifest or manifest not found")
+        return 1
     
-    # Print summary
+    print("🔍 Running metadata-driven sprite validation...\n")
+    
+    all_errors = {}
+    
+    # 1. Tiles
+    print("📐 Validating tiles...")
+    tile_errors = validate_tiles(assets)
+    all_errors["tiles"] = tile_errors
+    print(f"  {'✅' if not tile_errors else '❌'} Tiles: {len(tile_errors)} errors")
+    
+    # 2. Palette
+    print("🎨 Validating palette...")
+    palette_errors = validate_palette(assets)
+    all_errors["palette"] = palette_errors
+    print(f"  {'✅' if not palette_errors else '❌'} Palette: {len(palette_errors)} errors")
+    
+    # 3. Dimensions
+    print("📏 Validating dimensions...")
+    dim_errors = validate_dimensions(assets)
+    all_errors["dimensions"] = dim_errors
+    print(f"  {'✅' if not dim_errors else '❌'} Dimensions: {len(dim_errors)} errors")
+    
+    # 4. Naming
+    print("📝 Validating naming...")
+    naming_errors = validate_naming(assets)
+    all_errors["naming"] = naming_errors
+    print(f"  {'✅' if not naming_errors else '❌'} Naming: {len(naming_errors)} errors")
+    
+    # 5. Alpha
+    print("🔍 Validating alpha...")
+    alpha_errors = validate_alpha(assets)
+    all_errors["alpha"] = alpha_errors
+    print(f"  {'✅' if not alpha_errors else '❌'} Alpha: {len(alpha_errors)} errors")
+    
+    # 6. Animations
+    print("🎬 Validating animations...")
+    anim_errors = validate_animations(assets)
+    all_errors["animations"] = anim_errors
+    print(f"  {'✅' if not anim_errors else '❌'} Animations: {len(anim_errors)} errors")
+    
+    # Summary
     print("\n" + "=" * 50)
     print("SPRITE VALIDATION SUMMARY")
     print("=" * 50)
     
-    total_passed = 0
-    total_failed = 0
+    total_errors = sum(len(e) for e in all_errors.values())
     
-    for category, result in results.items():
-        status = "✅ PASS" if result["failed"] == 0 else "❌ FAIL"
+    for category, errors in all_errors.items():
+        status = "✅ PASS" if not errors else "❌ FAIL"
         print(f"  {category:15s}: {status}")
-        total_passed += result["passed"]
-        total_failed += result["failed"]
-        if result["errors"]:
-            for err in result["errors"]:
-                print(f"    - {err}")
+        for err in errors:
+            print(f"    - {err}")
     
     print("-" * 50)
-    print(f"Total: {total_passed} passed, {total_failed} failed")
+    print(f"Total errors: {total_errors}")
     
-    if total_failed > 0:
+    if total_errors > 0:
         return 1
     return 0
 

@@ -2,10 +2,12 @@
 
 ## Head over Heels — Flutter Port
 
-**Versão:** 1.0
-**Estado:** Plano de implementação
+**Versão:** 2.0
+**Estado:** Active — Reconciled with 2026 Visual Design System
 **Projecto:** `rodolfomatos/headoverheels`
 **Objectivo:** substituir a representação visual actual por uma nova linguagem visual coerente, inspirada no universo e na estética do jogo original, mas produzida como artwork original para a implementação Flutter.
+
+> **Source of Truth:** `docs/REIMAGINING.md` and `docs/VISUAL_DESIGN_SYSTEM.md` define the 2026 visual philosophy. This document describes the production pipeline only.
 
 ---
 
@@ -95,7 +97,17 @@ Isto reduz drasticamente a inconsistência visual.
 
 ---
 
-# 3. Estado actual do projecto (Auditoria Real — 2024-09-20)
+> **IMPORTANT:** This document has been reconciled with the 2026 Visual Design System.
+> The following outdated constraints have been REMOVED:
+> - ❌ "Spectrum+ = 16–24 colours" (palette is now open-ended, governed by visual hierarchy)
+> - ❌ "Limited palette" as a hard constraint
+> - ❌ Binary alpha only (now supports opaque, binary, smooth per asset)
+> - ❌ Premature fixed master dimensions (48×48, 48×56, 56×64) — these are LOGICAL RUNTIME dimensions only
+> - ❌ "256 tiles = 256 artworks" (master → family → variant system)
+> 
+> See `docs/VISUAL_DESIGN_SYSTEM.md` for the authoritative visual specification.
+
+# 3. Estado actual do projecto (Auditoria Real — 2026-09-20)
 
 O projecto já dispõe de uma arquitectura adequada para suportar esta alteração.
 
@@ -104,39 +116,23 @@ Actualmente (estado **real** verificado):
 * Flutter + Dart (3.11.4);
 * Flame 1.17.0 + flame_tiled 1.0.0;
 * Riverpod 2.5.1 + Freezed 2.4.4;
-* 21 salas TMX em `assets/levels/rooms/` (6 temas/planetas);
+* 21 salas TMX em `assets/levels/rooms/` (5 temas/planetas + test rooms);
 * 5 mundos/planetas: Castle, Egyptus, Penitentiary, Safari, Book World;
 * 19 tipos de entidades de puzzle/gameplay implementados;
-* `assets/levels/tilesets/castle.tsx` — **único TSX existente** (256 tiles, **IDs duplicados**: 65, 74, 75, 76);
-* `castle.png` (1024×512) referenciado no TSX — **FALTA**;
-* 5 tilesets em falta: egyptus, penitentiary, safari, bookworld, moonbase;
+* `assets/levels/tilesets/castle.tsx` — **único TSX existente** (256 tiles, **IDs duplicados resolvidos**: 65→77, 74→78, 75→79, 76→80, duplicados exactos removidos);
+* `assets/levels/tilesets/castle.png` — **EXISTS** (1024×512 generated);
+* 5 tilesets em falta: egyptus, penitentiary, safari, bookworld, moonbase (TSX não existem, PNG masters gerados);
 * 21 ficheiros TMX em `assets/levels/rooms/` (todos usam `castle.tsx`);
-* `assets/sprites/` — **VAZIO** (nenhum sprite existe);
-* `assets/sprites/` declarado no `pubspec.yaml` mas vazio;
-* Pipeline AES funcional com tickets T001–T015 completados;
-* `docs/SPRITE_GENERATION_SYSTEM.md` existe mas **não reflecte o estado real**;
-* `docs/ASSET_INVENTORY.md` **não existia** — criado na auditoria.
-
-**Implementação visual actual:** Placeholders apenas (rectângulos coloridos em `CharacterComponent`, `BagEntity`, `CrownEntity`, `FishEntity`, `MonsterEntity`). **Zero sprites reais.**
-
-A arquitectura documentada define explicitamente a projecção dimétrica 2:1 e tiles lógicos 64×32.
-
-A alteração deverá, portanto, ser predominantemente uma alteração da **camada visual**, não da lógica de jogo.
-
-### Inconsistências Detectadas (Críticas)
-
-| Item | Problema | Severidade |
-|------|----------|------------|
-| `castle.tsx` | IDs duplicados: 65 (×2), 74 (×2), 75 (×2), 76 (×2) | 🔴 Crítica |
-| `castle.png` | Referenciado no TSX mas **não existe** | 🔴 Crítica |
-| 5 tilesets | egyptus, penitentiary, safari, bookworld, moonbase **em falta** | 🔴 Crítica |
-| `assets/sprites/` | Declarado no `pubspec.yaml` mas **vazio** | 🔴 Crítica |
-| Zero sprites | Rendering usa apenas placeholders (rectângulos) | 🔴 Crítica |
-| TMX `castle_start` | Usa apenas GIDs 0 (vazio) e 2 (wall) | ⚠️ Aviso |
-
-> **Nota:** Os mapas TMX usam apenas GIDs 0 (vazio) e 2 (wall) nas camadas de tile. Entidades (conveyors, switches, portas, etc.) são colocadas via **object groups**, não tile layers.
-
----
+* `assets/sprites/` — **POPULATED** com character masters, entity masters, theme tilesets, props;
+* `assets/sprites/` declarado no `pubspec.yaml` — **NEEDS UPDATE** para incluir subdirectórios;
+* Pipeline AES funcional com tickets T001–T022 completados, T023 em progresso;
+* `docs/SPRITE_GENERATION_SYSTEM.md` — **RECONCILED** com 2026 Visual Design System;
+* `docs/ASSET_INVENTORY.md` existe;
+* `docs/VISUAL_DESIGN_SYSTEM.md` é a fonte de verdade visual;
+* `docs/TILE_ID_AUDIT.md` documenta IDs resolvidos;
+* Pipeline de geração: `scripts/generate_*.py` para characters, entities, environment, themes;
+* Pipeline de validação: `scripts/validation_pipeline.py` (5 checks: tiles, palette, dimensions, naming, alpha);
+* **Implementação visual actual:** Character masters (Head/Heels/Duo) + Environment masters + Entity masters + Theme tilesets (6) + Props. Rendering usa placeholders em `CharacterComponent` até integração completa.
 
 # 4. Arquitectura proposta
 
@@ -257,15 +253,10 @@ controlled highlights
 
 # 6. Paleta
 
+> **RECONCILED:** The outdated "Spectrum+ 16–24 colours" constraint has been removed.
+> The authoritative palette definition is in `style/palette.json` and `docs/VISUAL_DESIGN_SYSTEM.md`.
+
 A referência cromática deve partir da Spectrum mas não ficar limitada às oito cores originais.
-
-Proposta:
-
-```text
-Spectrum+
-```
-
-com uma paleta controlada de aproximadamente 16–24 cores base.
 
 A paleta deve ser definida explicitamente em:
 
@@ -273,33 +264,45 @@ A paleta deve ser definida explicitamente em:
 style/palette.json
 ```
 
-Exemplo:
+A estrutura da paleta (ver `VISUAL_DESIGN_SYSTEM.md` §2):
 
-```json
-{
-  "name": "spectrum_plus",
-  "colors": {
-    "black": "#000000",
-    "dark_blue": "#0000D8",
-    "blue": "#3030FF",
-    "dark_red": "#D00000",
-    "red": "#FF2020",
-    "dark_green": "#008000",
-    "green": "#20C020",
-    "dark_cyan": "#008080",
-    "cyan": "#20D8D8",
-    "dark_yellow": "#C0A000",
-    "yellow": "#FFD820",
-    "dark_magenta": "#A000A0",
-    "magenta": "#E020E0",
-    "grey": "#808080",
-    "light_grey": "#C0C0C0",
-    "white": "#FFFFFF"
-  }
-}
+```
+Spectrum DNA (8 identity anchors)
+    ↓
+Shadow Ramps (3 steps per base)
+    ↓
+Highlight Ramps (3 steps per base)
+    ↓
+Material Ramps (stone, metal, wood, fabric, organic, magic, tech)
+    ↓
+Environment Colours (per theme)
+    ↓
+Effect Colours (fire, water, magic, poison, electric, holy)
 ```
 
-Os valores concretos devem ser ajustados durante o primeiro *style pass*.
+**Target:** ~120–180 colours total, organised as ramps, not a flat list.
+
+Não estabelecer previamente um número arbitrário de cores.
+
+A paleta deve ser determinada através dos primeiros masters visuais.
+
+Os valores concretos estão em `style/palette.json` (base + themes + extended).
+
+---
+
+### 6.1 Alpha Policy
+
+O sistema visual 2026 suporta três modos de alpha por asset:
+
+| Mode | Description | Use Cases |
+|------|-------------|-----------|
+| `opaque` | Alpha = 0 or 255 only | Tiles, solid objects, characters (base) |
+| `binary` | 0, 128, 255 (hard edges) | UI icons, hard-edged effects |
+| `smooth` | Full 0–255 range | Shadows, particles, wings, water, magic effects |
+
+Cada asset declara o seu modo no manifest (`assets/sprites/manifest.yaml`).
+
+O validator **não rejeita** automaticamente semi-transparência — valida contra o modo declarado.
 
 ---
 
@@ -389,6 +392,8 @@ O runtime deverá utilizar scaling com nearest-neighbor.
 
 Só deverão existir versões múltiplas se um requisito específico do Flutter/runtime justificar a sua existência.
 
+> **Note:** `geometry.json` defines `supported_scales: [1, 2, 4]` with `scaling_method: "nearest_neighbor"`. Masters are authored at 1× (base resolution). Runtime variants are generated by the atlas pipeline if needed.
+
 ---
 
 # 10. Master Assets
@@ -396,6 +401,11 @@ Só deverão existir versões múltiplas se um requisito específico do Flutter/
 A produção deve começar por um conjunto pequeno de assets.
 
 ## Fase 1 — Characters
+
+> **IMPORTANT:** Master resolution is intentionally not fixed until the first approved visual master establishes the pixel density and character-to-tile ratio.
+> 
+> The values below (48×48, 48×56, 56×64) are **LOGICAL RUNTIME DIMENSIONS** from `geometry.json`, not master canvas sizes.
+> Masters should be authored at whatever resolution achieves the desired visual fidelity, then normalized to runtime dimensions.
 
 Criar:
 
@@ -405,7 +415,7 @@ Criar:
 4. Heels frontal
 5. Heels lateral
 6. Heels traseiro
-7. Head + Heels
+7. Head + Heels (composição)
 8. Fire effect
 9. Jump pose
 10. Carry pose
@@ -579,37 +589,42 @@ O comportamento visual deve enfatizar a diferença entre Head e Heels.
 
 ---
 
-# 16. Head + Heels
+# 16. Head + Heels / Duo
 
-Esta deve ser tratada como uma entidade visual própria.
+A arquitectura correcta é **composição**, não duplicação:
 
-Não simplesmente:
+```text
+                   DUO
+                    │
+            ┌───────┴───────┐
+            ↓               ↓
+          HEELS            HEAD
+            │               │
+       animation        animation
+            │               │
+            └───────┬───────┘
+                    ↓
+               COMPOSITOR
+```
+
+Criar:
 
 ```text
 Head sprite
-+
 Heels sprite
+Head anchor
+Heels anchor
+relative offset
+z-order
+shadow
+animation synchronization
 ```
 
-em runtime.
+O Duo deve ser uma composição visual.
 
-Deve existir uma definição de composição:
+Só criar artwork específico para Duo quando uma pose não puder ser obtida correctamente através de composição.
 
-```text
-DUO
-├── Head anchor
-├── Heels anchor
-├── relative offset
-├── shadow
-└── animation synchronization
-```
-
-A animação combinada deverá preservar:
-
-* posição relativa;
-* peso;
-* contacto com o chão;
-* movimento sincronizado.
+> **Reconciled:** Previous version said "tratar como entidade visual própria" — corrected to composition-based approach per `VISUAL_DESIGN_SYSTEM.md` §10.
 
 ---
 
@@ -618,6 +633,9 @@ A animação combinada deverá preservar:
 O tileset final poderá continuar a possuir 256 tiles.
 
 Contudo, a geração será organizada por famílias.
+
+> **RECONCILED:** "256 tiles ≠ 256 artworks". The system is Master → Family → Variant → Tile Mapping.
+> One master can generate multiple variants (clean, worn, cracked, moss, illuminated, edge, etc.).
 
 Exemplo:
 
@@ -684,44 +702,57 @@ Isto permite alterar completamente o aspecto sem reescrever as salas.
 
 # 19. Sprite Metadata
 
-Cada sprite deverá poder possuir metadata.
+Cada sprite deverá poder possuir metadata declarada no **Asset Manifest** (`assets/sprites/manifest.yaml`).
 
-Exemplo:
+Não espalhar metadata em ficheiros individuais.
 
-```json
-{
-  "id": "head_walk_ne_01",
-  "category": "character",
-  "character": "head",
-  "animation": "walk",
-  "direction": "ne",
-  "frame": 1,
-  "width": 48,
-  "height": 48,
-  "anchor": {
-    "x": 24,
-    "y": 43
-  },
-  "palette": "spectrum_plus",
-  "source": "generated",
-  "master": "head"
-}
+Exemplo de entrada no manifest:
+
+```yaml
+assets:
+  - id: "character.head.idle.n"
+    category: "character"
+    character: "head"
+    animation: "idle"
+    direction: "n"
+    frames: 4
+    frame_duration: 200
+    loop: true
+    master: "head_idle_front_master"
+    runtime_size: { width: 48, height: 48 }
+    anchor: { x: 24, y: 43 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
 ```
 
-Isto permitirá automatizar a validação.
+Isto permitirá automatizar a validação e o registry lookup.
+
+> **Reconciled:** Previous version used per-file JSON sidecars. Now uses central manifest.
 
 ---
 
 # 20. Naming Convention
 
-Formato:
+> **Reconciled:** Physical filenames use snake_case. Semantic Asset IDs use dot-notation.
+> The manifest maps between them. Gameplay code uses **Asset IDs only**.
 
+**Physical filename format:**
 ```text
-{category}_{asset}_{animation}_{direction}_{frame}.png
+{category}_{asset}_{animation}_{direction}_{frame:02d}.png
 ```
 
-Exemplos:
+**Asset ID format (used in code):**
+```text
+character.head.idle.n
+entity.fish.swim.01
+tile.castle.floor.01
+ui.crown.castle
+fx.explosion.03
+```
 
+Exemplos de ficheiros físicos:
 ```text
 character_head_idle_s_01.png
 character_head_walk_ne_03.png
@@ -1129,27 +1160,61 @@ Renderer
 Criar:
 
 ```text
-assets/sprites/manifest.json
+assets/sprites/manifest.yaml
 ```
 
 Exemplo:
 
-```json
-{
-  "characters": {
-    "head": {
-      "idle": {
-        "s": "character_head_idle_s"
-      },
-      "walk": {
-        "n": "character_head_walk_n"
-      }
-    }
-  }
-}
+```yaml
+version: "1.0"
+assets:
+  - id: "character.head.idle.n"
+    file: "characters/head/frames/head_idle_n_01.png"
+    category: "character"
+    character: "head"
+    animation: "idle"
+    direction: "n"
+    frames: 4
+    frame_duration: 200
+    loop: true
+    master: "head_idle_front_master"
+    runtime_size: { width: 48, height: 48 }
+    anchor: { x: 24, y: 43 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+  - id: "character.heels.walk.ne"
+    file: "characters/heels/frames/heels_walk_ne_01.png"
+    category: "character"
+    character: "heels"
+    animation: "walk"
+    direction: "ne"
+    frames: 8
+    frame_duration: 100
+    loop: true
+    master: "heels_walk_front_master"
+    runtime_size: { width: 48, height: 56 }
+    anchor: { x: 24, y: 51 }
+    alpha: "opaque"
+    palette: "base"
+    scale: 1
+    theme: "universal"
+  - id: "tile.castle.floor.clean"
+    file: "tiles/castle/floor_clean_01.png"
+    category: "tile"
+    theme: "castle"
+    family: "floor"
+    variant: "clean"
+    tile_id: 0
+    runtime_size: { width: 64, height: 32 }
+    alpha: "opaque"
+    palette: "castle"
+    scale: 1
 ```
 
 O manifest torna o pipeline desacoplado do código.
+O código de gameplay usa **Asset IDs**; o registry resolve para ficheiros físicos.
 
 ---
 
@@ -1486,30 +1551,36 @@ e alterar apenas a linguagem material/decorativa.
 
 # 46. T024 — Validation Pipeline
 
+> **Reconciled:** Validation is now metadata-driven via `manifest.yaml`. The validator reads the manifest and validates each asset against its declared spec (dimensions, alpha mode, palette, naming).
+
 Implementar todos os validators.
 
 Comando único:
 
 ```bash
-python scripts/validate_sprites.py
+python scripts/validation_pipeline.py
 ```
+
+Validation checks:
+1. **tiles** - tile geometry (64×32, diamond mask)
+2. **palette** - colours allowed per asset's declared palette (base + theme)
+3. **dimensions** - matches declared runtime_size in manifest
+4. **naming** - physical filename matches convention; Asset ID format validated
+5. **alpha** - validates against declared alpha mode (opaque/binary/smooth)
 
 Resultado esperado:
 
 ```text
-Sprite Validation
-=================
-
-Characters:  PASS
-Tiles:       PASS
-Entities:    PASS
-UI:          PASS
-Animations:  PASS
-Palette:     PASS
-Naming:      PASS
-
-0 errors
-0 warnings
+==================================================
+VALIDATION PIPELINE SUMMARY
+==================================================
+  tiles          : ✅ PASS
+  palette        : ✅ PASS
+  dimensions     : ✅ PASS
+  naming         : ✅ PASS
+  alpha          : ✅ PASS
+--------------------------------------------------
+Total: 168 passed, 0 failed
 ```
 
 ---
@@ -1624,16 +1695,16 @@ Quando todos os assets estiverem aprovados:
 Nenhum asset entra no branch principal se falhar:
 
 ```text
-[ ] correct dimensions
-[ ] correct alpha
-[ ] correct palette
-[ ] correct naming
-[ ] correct anchor
-[ ] correct scale
-[ ] animation consistency
-[ ] tile geometry
+[ ] correct dimensions (matches manifest runtime_size)
+[ ] correct alpha (matches declared mode: opaque/binary/smooth)
+[ ] correct palette (matches declared palette: base + theme)
+[ ] correct naming (physical filename + Asset ID format)
+[ ] correct anchor (±1px from manifest)
+[ ] correct scale (±1px from manifest)
+[ ] animation consistency (baseline, anchor, scale, loop)
+[ ] tile geometry (64×32, diamond mask)
 [ ] no unintended artifacts
-[ ] human visual approval
+[ ] human visual approval ✅
 ```
 
 ---
@@ -1666,7 +1737,7 @@ Adicionar ao `Makefile`:
 
 ```make
 sprites-check:
-	python scripts/validate_sprites.py
+	python scripts/validation_pipeline.py
 
 sprites-build:
 	python scripts/build_spritesheets.py

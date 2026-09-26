@@ -61,3 +61,4 @@ flutter:
     - assets/levels/rooms/
     - assets/levels/world.json
     - assets/audio/
+    - assets/sprites/

@@ -44,6 +44,10 @@ EditorController
 - Uses the same 64×32 dimetric coordinates as the runtime.
 - Writes edits to a serializable `EditorDocument`; export to TMX/TSX happens through a dedicated exporter.
 - Object layers store semantic `type` values instead of assuming that an object is a tile.
+- `TmxCodec` supports CSV tile layers and round-trips object properties.
+- Object coordinates have two explicit modes: `tiledIsometric` (standard Tiled projection) and `grid` (used by the current Head over Heels generated rooms, where object x/y are grid values multiplied by tile size). The mode is stored in document metadata; the editor never guesses.
+- When a TSX tileset is loaded, tiles are painted on the canvas as cropped sprites and the palette browser lists every tile with its `type`, `class` and properties.
+- `EditorFileGateway` isolates the platform file system: `FileSelectorEditorGateway` uses `file_selector` (desktop + web) and `MemoryEditorFileGateway` is used by tests. The editor degrades to clipboard and dialogs when no gateway is configured.
 
 ### Sprite browser and animator
 
@@ -51,6 +55,10 @@ EditorController
 - Groups assets by `id`, `category`, `subject`, `animation` and `direction`.
 - Shows real frame count versus declared frame count; incomplete animations are labelled rather than hidden.
 - Accepts `metadata.frame_files` for multi-frame assets and uploads new frame lists through the manifest editor.
+- `SpriteManager` filters by category or free text, then edits the semantic fields that the runtime reads: `runtime_size`, `anchor`, `alpha`, `palette`, `frames`, `frame_duration` and `loop`. The id, subject, animation and direction are treated as identity and are not editable after import.
+- `SpriteAnimator` plays `metadata.frame_files` (falling back to `file`), honours the entry `loop` flag, and exposes step, duration and scrub controls.
+- `AssetManifestService` is the only writer of `manifest.yaml`; `AssetImportService` writes binaries and upserts entries.
+- Appending frames keeps the existing master `file` and replaces frames with the same name, so re-uploading a corrected frame is idempotent. Frames whose dimensions differ from the entry are rejected instead of silently rescaling.
 
 ### Asset import
 

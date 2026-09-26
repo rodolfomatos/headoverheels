@@ -32,22 +32,30 @@ class _SpriteGalleryState extends State<SpriteGallery> {
 
     return Column(
       children: [
-        Row(
-          children: [
-            const Text('Sprite scale'),
-            const SizedBox(width: 12),
-            SegmentedButton<double>(
-              segments: const [
-                ButtonSegment(value: 1, label: Text('1x')),
-                ButtonSegment(value: 2, label: Text('2x')),
-                ButtonSegment(value: 4, label: Text('4x')),
-              ],
-              selected: {_scale},
-              onSelectionChanged: (value) {
-                setState(() => _scale = value.first);
-              },
-            ),
-          ],
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Row(
+            children: [
+              const Text('Scale'),
+              const SizedBox(width: 8),
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: SegmentedButton<double>(
+                    segments: const [
+                      ButtonSegment(value: 1, label: Text('1x')),
+                      ButtonSegment(value: 2, label: Text('2x')),
+                      ButtonSegment(value: 4, label: Text('4x')),
+                    ],
+                    selected: {_scale},
+                    onSelectionChanged: (value) {
+                      setState(() => _scale = value.first);
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
         const Divider(),
         Expanded(

@@ -2,7 +2,7 @@
 project: headoverheels
 created: 2026-09-18
 current_sprint: sprint-10
-current_ticket: "T033"
+current_ticket: "T034"
 ---
 
 # Kanban — headoverheels
@@ -42,9 +42,10 @@ current_ticket: "T033"
 | T030 | Builder architecture & reusable iso_core foundation | high | done |
 | T031 | Editor document, storage, undo/redo & sprite import foundation | high | done |
 | T032 | Builder CLI scaffold and project validation | medium | done |
-| T033 | Visual isometric map editor | high | in-progress |
-| T034 | Sprite browser/animator and asset management UI | high | pending |
+| T033 | Visual isometric map editor | high | done |
+| T034 | Sprite browser/animator and asset management UI | high | done |
 | T035 | Migrate Head over Heels into games/headoverheels | high | pending |
+| T036 | TSX authoring: edit tile types/properties and export TSX | medium | pending |
 
 ## Sprint 01 — Foundation & Research
 **Goal**: Understand original game, establish core architecture, prove isometric rendering
@@ -139,12 +140,20 @@ current_ticket: "T033"
 | T030 | Builder architecture & reusable iso_core foundation | done |
 | T031 | Editor document, storage, undo/redo & sprite import foundation | done |
 | T032 | Builder CLI scaffold and project validation | done |
-| T033 | Visual isometric map editor | in-progress |
-| T034 | Sprite browser/animator and asset management UI | pending |
+| T033 | Visual isometric map editor | done |
+| T034 | Sprite browser/animator and asset management UI | done |
+| T036 | TSX authoring: edit tile types/properties and export TSX | pending |
 | T035 | Migrate Head over Heels into games/headoverheels | pending |
 
 ## In Progress
-* T033: Visual isometric map editor
+* T034: sprite browser/animator and asset management UI — manifest editor, filters, frame
+  append/import, delete and frame mismatch validation landed; awaiting commit
+* T036: TSX authoring (edit tile `type`/properties, write TSX)
+
+## Notes
+* T033 scope: TMX/TSX import, pan/zoom dimetric canvas with tileset image preview, paint/place/erase
+  tools, layer visibility, object inspector, document save/load, TMX export, TSX palette browser and
+  file-picker gateways. Known gap: no per-layer tile selection.
 
 ## Done
 * T001: Research original game mechanics & online MSX version
@@ -174,3 +183,5 @@ current_ticket: "T033"
 * T030: Builder architecture & reusable iso_core foundation
 * T031: Editor document, storage, undo/redo & sprite import foundation
 * T032: Builder CLI scaffold and project validation
+* T033: Visual isometric map editor (palette/TSX browser, file gateways, canvas preview)
+* T034: Sprite browser/animator and asset management UI (manifest editor, frame import, delete)

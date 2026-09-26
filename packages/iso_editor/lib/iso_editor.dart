@@ -1,6 +1,14 @@
+export 'src/app/editor_shell.dart';
 export 'src/assets/asset_import_service.dart';
+export 'src/assets/asset_manifest_service.dart';
 export 'src/document/editor_document.dart';
 export 'src/state/editor_controller.dart';
+export 'src/storage/editor_file_gateway.dart';
 export 'src/storage/editor_storage.dart';
+export 'src/tmx/tmx_codec.dart';
+export 'src/tmx/tsx_catalog.dart';
 export 'src/views/map_editor_view.dart';
+export 'src/views/sprite_animator.dart';
 export 'src/views/sprite_gallery.dart';
+export 'src/views/sprite_manager.dart';
+export 'src/views/tsx_browser.dart';

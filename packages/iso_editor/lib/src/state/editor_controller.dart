@@ -27,6 +27,33 @@ class EditorController extends ChangeNotifier {
   bool get canUndo => _undo.isNotEmpty;
   bool get canRedo => _redo.isNotEmpty;
 
+  String get documentKey {
+    final slug = _document.projectName
+        .trim()
+        .toLowerCase()
+        .replaceAll(RegExp('[^a-z0-9_]+'), '_')
+        .replaceAll(RegExp(r'^_+|_+$'), '');
+    return 'projects/${slug.isEmpty ? 'untitled' : slug}/editor.json';
+  }
+
+  Future<void> load({String? key}) async {
+    final document = EditorDocument.fromJson(
+      jsonDecode(await storage.readText(key ?? documentKey))
+          as Map<String, dynamic>,
+    );
+    _document = document;
+    _selection = null;
+    _dirty = false;
+    _undo.clear();
+    _redo.clear();
+    notifyListeners();
+  }
+
+  Future<void> save({String? key}) async {
+    await storage.writeText(key ?? documentKey, _document.encode());
+    markSaved();
+  }
+
   void setTool(EditorTool value) {
     if (_tool == value) return;
     _tool = value;
@@ -53,6 +80,69 @@ class EditorController extends ChangeNotifier {
     layers[layerIndex] = layer.setCell(address, tileId);
     _document = _document.copyWith(layers: layers);
     _markDirty();
+  }
+
+  void applyCell(
+    CellAddress address, {
+    int tileId = 1,
+    String objectType = 'entity',
+  }) {
+    switch (_tool) {
+      case EditorTool.select:
+        _selection = _objectAt(address)?.id;
+        notifyListeners();
+        return;
+      case EditorTool.tile:
+        setTile(0, address, tileId);
+        return;
+      case EditorTool.object:
+        placeObject(_newObject(address, objectType));
+        return;
+      case EditorTool.spawn:
+        placeObject(_newObject(address, 'spawn'));
+        return;
+      case EditorTool.erase:
+        setTile(0, address, null);
+        final object = _objectAt(address);
+        if (object != null) removeObject(object.id);
+        return;
+    }
+  }
+
+  void setLayerVisibility(int layerIndex, bool visible) {
+    if (layerIndex < 0 || layerIndex >= _document.layers.length) return;
+    final layer = _document.layers[layerIndex];
+    if (layer.visible == visible) return;
+    _pushUndo();
+    final layers = [..._document.layers];
+    layers[layerIndex] = TileLayer(
+      name: layer.name,
+      visible: visible,
+      locked: layer.locked,
+      cells: layer.cells,
+    );
+    _document = _document.copyWith(layers: layers);
+    _markDirty();
+  }
+
+  ObjectPlacement _newObject(CellAddress address, String type) {
+    final id =
+        '${type}_${address.x}_${address.y}_${_document.objects.length + 1}';
+    return ObjectPlacement(
+      id: id,
+      name: id,
+      type: type,
+      position: Vector3(address.x.toDouble(), address.y.toDouble(), 0),
+    );
+  }
+
+  ObjectPlacement? _objectAt(CellAddress address) {
+    for (final object in _document.objects.reversed) {
+      final x = object.position.x.round();
+      final y = object.position.y.round();
+      if (x == address.x && y == address.y) return object;
+    }
+    return null;
   }
 
   void placeObject(ObjectPlacement object) {

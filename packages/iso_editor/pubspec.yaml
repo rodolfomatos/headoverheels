@@ -7,12 +7,14 @@ environment:
   sdk: ^3.11.4
 
 dependencies:
+  file_selector: ^1.1.0
   flutter:
     sdk: flutter
   iso_core:
     path: ../iso_core
   path: ^1.9.0
   vector_math: ^2.1.0
+  xml: ^6.6.1
   yaml: ^3.1.2
 
 dev_dependencies:

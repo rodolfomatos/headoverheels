@@ -2,7 +2,7 @@
 project: headoverheels
 created: 2026-09-18
 current_sprint: sprint-10
-current_ticket: "T034"
+current_ticket: "T035"
 ---
 
 # Kanban — headoverheels
@@ -146,8 +146,7 @@ current_ticket: "T034"
 | T035 | Migrate Head over Heels into games/headoverheels | pending |
 
 ## In Progress
-* T034: sprite browser/animator and asset management UI — manifest editor, filters, frame
-  append/import, delete and frame mismatch validation landed; awaiting commit
+* T035: Migrate Head over Heels into games/headoverheels
 * T036: TSX authoring (edit tile `type`/properties, write TSX)
 
 ## Notes

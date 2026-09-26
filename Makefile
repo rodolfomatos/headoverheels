@@ -1,7 +1,7 @@
-.PHONY: setup run test lint format build build-release check doctor help
+.PHONY: setup run test test-packages test-coverage lint format format-check check assets-check doctor help build build-release build-release-apk build-release-appbundle build-release-all build-version generate clean security-scan install
 
 AES_LANGUAGE ?= flutter
-AES_LINT ?= flutter analyze
+AES_LINT ?= flutter analyze --no-fatal-infos --no-fatal-warnings
 AES_TEST ?= flutter test
 AES_FORMAT ?= dart format .
 AES_BUILD ?= flutter build apk --release
@@ -24,6 +24,20 @@ lint:
 
 format:
 	@$(AES_FORMAT)
+
+format-check:
+	@dart format --output=none --set-exit-if-changed lib test packages
+
+check: format-check lint test test-packages assets-check
+
+test-packages:
+	@cd packages/iso_core && flutter test
+	@cd packages/iso_editor && flutter test
+	@cd packages/iso_builder_cli && dart test
+
+assets-check:
+	@python3 scripts/validation_pipeline.py
+	@python3 scripts/validate_sprites.py assets/sprites
 
 build:
 	@$(AES_BUILD)
@@ -94,4 +108,7 @@ help:
 	@echo "  make security-scan   - Check for security issues"
 	@echo "  make install         - Install release APK on device"
 	@echo "  make doctor          - Show environment info"
+	@echo "  make format-check    - Verify Dart formatting"
+	@echo "  make test-packages   - Test builder packages"
+	@echo "  make assets-check    - Validate sprite assets"
 	@echo "  make check           - Run all checks"

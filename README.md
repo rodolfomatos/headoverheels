@@ -93,6 +93,10 @@ headoverheels/
 │   │   └── ui/                 # Screens, widgets, theme
 │   ├── utils/                  # JSON converters (Vector2/3, Freezed)
 │   └── main.dart               # App entry point
+├── packages/                   # Reusable builder platform
+│   ├── iso_core/               # 2:1 dimetric runtime, assets, levels, physics
+│   ├── iso_editor/             # Map editor, sprite gallery, asset import
+│   └── iso_builder_cli/        # Project scaffolding and validation
 ├── aes/                        # AES Protocol project management
 │   ├── kanban.md               # Project board
 │   ├── sprints/                # Sprint definitions
@@ -220,9 +224,11 @@ cat aes/tickets/T005-learn.md   # Learnings & hostile audit
 ```bash
 make check
 # Runs:
-# 1. dart format . --set-exit-if-changed
+# 1. dart format --output=none --set-exit-if-changed lib test packages
 # 2. flutter analyze --no-fatal-infos --no-fatal-warnings
 # 3. flutter test
+# 4. iso_core, iso_editor and iso_builder_cli tests
+# 5. asset validation pipelines
 ```
 
 ### Pre-Commit Checklist
@@ -273,6 +279,24 @@ make check
   "planets": [...]
 }
 ```
+
+---
+
+## 🧰 Builder Platform
+
+The repository is being structured as a reusable isometric game builder:
+
+- `packages/iso_core` — platform-neutral Flutter/Flame runtime: dimetric coordinates, physics, entity contracts, manifest-driven assets, level loading and sprite resolution.
+- `packages/iso_editor` — editor foundation: serializable map document, undo/redo, storage abstraction, PNG asset import, dimetric map view and sprite gallery.
+- `packages/iso_builder_cli` — project scaffolding and validation:
+  ```bash
+  dart run packages/iso_builder_cli/bin/iso_builder.dart create "My Game"
+  dart run packages/iso_builder_cli/bin/iso_builder.dart analyze games/my_game
+  ```
+
+Head over Heels specific state and mechanics remain in the game layer; the generic core does not depend on Head, Heels or their puzzle entities.
+
+See `docs/BUILDER_ARCHITECTURE.md`.
 
 ---
 

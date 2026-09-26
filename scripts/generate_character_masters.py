@@ -349,7 +349,7 @@ def create_duo_composition():
     # Add shadow
     draw.ellipse([14, 60, 42, 65], fill=(0, 0, 0, 80))
     
-    sheet_path = Path(__file__).parent.parent / "assets" / "sprites" / "characters" / "duo" / "duo_idle_front.png"
+    sheet_path = Path(__file__).parent.parent / "assets" / "sprites" / "characters" / "duo" / "duo_idle_front_01.png"
     sheet.save(sheet_path)
     print(f"Created {sheet_path}")
 

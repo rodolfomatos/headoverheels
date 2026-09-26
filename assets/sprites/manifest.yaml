@@ -641,8 +641,8 @@ assets:
   palette: extended
   scale: 1
   theme: universal
-- id: character.duo.idle.s
-  file: characters/duo/duo_idle_front.png
+- id: character.duo.idle.n
+  file: characters/duo/duo_idle_front_01.png
   category: character
   character: duo
   animation: idle
@@ -993,6 +993,7 @@ assets:
   alpha: opaque
   palette: castle
   scale: 1
+  type: master
 - id: tileset.egyptus
   file: tiles/egyptus.png
   category: tileset
@@ -1003,6 +1004,7 @@ assets:
   alpha: opaque
   palette: egyptus
   scale: 1
+  type: master
 - id: tileset.penitentiary
   file: tiles/penitentiary.png
   category: tileset
@@ -1013,6 +1015,7 @@ assets:
   alpha: opaque
   palette: penitentiary
   scale: 1
+  type: master
 - id: tileset.safari
   file: tiles/safari.png
   category: tileset
@@ -1023,6 +1026,7 @@ assets:
   alpha: opaque
   palette: safari
   scale: 1
+  type: master
 - id: tileset.bookworld
   file: tiles/bookworld.png
   category: tileset
@@ -1033,6 +1037,7 @@ assets:
   alpha: opaque
   palette: bookworld
   scale: 1
+  type: master
 - id: tileset.moonbase
   file: tiles/moonbase.png
   category: tileset
@@ -1043,6 +1048,7 @@ assets:
   alpha: opaque
   palette: moonbase
   scale: 1
+  type: master
 - id: prop.barrel
   file: props/barrel/barrel.png
   category: prop
@@ -1057,6 +1063,7 @@ assets:
   palette: extended
   scale: 1
   theme: universal
+  type: source
 - id: prop.lever
   file: props/lever/lever.png
   category: prop
@@ -1071,6 +1078,7 @@ assets:
   palette: extended
   scale: 1
   theme: universal
+  type: source
 - id: prop.chain
   file: props/chain/chain.png
   category: prop
@@ -1085,6 +1093,7 @@ assets:
   palette: extended
   scale: 1
   theme: universal
+  type: source
 - id: prop.torch
   file: props/torch/torch.png
   category: prop
@@ -1099,6 +1108,7 @@ assets:
   palette: extended
   scale: 1
   theme: universal
+  type: source
 - id: prop.crate
   file: props/crate/crate.png
   category: prop
@@ -1113,6 +1123,7 @@ assets:
   palette: extended
   scale: 1
   theme: universal
+  type: source
 - id: prop.crate_broken
   file: props/crate_broken/crate_broken.png
   category: prop
@@ -1127,6 +1138,7 @@ assets:
   palette: extended
   scale: 1
   theme: universal
+  type: source
 - id: prop.banner
   file: props/banner/banner.png
   category: prop
@@ -1141,6 +1153,7 @@ assets:
   palette: extended
   scale: 1
   theme: universal
+  type: source
 - id: prop.skull
   file: props/skull/skull.png
   category: prop
@@ -1155,6 +1168,7 @@ assets:
   palette: extended
   scale: 1
   theme: universal
+  type: source
 - id: prop.sign
   file: props/sign/sign.png
   category: prop
@@ -1169,6 +1183,7 @@ assets:
   palette: extended
   scale: 1
   theme: universal
+  type: source
 - id: prop.pressure_plate
   file: props/pressure_plate/pressure_plate.png
   category: prop
@@ -1183,3 +1198,4 @@ assets:
   palette: extended
   scale: 1
   theme: universal
+  type: source

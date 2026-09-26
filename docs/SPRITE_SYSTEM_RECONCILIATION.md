@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-21  
 **Status:** Complete  
-**Tickets:** T016–T022 done, T023 in-progress, T024–T029 pending
+**Tickets:** T016–T024 complete; T025+ pending
 
 ---
 
@@ -112,7 +112,7 @@ assets/sprites/
 │   │   ├── heels_master.png
 │   │   └── frames/                  # 20 frames (idle/walk/run/jump/carry × 4 dir)
 │   └── duo/
-│       └── duo_idle_front.png       # Composed reference
+│       └── duo_idle_front_01.png       # Composed reference
 ├── entities/
 │   ├── fish/fish_master.png
 │   ├── rabbit/rabbit_master.png
@@ -270,7 +270,7 @@ $ flutter test
 |------|--------|
 | `docs/SPRITE_GENERATION_SYSTEM.md` | Major rewrite — removed outdated constraints, aligned with 2026 VDS |
 | `scripts/validate_sprites.py` | Complete rewrite — metadata-driven via manifest |
-| `assets/sprites/manifest.yaml` | Created — central asset manifest (58 entries) |
+| `assets/sprites/manifest.yaml` | Created — central asset manifest (65 entries) |
 | `pubspec.yaml` | Added `assets/sprites/` |
 | `docs/SPRITE_SYSTEM_RECONCILIATION.md` | This document |
 

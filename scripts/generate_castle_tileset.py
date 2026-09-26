@@ -8,6 +8,8 @@ from PIL import Image, ImageDraw
 from pathlib import Path
 import random
 
+from tileset_geometry import save_masked
+
 # Output directories
 OUTPUT_DIR = Path(__file__).parent.parent / "assets" / "sprites" / "tiles" / "castle"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -233,7 +235,7 @@ def create_castle_tileset():
         sheet.paste(tile_img, ((i % 16) * 64, (i // 16 + 1) * 32))
     
     # Save
-    sheet.save(OUTPUT_DIR / "castle_masters.png")
+    save_masked(sheet, OUTPUT_DIR / "castle_masters.png")
     print(f"Created castle_masters.png")
 
 def create_castle_full_tileset():

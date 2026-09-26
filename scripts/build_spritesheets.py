@@ -5,10 +5,12 @@ Manifest-driven: reads assets/sprites/manifest.yaml and builds
 spritesheets for each animation group.
 """
 
-import sys
-import yaml
 import json
+import shutil
+import sys
 from pathlib import Path
+
+import yaml
 from PIL import Image
 
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -122,6 +124,8 @@ def build_spritesheet(frames: list[Path], output_path: Path, spec: dict) -> bool
 
 
 def main():
+    if OUTPUT_DIR.exists():
+        shutil.rmtree(OUTPUT_DIR)
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     
     assets = load_manifest()

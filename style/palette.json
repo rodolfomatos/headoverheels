@@ -121,6 +121,12 @@
       "detail_blue": "#0047A2",
       "detail_orange": "#FF6D00"
     },
+    "shared": {
+      "highlight_yellow": "#FFD600",
+      "accent_green": "#2E7D32",
+      "torch_orange": "#FF6D00",
+      "detail_gray": "#323232"
+    },
     "extended": {
       "orange": "#FF9800",
       "amber": "#FFB300",

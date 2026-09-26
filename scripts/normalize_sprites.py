@@ -14,12 +14,14 @@ Responsibilities:
 - Output normalized frames to build/normalized/
 """
 
-import sys
 import json
-import yaml
+import shutil
+import sys
 from pathlib import Path
-from PIL import Image
+
 import numpy as np
+import yaml
+from PIL import Image
 
 PROJECT_ROOT = Path(__file__).parent.parent
 ASSETS_DIR = PROJECT_ROOT / "assets" / "sprites"
@@ -198,6 +200,8 @@ def validate_alpha(img: Image.Image, alpha_mode: str, filename: str) -> list[str
 
 
 def main():
+    if BUILD_DIR.exists():
+        shutil.rmtree(BUILD_DIR)
     BUILD_DIR.mkdir(parents=True, exist_ok=True)
     
     assets = load_manifest()

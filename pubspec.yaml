@@ -36,6 +36,10 @@ dependencies:
   # Persistent preferences
   shared_preferences: ^2.2.2
 
+  # Reusable isometric engine core
+  iso_core:
+    path: packages/iso_core
+
 
 dev_dependencies:
   flutter_test:
@@ -62,3 +66,5 @@ flutter:
     - assets/levels/world.json
     - assets/audio/
     - assets/sprites/
+    - style/palette.json
+    - style/geometry.json

@@ -1,0 +1,21 @@
+name: iso_editor
+description: Map editor, sprite browser and asset importer for projects powered by iso_core.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.11.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  iso_core:
+    path: ../iso_core
+  path: ^1.9.0
+  vector_math: ^2.1.0
+  yaml: ^3.1.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0

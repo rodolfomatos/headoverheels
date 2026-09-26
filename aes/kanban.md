@@ -1,8 +1,8 @@
 ---
 project: headoverheels
 created: 2026-09-18
-current_sprint: sprint-08
-current_ticket: "T020"
+current_sprint: sprint-10
+current_ticket: "T033"
 ---
 
 # Kanban — headoverheels
@@ -21,24 +21,30 @@ current_ticket: "T020"
 | T009 | Implement Bag system (Heels carry items) | high | done |
 | T010 | Connect CharacterState notifier to CharacterComponent | high | done |
 | T011 | Create test room TMX with all entity types | high | done |
-| T012 | Port original level data / design new levels | medium | pending |
-| T013 | Audio: SFX, music, adaptive audio system | medium | pending |
-| T014 | Polish: animations, transitions, accessibility | low | pending |
-| T015 | Release build & Play Store preparation | low | pending |
+| T012 | Port original level data / design new levels | medium | done |
+| T013 | Audio: SFX, music, adaptive audio system | medium | done |
+| T014 | Polish: animations, transitions, accessibility | low | done |
+| T015 | Release build & Play Store preparation | low | done |
 | T016 | Asset & Visual System Audit | high | done |
 | T017 | Visual Design System | high | done |
 | T018 | Character Masters | high | done |
 | T019 | Character Animation Pipeline | high | done |
 | T020 | Environment Masters | high | done |
 | T021 | Castle Tileset | high | done |
-| T022 | Entity Masters | high | in-progress |
-| T023 | Remaining Themes | medium | pending |
+| T022 | Entity Masters | high | done |
+| T023 | Remaining Themes | medium | done |
 | T024 | Validation Pipeline | medium | done |
 | T025 | Atlas Pipeline | medium | pending |
 | T026 | Flutter Sprite Registry | medium | pending |
 | T027 | Gameplay Integration | medium | pending |
 | T028 | Visual QA | low | pending |
 | T029 | Final Asset Migration | low | pending |
+| T030 | Builder architecture & reusable iso_core foundation | high | done |
+| T031 | Editor document, storage, undo/redo & sprite import foundation | high | done |
+| T032 | Builder CLI scaffold and project validation | medium | done |
+| T033 | Visual isometric map editor | high | in-progress |
+| T034 | Sprite browser/animator and asset management UI | high | pending |
+| T035 | Migrate Head over Heels into games/headoverheels | high | pending |
 
 ## Sprint 01 — Foundation & Research
 **Goal**: Understand original game, establish core architecture, prove isometric rendering
@@ -110,7 +116,7 @@ current_ticket: "T020"
 | T020 | Environment Masters | done |
 | T021 | Castle Tileset | done |
 | T022 | Entity Masters | done |
-| T023 | Remaining Themes | in-progress |
+| T023 | Remaining Themes | done |
 | T024 | Validation Pipeline | done |
 | T025 | Atlas Pipeline | pending |
 
@@ -119,14 +125,26 @@ current_ticket: "T020"
 
 | ID | Title | Status |
 |----|-------|--------|
+| T025 | Atlas Pipeline | pending |
 | T026 | Flutter Sprite Registry | pending |
 | T027 | Gameplay Integration | pending |
-| T023 | Visual QA | pending |
-| T024 | Final Asset Migration | pending |
-| T025 | Release build & Play Store preparation | pending |
+| T028 | Visual QA | pending |
+| T029 | Final Asset Migration | pending |
+
+## Sprint 10 — Builder Platform
+**Goal**: Extract a reusable isometric engine and build editor/CLI foundations
+
+| ID | Title | Status |
+|----|-------|--------|
+| T030 | Builder architecture & reusable iso_core foundation | done |
+| T031 | Editor document, storage, undo/redo & sprite import foundation | done |
+| T032 | Builder CLI scaffold and project validation | done |
+| T033 | Visual isometric map editor | in-progress |
+| T034 | Sprite browser/animator and asset management UI | pending |
+| T035 | Migrate Head over Heels into games/headoverheels | pending |
 
 ## In Progress
-* T023: Remaining Themes
+* T033: Visual isometric map editor
 
 ## Done
 * T001: Research original game mechanics & online MSX version
@@ -151,4 +169,8 @@ current_ticket: "T020"
 * T020: Environment Masters
 * T021: Castle Tileset
 * T022: Entity Masters
+* T023: Remaining Themes
 * T024: Validation Pipeline
+* T030: Builder architecture & reusable iso_core foundation
+* T031: Editor document, storage, undo/redo & sprite import foundation
+* T032: Builder CLI scaffold and project validation

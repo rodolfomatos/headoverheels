@@ -13,10 +13,10 @@ class GuardianEntity extends MonsterEntity {
   static const int requiredCrowns = 4;
 
   GuardianEntity({
-    required String id,
-    required TriggerZone triggerZone,
-    required List<Vector3> patrolPoints,
-  }) : super(id: id, triggerZone: triggerZone, patrolPoints: patrolPoints);
+    required super.id,
+    required super.triggerZone,
+    required super.patrolPoints,
+  });
 
   @override
   void onLoad() {

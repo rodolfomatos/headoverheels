@@ -148,7 +148,7 @@ current_ticket: "T050"
 | T035 | Migrate Head over Heels into games/headoverheels | done |
 | T049 | Replace the untracked HoH audio with synthesised cues | done |
 | T051 | Publish nested assets: a pubspec entry ships only its own files | done |
-| T050 | Clear the 34 analyzer warnings in the HoH code | pending |
+| T050 | Clear the analyzer warnings in the HoH code | done |
 | T052 | The Palette panel squeezes its controls out of reach | pending |
 
 ## Sprint 11 — Knight Lore Completion
@@ -169,9 +169,6 @@ first game onto the same platform
 | T036 | TSX authoring: edit tile types/properties and export TSX | done |
 
 ## In Progress
-* T050: Clear the analyzer warnings in the migrated code
-
-## Queued (after T050)
 * T052: The Palette panel squeezes its controls out of reach
 
 
@@ -209,13 +206,17 @@ first game onto the same platform
   Found while checking that T049's audio reached the web build: the 30 WAVs were
   correctly ignored by the bundler because `assets/audio/` said nothing about
   `assets/audio/music/`.
-* T050 scope: `make lint` passes because the gate runs with
-  `--no-fatal-infos --no-fatal-warnings`, and it reports 34 findings in the
-  migrated HoH code: 3 unused imports, an unused local in
-  `sprite_registry.dart`, and the rest deprecations, mostly `withOpacity` in
-  `app_theme.dart` and `main_menu_screen.dart`, which Flutter wants written as
-  `withValues`. None of them fail a build, and none of them are mine, so they
-  are a ticket rather than a drive-by edit inside the migration commit.
+* T050 scope: 34 findings, now zero, and `flutter analyze` on the game is clean
+  without a flag. Two imports and a computed name in `sprite_registry.dart` that
+  nothing read; three dead locals in the joystick, and a `_isDragging` field that
+  was set on every pan and never read, which is now used: the knob brightens
+  while it is held, which is what the field was clearly for. Twenty two
+  `withOpacity` calls became `withValues(alpha:)`, which keeps the alpha in
+  floating point instead of quantising it to eight bits. The theme set both
+  `background` and `surface`, and both `onBackground` and `onSurface`;
+  Material 3 ignores the deprecated pair and derives the background from
+  `surface`, so the two lines are gone rather than renamed, and no colour that
+  renders has changed. Two constructors now pass their parameters up.
 * T035 scope: the root package is now `games/headoverheels`. `lib`, `assets`,
   `style`, `test`, the five platform directories, `analysis_options.yaml`,
   `.metadata` and the pubspec moved with `git mv`, so the history follows the

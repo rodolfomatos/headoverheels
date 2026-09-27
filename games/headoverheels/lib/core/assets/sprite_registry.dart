@@ -80,9 +80,8 @@ class SpriteRegistry {
     int frameIndex = 1;
 
     while (true) {
-      // assetId format: character.head.idle.n -> extract base name
-      final parts = assetId.split('.');
-      final baseName = parts.sublist(1, parts.length - 1).join('_');
+      // The frame name is built from the character, the animation and the
+      // direction, so a missing frame ends the loop rather than throwing.
       final frameName =
           'assets/sprites/characters/$character/frames/${character}_${animName}_${direction}_${frameIndex.toString().padLeft(2, '0')}.png';
 

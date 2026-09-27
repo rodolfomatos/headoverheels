@@ -18,11 +18,10 @@ class HushPuppyEntity extends PuzzleEntity {
   double _returnTimer;
   final Vector3 _originalPosition;
 
-  HushPuppyEntity({required String id, required TriggerZone triggerZone})
+  HushPuppyEntity({required super.id, required super.triggerZone})
     : _isAwake = false,
       _returnTimer = 0.0,
-      _originalPosition = triggerZone.position,
-      super(id: id, triggerZone: triggerZone);
+      _originalPosition = triggerZone.position;
 
   @override
   void onLoad() {

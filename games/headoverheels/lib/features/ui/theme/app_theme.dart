@@ -120,14 +120,12 @@ class AppTheme {
   static ThemeData dark() {
     final colorScheme = ColorScheme.dark(
       primary: AppColors.darkAccent,
-      secondary: AppColors.darkAccent.withOpacity(0.8),
+      secondary: AppColors.darkAccent.withValues(alpha: 0.8),
       surface: AppColors.darkSurface,
-      background: AppColors.darkBackground,
       error: AppColors.darkDestructive,
       onPrimary: AppColors.darkBackground,
       onSecondary: AppColors.darkBackground,
       onSurface: AppColors.darkText,
-      onBackground: AppColors.darkText,
       onError: AppColors.darkBackground,
       outline: AppColors.darkBorder,
       shadow: Colors.black,
@@ -235,7 +233,7 @@ class AppTheme {
         activeTrackColor: AppColors.darkAccent,
         inactiveTrackColor: AppColors.darkBorder,
         thumbColor: AppColors.darkAccent,
-        overlayColor: AppColors.darkAccent.withOpacity(0.2),
+        overlayColor: AppColors.darkAccent.withValues(alpha: 0.2),
         trackHeight: 4,
         thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
       ),
@@ -248,7 +246,7 @@ class AppTheme {
         }),
         trackColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return AppColors.darkAccent.withOpacity(0.5);
+            return AppColors.darkAccent.withValues(alpha: 0.5);
           }
           return AppColors.darkBorder;
         }),
@@ -295,7 +293,7 @@ class AppTheme {
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.darkSurface,
-        indicatorColor: AppColors.darkAccent.withOpacity(0.2),
+        indicatorColor: AppColors.darkAccent.withValues(alpha: 0.2),
         labelTextStyle: WidgetStateProperty.all(AppTypography.small),
         iconTheme: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
@@ -314,7 +312,7 @@ class AppTheme {
       ),
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.darkSurface,
-        selectedColor: AppColors.darkAccent.withOpacity(0.2),
+        selectedColor: AppColors.darkAccent.withValues(alpha: 0.2),
         labelStyle: AppTypography.body,
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
@@ -354,14 +352,12 @@ class AppTheme {
   static ThemeData light() {
     final colorScheme = ColorScheme.light(
       primary: AppColors.lightAccent,
-      secondary: AppColors.lightAccent.withOpacity(0.8),
+      secondary: AppColors.lightAccent.withValues(alpha: 0.8),
       surface: AppColors.lightSurface,
-      background: AppColors.lightBackground,
       error: AppColors.lightDestructive,
       onPrimary: AppColors.lightBackground,
       onSecondary: AppColors.lightBackground,
       onSurface: AppColors.lightText,
-      onBackground: AppColors.lightText,
       onError: AppColors.lightBackground,
       outline: AppColors.lightBorder,
       shadow: Colors.black26,
@@ -471,7 +467,7 @@ class AppTheme {
         activeTrackColor: AppColors.lightAccent,
         inactiveTrackColor: AppColors.lightBorder,
         thumbColor: AppColors.lightAccent,
-        overlayColor: AppColors.lightAccent.withOpacity(0.2),
+        overlayColor: AppColors.lightAccent.withValues(alpha: 0.2),
         trackHeight: 4,
         thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
       ),
@@ -484,7 +480,7 @@ class AppTheme {
         }),
         trackColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return AppColors.lightAccent.withOpacity(0.5);
+            return AppColors.lightAccent.withValues(alpha: 0.5);
           }
           return AppColors.lightBorder;
         }),
@@ -531,7 +527,7 @@ class AppTheme {
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.lightSurface,
-        indicatorColor: AppColors.lightAccent.withOpacity(0.2),
+        indicatorColor: AppColors.lightAccent.withValues(alpha: 0.2),
         labelTextStyle: WidgetStateProperty.all(AppTypography.small),
         iconTheme: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
@@ -550,7 +546,7 @@ class AppTheme {
       ),
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.lightSurface,
-        selectedColor: AppColors.lightAccent.withOpacity(0.2),
+        selectedColor: AppColors.lightAccent.withValues(alpha: 0.2),
         labelStyle: AppTypography.body,
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,

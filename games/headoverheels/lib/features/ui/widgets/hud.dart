@@ -114,7 +114,7 @@ class HUD extends ConsumerWidget {
         vertical: AppSpacing.xs,
       ),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.2),
+        color: color.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(AppRadius.full),
         border: Border.all(color: color, width: 2),
       ),

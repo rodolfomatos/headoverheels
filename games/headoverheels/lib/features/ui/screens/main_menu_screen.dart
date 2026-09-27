@@ -3,8 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:headoverheels/features/ui/theme/app_theme.dart';
-import 'package:headoverheels/features/ui/widgets/virtual_joystick.dart';
-import 'package:headoverheels/features/ui/widgets/action_buttons.dart';
 
 class MainMenuScreen extends ConsumerWidget {
   const MainMenuScreen({super.key});
@@ -108,7 +106,7 @@ class MainMenuScreen extends ConsumerWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.headColor.withOpacity(0.3),
+                color: AppColors.headColor.withValues(alpha: 0.3),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),

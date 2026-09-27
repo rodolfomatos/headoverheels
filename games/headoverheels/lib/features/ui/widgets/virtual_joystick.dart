@@ -30,9 +30,9 @@ class _VirtualJoystickState extends State<VirtualJoystick> {
 
   @override
   Widget build(BuildContext context) {
-    final baseColor = widget.baseColor ?? AppColors.darkSurface;
-    final knobColor = widget.knobColor ?? AppColors.darkAccent;
-    final borderColor = AppColors.darkBorder;
+    // The knob brightens while it is held: the field was being maintained on
+    // every pan and never read, which is what the analyzer was pointing at.
+    final held = _isDragging;
 
     return GestureDetector(
       onTapDown: (_) {
@@ -72,7 +72,7 @@ class _VirtualJoystickState extends State<VirtualJoystick> {
                 border: Border.all(color: AppColors.darkBorder, width: 2),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withValues(alpha: 0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -92,16 +92,22 @@ class _VirtualJoystickState extends State<VirtualJoystick> {
                 height: widget.radius * 1.2,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: widget.knobColor ?? AppColors.darkAccent,
+                  color: held
+                      ? Color.lerp(
+                          widget.knobColor ?? AppColors.darkAccent,
+                          Colors.white,
+                          0.25,
+                        )
+                      : widget.knobColor ?? AppColors.darkAccent,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.4),
+                      color: Colors.black.withValues(alpha: 0.4),
                       blurRadius: 6,
                       offset: const Offset(0, 3),
                     ),
                     BoxShadow(
                       color: (widget.knobColor ?? AppColors.darkAccent)
-                          .withOpacity(0.3),
+                          .withValues(alpha: held ? 0.45 : 0.3),
                       blurRadius: 12,
                       spreadRadius: 2,
                     ),

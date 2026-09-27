@@ -104,22 +104,24 @@ class _ActionButton extends StatelessWidget {
       child: InkWell(
         onTap: enabled ? onPressed : null,
         borderRadius: BorderRadius.circular(AppRadius.xl),
-        splashColor: color.withOpacity(0.3),
-        highlightColor: color.withOpacity(0.1),
+        splashColor: color.withValues(alpha: 0.3),
+        highlightColor: color.withValues(alpha: 0.1),
         child: Container(
           width: 80,
           height: 80,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: enabled ? color : AppColors.darkMuted.withOpacity(0.3),
+            color: enabled ? color : AppColors.darkMuted.withValues(alpha: 0.3),
             border: Border.all(
-              color: enabled ? color.withOpacity(0.5) : AppColors.darkBorder,
+              color: enabled
+                  ? color.withValues(alpha: 0.5)
+                  : AppColors.darkBorder,
               width: 2,
             ),
             boxShadow: enabled
                 ? [
                     BoxShadow(
-                      color: color.withOpacity(0.3),
+                      color: color.withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 4),
                     ),
@@ -205,7 +207,7 @@ class PauseButton extends StatelessWidget {
       child: InkWell(
         onTap: onPressed,
         borderRadius: BorderRadius.circular(AppRadius.full),
-        splashColor: AppColors.darkAccent.withOpacity(0.3),
+        splashColor: AppColors.darkAccent.withValues(alpha: 0.3),
         child: Container(
           width: 48,
           height: 48,

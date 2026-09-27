@@ -81,7 +81,9 @@ class EntityFactory {
     return ConveyorEntity(
       id: trigger.id,
       triggerZone: trigger,
-      direction: _exitDirToDirection8(trigger.conveyorDirection ?? ExitDirection.east),
+      direction: _exitDirToDirection8(
+        trigger.conveyorDirection ?? ExitDirection.east,
+      ),
       speed: trigger.conveyorSpeed ?? 2.0, // tiles/sec
     );
   }
@@ -131,7 +133,7 @@ class _DoorEntity extends PuzzleEntity {
       );
       if (!hasKey) return;
     }
-    
+
     // Trigger room transition
     _triggerTransition(character);
   }
@@ -238,7 +240,8 @@ class ConveyorEntity extends PuzzleEntity {
   }
 
   void _applyVelocity(CharacterComponent character) {
-    final velocity = _directionToVector(direction) * (speed / 60.0); // Convert to per-frame
+    final velocity =
+        _directionToVector(direction) * (speed / 60.0); // Convert to per-frame
     character.position += velocity;
   }
 

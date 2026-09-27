@@ -26,8 +26,9 @@ class InputSystem {
   CharacterStateNotifier? get _controlledNotifier {
     final dualState = ref.read(dualCharacterProvider);
     final controlled = dualState.controlled;
-    
-    if (controlled == ControlledEntity.head || controlled == ControlledEntity.combined) {
+
+    if (controlled == ControlledEntity.head ||
+        controlled == ControlledEntity.combined) {
       return ref.read(headProvider.notifier);
     } else if (controlled == ControlledEntity.heels) {
       return ref.read(heelsProvider.notifier);
@@ -75,11 +76,13 @@ class InputSystem {
   void updatePhysics(double dt) {
     ref.read(headProvider.notifier).update(dt);
     ref.read(heelsProvider.notifier).update(dt);
-    
+
     // Sync dual character state
     final headState = ref.read(headProvider);
     final heelsState = ref.read(heelsProvider);
-    ref.read(dualCharacterProvider.notifier).syncFromNotifiers(headState, heelsState);
+    ref
+        .read(dualCharacterProvider.notifier)
+        .syncFromNotifiers(headState, heelsState);
   }
 }
 

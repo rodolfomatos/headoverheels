@@ -11,10 +11,10 @@ import 'package:headoverheels/entities/character_state.dart';
 class SpriteRegistry {
   final Map<String, SpriteAnimation> _animations = {};
   final Map<String, Sprite> _sprites = {};
-  
+
   // Asset ID -> SpriteAnimationData mapping
   final Map<String, SpriteAnimationData> _animationData = {};
-  
+
   static final SpriteRegistry _instance = SpriteRegistry._internal();
   factory SpriteRegistry() => _instance;
   SpriteRegistry._internal();
@@ -37,7 +37,10 @@ class SpriteRegistry {
     await _loadCharacterAnimationsForType('duo', CharacterType.combined);
   }
 
-  Future<void> _loadCharacterAnimationsForType(String character, CharacterType type) async {
+  Future<void> _loadCharacterAnimationsForType(
+    String character,
+    CharacterType type,
+  ) async {
     final animations = <String, List<String>>{
       'idle': ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'],
       'walk': ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'],
@@ -58,7 +61,7 @@ class SpriteRegistry {
     for (final entry in animations.entries) {
       final animName = entry.key;
       final directions = entry.value;
-      
+
       for (final direction in directions) {
         final assetId = 'character.$character.$animName.$direction';
         await _loadAnimation(assetId, character, animName, direction);
@@ -75,13 +78,14 @@ class SpriteRegistry {
     // Try to load from individual frames first
     final frames = <Sprite>[];
     int frameIndex = 1;
-    
+
     while (true) {
       // assetId format: character.head.idle.n -> extract base name
       final parts = assetId.split('.');
       final baseName = parts.sublist(1, parts.length - 1).join('_');
-      final frameName = 'assets/sprites/characters/$character/frames/${character}_${animName}_${direction}_${frameIndex.toString().padLeft(2, '0')}.png';
-      
+      final frameName =
+          'assets/sprites/characters/$character/frames/${character}_${animName}_${direction}_${frameIndex.toString().padLeft(2, '0')}.png';
+
       try {
         final image = await Flame.images.load(frameName);
         final sprite = Sprite(image);
@@ -91,9 +95,12 @@ class SpriteRegistry {
         break; // No more frames
       }
     }
-    
+
     if (frames.isNotEmpty) {
-      final animation = SpriteAnimation.spriteList(frames, stepTime: _getStepTime(animName));
+      final animation = SpriteAnimation.spriteList(
+        frames,
+        stepTime: _getStepTime(animName),
+      );
       _animations[assetId] = animation;
       _animationData[assetId] = SpriteAnimationData(
         assetId: assetId,
@@ -109,21 +116,33 @@ class SpriteRegistry {
 
   double _getStepTime(String animation) {
     switch (animation) {
-      case 'idle': return 0.2;
-      case 'walk': return 0.1;
-      case 'run': return 0.075;
+      case 'idle':
+        return 0.2;
+      case 'walk':
+        return 0.1;
+      case 'run':
+        return 0.075;
       case 'jump':
       case 'jumpRise':
       case 'jumpPeak':
-      case 'jumpFall': return 0.15;
-      case 'land': return 0.1;
-      case 'climb': return 0.2;
-      case 'carry': return 0.2;
-      case 'fire': return 0.1;
-      case 'swop': return 0.15;
-      case 'hurt': return 0.1;
-      case 'death': return 0.2;
-      default: return 0.1;
+      case 'jumpFall':
+        return 0.15;
+      case 'land':
+        return 0.1;
+      case 'climb':
+        return 0.2;
+      case 'carry':
+        return 0.2;
+      case 'fire':
+        return 0.1;
+      case 'swop':
+        return 0.15;
+      case 'hurt':
+        return 0.1;
+      case 'death':
+        return 0.2;
+      default:
+        return 0.1;
     }
   }
 
@@ -188,7 +207,8 @@ class SpriteRegistry {
   bool hasAnimation(String assetId) => _animations.containsKey(assetId);
 
   /// Get animation data for debugging.
-  Map<String, SpriteAnimationData> get animationData => Map.unmodifiable(_animationData);
+  Map<String, SpriteAnimationData> get animationData =>
+      Map.unmodifiable(_animationData);
 }
 
 /// Data class for sprite animation metadata.

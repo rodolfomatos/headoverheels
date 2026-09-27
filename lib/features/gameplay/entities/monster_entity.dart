@@ -26,7 +26,9 @@ class MonsterEntity extends PuzzleEntity {
        _isFrozen = false,
        super(
          triggerZone: triggerZone.copyWith(
-           position: patrolPoints.isNotEmpty ? patrolPoints.first : triggerZone.position,
+           position: patrolPoints.isNotEmpty
+               ? patrolPoints.first
+               : triggerZone.position,
          ),
        );
 
@@ -34,11 +36,13 @@ class MonsterEntity extends PuzzleEntity {
   void onLoad() {
     super.onLoad();
     // Visual indicator for monster
-    add(RectangleComponent(
-      size: size * 0.8,
-      anchor: Anchor.center,
-      paint: Paint()..color = const Color(0xFFFF0000),
-    ));
+    add(
+      RectangleComponent(
+        size: size * 0.8,
+        anchor: Anchor.center,
+        paint: Paint()..color = const Color(0xFFFF0000),
+      ),
+    );
   }
 
   @override

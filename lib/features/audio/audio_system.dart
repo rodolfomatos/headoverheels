@@ -52,15 +52,38 @@ class AudioSystem {
   /// Initialize audio system - preload all assets gracefully.
   Future<void> initialize() async {
     const assets = [
-      _musicMainMenu, _musicCastle, _musicEgyptus, _musicPenitentiary,
-      _musicSafari, _musicBookworld, _musicBoss, _musicGameOver,
-      _sfxJump, _sfxLand, _sfxPickup, _sfxSwitch, _sfxDoor, _sfxTeleport,
-      _sfxSpring, _sfxConveyor, _sfxFire, _sfxDoughnutHit, _sfxEnemyHit,
-      _sfxPlayerHit, _sfxPlayerDeath, _sfxFishEat, _sfxFishPoison,
-      _sfxCrown, _sfxBag, _sfxHushPuppy, _sfxSwop, _sfxPause,
-      _sfxMenuSelect, _sfxMenuNavigate,
+      _musicMainMenu,
+      _musicCastle,
+      _musicEgyptus,
+      _musicPenitentiary,
+      _musicSafari,
+      _musicBookworld,
+      _musicBoss,
+      _musicGameOver,
+      _sfxJump,
+      _sfxLand,
+      _sfxPickup,
+      _sfxSwitch,
+      _sfxDoor,
+      _sfxTeleport,
+      _sfxSpring,
+      _sfxConveyor,
+      _sfxFire,
+      _sfxDoughnutHit,
+      _sfxEnemyHit,
+      _sfxPlayerHit,
+      _sfxPlayerDeath,
+      _sfxFishEat,
+      _sfxFishPoison,
+      _sfxCrown,
+      _sfxBag,
+      _sfxHushPuppy,
+      _sfxSwop,
+      _sfxPause,
+      _sfxMenuSelect,
+      _sfxMenuNavigate,
     ];
-    
+
     for (final asset in assets) {
       try {
         await FlameAudio.audioCache.load(asset);
@@ -158,7 +181,8 @@ class AudioSystem {
   void playSwop() => playSfx(_sfxSwop);
   void playPause() => playSfx(_sfxPause);
   void playMenuSelect() => playSfx(_sfxMenuSelect);
-  void playMenuNavigate() => playSfx(_sfxMenuNavigate, volume: _sfxVolume * 0.5);
+  void playMenuNavigate() =>
+      playSfx(_sfxMenuNavigate, volume: _sfxVolume * 0.5);
 
   /// Set music enabled state.
   void setMusicEnabled(bool enabled) {
@@ -179,7 +203,9 @@ class AudioSystem {
     // Note: FlameAudio Bgm doesn't have setVolume, volume is set on play
     // Replay current music with new volume
     if (_currentMusic != null) {
-      playMusic(_currentMusic!.replaceFirst(_musicPrefix, '').replaceFirst('.ogg', ''));
+      playMusic(
+        _currentMusic!.replaceFirst(_musicPrefix, '').replaceFirst('.ogg', ''),
+      );
     }
   }
 

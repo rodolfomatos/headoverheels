@@ -150,7 +150,9 @@ class AppTheme {
         bodyLarge: AppTypography.body.copyWith(color: AppColors.darkText),
         bodyMedium: AppTypography.body.copyWith(color: AppColors.darkText),
         bodySmall: AppTypography.small.copyWith(color: AppColors.darkMuted),
-        labelLarge: AppTypography.button.copyWith(color: AppColors.darkBackground),
+        labelLarge: AppTypography.button.copyWith(
+          color: AppColors.darkBackground,
+        ),
         labelMedium: AppTypography.small.copyWith(color: AppColors.darkMuted),
         labelSmall: AppTypography.small.copyWith(color: AppColors.darkMuted),
       ),
@@ -260,7 +262,9 @@ class AppTheme {
         }),
         checkColor: WidgetStateProperty.all(AppColors.darkBackground),
         side: BorderSide(color: AppColors.darkBorder, width: 2),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.sm),
+        ),
       ),
       radioTheme: RadioThemeData(
         fillColor: WidgetStateProperty.resolveWith((states) {
@@ -276,12 +280,16 @@ class AppTheme {
           borderRadius: BorderRadius.circular(AppRadius.lg),
         ),
         titleTextStyle: AppTypography.h2.copyWith(color: AppColors.darkText),
-        contentTextStyle: AppTypography.body.copyWith(color: AppColors.darkText),
+        contentTextStyle: AppTypography.body.copyWith(
+          color: AppColors.darkText,
+        ),
       ),
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: AppColors.darkSurface,
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AppRadius.xl),
+          ),
         ),
         modalBackgroundColor: AppColors.darkSurface,
       ),
@@ -331,7 +339,9 @@ class AppTheme {
       ),
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.darkSurface,
-        contentTextStyle: AppTypography.body.copyWith(color: AppColors.darkText),
+        contentTextStyle: AppTypography.body.copyWith(
+          color: AppColors.darkText,
+        ),
         actionTextColor: AppColors.darkAccent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.md),
@@ -362,7 +372,9 @@ class AppTheme {
       colorScheme: colorScheme,
       fontFamily: AppTypography.fontFamily,
       textTheme: TextTheme(
-        displayLarge: AppTypography.display.copyWith(color: AppColors.lightText),
+        displayLarge: AppTypography.display.copyWith(
+          color: AppColors.lightText,
+        ),
         displayMedium: AppTypography.h1.copyWith(color: AppColors.lightText),
         displaySmall: AppTypography.h2.copyWith(color: AppColors.lightText),
         headlineLarge: AppTypography.h1.copyWith(color: AppColors.lightText),
@@ -374,7 +386,9 @@ class AppTheme {
         bodyLarge: AppTypography.body.copyWith(color: AppColors.lightText),
         bodyMedium: AppTypography.body.copyWith(color: AppColors.lightText),
         bodySmall: AppTypography.small.copyWith(color: AppColors.lightMuted),
-        labelLarge: AppTypography.button.copyWith(color: AppColors.lightBackground),
+        labelLarge: AppTypography.button.copyWith(
+          color: AppColors.lightBackground,
+        ),
         labelMedium: AppTypography.small.copyWith(color: AppColors.lightMuted),
         labelSmall: AppTypography.small.copyWith(color: AppColors.lightMuted),
       ),
@@ -484,7 +498,9 @@ class AppTheme {
         }),
         checkColor: WidgetStateProperty.all(AppColors.lightBackground),
         side: BorderSide(color: AppColors.lightBorder, width: 2),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.sm),
+        ),
       ),
       radioTheme: RadioThemeData(
         fillColor: WidgetStateProperty.resolveWith((states) {
@@ -500,12 +516,16 @@ class AppTheme {
           borderRadius: BorderRadius.circular(AppRadius.lg),
         ),
         titleTextStyle: AppTypography.h2.copyWith(color: AppColors.lightText),
-        contentTextStyle: AppTypography.body.copyWith(color: AppColors.lightText),
+        contentTextStyle: AppTypography.body.copyWith(
+          color: AppColors.lightText,
+        ),
       ),
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: AppColors.lightSurface,
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AppRadius.xl),
+          ),
         ),
         modalBackgroundColor: AppColors.lightSurface,
       ),
@@ -555,7 +575,9 @@ class AppTheme {
       ),
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.lightSurface,
-        contentTextStyle: AppTypography.body.copyWith(color: AppColors.lightText),
+        contentTextStyle: AppTypography.body.copyWith(
+          color: AppColors.lightText,
+        ),
         actionTextColor: AppColors.lightAccent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.md),

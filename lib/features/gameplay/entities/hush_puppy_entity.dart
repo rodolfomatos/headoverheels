@@ -18,23 +18,23 @@ class HushPuppyEntity extends PuzzleEntity {
   double _returnTimer;
   final Vector3 _originalPosition;
 
-  HushPuppyEntity({
-    required String id,
-    required TriggerZone triggerZone,
-  }) : _isAwake = false,
-       _returnTimer = 0.0,
-       _originalPosition = triggerZone.position,
-       super(id: id, triggerZone: triggerZone);
+  HushPuppyEntity({required String id, required TriggerZone triggerZone})
+    : _isAwake = false,
+      _returnTimer = 0.0,
+      _originalPosition = triggerZone.position,
+      super(id: id, triggerZone: triggerZone);
 
   @override
   void onLoad() {
     super.onLoad();
     // Visual indicator for hush puppy
-    add(RectangleComponent(
-      size: size * 0.5,
-      anchor: Anchor.center,
-      paint: Paint()..color = const Color(0xFF888888), // Gray (sleeping)
-    ));
+    add(
+      RectangleComponent(
+        size: size * 0.5,
+        anchor: Anchor.center,
+        paint: Paint()..color = const Color(0xFF888888), // Gray (sleeping)
+      ),
+    );
   }
 
   @override

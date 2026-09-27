@@ -15,11 +15,11 @@ class VisualStateResolver {
     final character = _characterTypeToString(characterType);
     final animationStr = _animationStateToString(animation);
     final direction = _facingDirectionToString(facing);
-    
+
     if (isCombined) {
       return 'character.duo.$animationStr';
     }
-    
+
     return 'character.$character.$animationStr.$direction';
   }
 

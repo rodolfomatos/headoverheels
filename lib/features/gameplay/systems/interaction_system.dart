@@ -82,7 +82,11 @@ class _CollisionTracker {
     return _collisions[entity]?[character.hashCode] ?? false;
   }
 
-  static void setColliding(PuzzleEntity entity, CharacterComponent character, bool colliding) {
+  static void setColliding(
+    PuzzleEntity entity,
+    CharacterComponent character,
+    bool colliding,
+  ) {
     _collisions.putIfAbsent(entity, () => {});
     if (colliding) {
       _collisions[entity]![character.hashCode] = true;

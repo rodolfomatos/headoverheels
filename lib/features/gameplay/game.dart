@@ -18,7 +18,7 @@ class HeadOverHeelsGame extends FlameGame {
   final WorldGraph _worldGraph;
   final InteractionSystem _interactionSystem = InteractionSystem();
   late final InputSystem _inputSystem;
-  
+
   RoomComponent? _currentRoom;
   late RoomId _currentRoomId;
   String? _lastPlanetId;
@@ -76,10 +76,7 @@ class HeadOverHeelsGame extends FlameGame {
     }
 
     // Create and load new room
-    final room = RoomComponent(
-      roomId: roomId,
-      definition: definition,
-    );
+    final room = RoomComponent(roomId: roomId, definition: definition);
     await add(room);
     _currentRoom = room;
     _currentRoomId = roomId;
@@ -104,9 +101,9 @@ class HeadOverHeelsGame extends FlameGame {
   Future<void> transitionTo(RoomId targetRoomId, String targetEntrance) async {
     final audioSystem = ref.read(audioSystemProvider);
     audioSystem.playTeleport();
-    
+
     await _loadRoom(targetRoomId);
-    
+
     // Position characters at entrance
     final entrance = _findEntrance(targetEntrance);
     if (entrance != null) {
@@ -169,18 +166,12 @@ class HeadOverHeelsGame extends FlameGame {
   /// Add characters to the game world.
   Future<void> _addCharacters() async {
     // Head character
-    final head = CharacterComponent(
-      type: CharacterType.head,
-      ref: ref,
-    );
+    final head = CharacterComponent(type: CharacterType.head, ref: ref);
     await add(head);
     _interactionSystem.registerCharacter(head);
 
     // Heels character
-    final heels = CharacterComponent(
-      type: CharacterType.heels,
-      ref: ref,
-    );
+    final heels = CharacterComponent(type: CharacterType.heels, ref: ref);
     await add(heels);
     _interactionSystem.registerCharacter(heels);
   }

@@ -16,17 +16,15 @@ class CharacterComponent extends PositionComponent with CollisionCallbacks {
 
   late SpriteAnimationComponent _animation;
 
-  CharacterComponent({
-    required this.type,
-    required this.ref,
-  }) : super(
-       position: Vector2.zero(),
-       size: Vector2(
-         IsometricCoordinates.tileWidth * 0.8,
-         IsometricCoordinates.tileHeight * 0.8,
-       ),
-       anchor: Anchor.center,
-     );
+  CharacterComponent({required this.type, required this.ref})
+    : super(
+        position: Vector2.zero(),
+        size: Vector2(
+          IsometricCoordinates.tileWidth * 0.8,
+          IsometricCoordinates.tileHeight * 0.8,
+        ),
+        anchor: Anchor.center,
+      );
 
   @override
   Future<void> onLoad() async {

@@ -28,11 +28,14 @@ class SwitchEntity extends PuzzleEntity {
   void onLoad() {
     super.onLoad();
     // Visual indicator for switch state
-    add(RectangleComponent(
-      size: size * 0.6,
-      anchor: Anchor.center,
-      paint: Paint()..color = isOn ? const Color(0xFF00FF00) : const Color(0xFFFF0000),
-    ));
+    add(
+      RectangleComponent(
+        size: size * 0.6,
+        anchor: Anchor.center,
+        paint: Paint()
+          ..color = isOn ? const Color(0xFF00FF00) : const Color(0xFFFF0000),
+      ),
+    );
   }
 
   @override
@@ -45,7 +48,7 @@ class SwitchEntity extends PuzzleEntity {
   @override
   void onInteract(CharacterComponent character) {
     if (_cooldownTimer > 0) return;
-    
+
     // Only Heels or Combined can activate switches (push action)
     if (!character.canCarry && character.type != CharacterType.combined) {
       return; // Head alone cannot push switches
@@ -53,7 +56,7 @@ class SwitchEntity extends PuzzleEntity {
 
     _toggle();
     _cooldownTimer = activationCooldown;
-    
+
     // Notify target entity
     _notifyTarget();
   }
@@ -62,7 +65,9 @@ class SwitchEntity extends PuzzleEntity {
     isOn = !isOn;
     // Update visual
     final rect = children.whereType<RectangleComponent>().firstOrNull;
-    rect?.paint.color = isOn ? const Color(0xFF00FF00) : const Color(0xFFFF0000);
+    rect?.paint.color = isOn
+        ? const Color(0xFF00FF00)
+        : const Color(0xFFFF0000);
   }
 
   void _notifyTarget() {
@@ -74,7 +79,7 @@ class SwitchEntity extends PuzzleEntity {
     final target = room.entities.whereType<PuzzleEntity>().firstWhereOrNull(
       (e) => e.id == targetId,
     );
-    
+
     if (target != null) {
       target.onSwitchToggled(isOn, id);
     }
@@ -95,7 +100,7 @@ class SwitchEntity extends PuzzleEntity {
 mixin Togglable on PuzzleEntity {
   bool get isActive;
   void setActive(bool active);
-  
+
   void onSwitchToggled(bool isOn, String switchId) {
     setActive(isOn);
   }

@@ -23,11 +23,13 @@ class DroppedItemEntity extends PuzzleEntity {
     super.onLoad();
     // Visual indicator based on item type
     final (icon, color) = _getItemVisual(item);
-    add(RectangleComponent(
-      size: size * 0.5,
-      anchor: Anchor.center,
-      paint: Paint()..color = color,
-    ));
+    add(
+      RectangleComponent(
+        size: size * 0.5,
+        anchor: Anchor.center,
+        paint: Paint()..color = color,
+      ),
+    );
   }
 
   @override

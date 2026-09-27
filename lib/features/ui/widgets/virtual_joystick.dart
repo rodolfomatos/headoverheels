@@ -69,10 +69,7 @@ class _VirtualJoystickState extends State<VirtualJoystick> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: widget.baseColor ?? AppColors.darkSurface,
-                border: Border.all(
-                  color: AppColors.darkBorder,
-                  width: 2,
-                ),
+                border: Border.all(color: AppColors.darkBorder, width: 2),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.3),
@@ -103,7 +100,8 @@ class _VirtualJoystickState extends State<VirtualJoystick> {
                       offset: const Offset(0, 3),
                     ),
                     BoxShadow(
-                      color: (widget.knobColor ?? AppColors.darkAccent).withOpacity(0.3),
+                      color: (widget.knobColor ?? AppColors.darkAccent)
+                          .withOpacity(0.3),
                       blurRadius: 12,
                       spreadRadius: 2,
                     ),
@@ -148,11 +146,7 @@ class _VirtualJoystickState extends State<VirtualJoystick> {
             opacity: 0.3,
             child: Transform.rotate(
               angle: _getRotation(dir.offset),
-              child: Icon(
-                dir.icon,
-                color: AppColors.darkMuted,
-                size: 16,
-              ),
+              child: Icon(dir.icon, color: AppColors.darkMuted, size: 16),
             ),
           ),
         );

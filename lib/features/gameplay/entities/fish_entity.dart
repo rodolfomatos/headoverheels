@@ -24,11 +24,16 @@ class FishEntity extends PuzzleEntity {
   void onLoad() {
     super.onLoad();
     // Visual indicator for fish
-    add(RectangleComponent(
-      size: size * 0.6,
-      anchor: Anchor.center,
-      paint: Paint()..color = _isAlive ? const Color(0xFF00FFFF) : const Color(0xFF888888),
-    ));
+    add(
+      RectangleComponent(
+        size: size * 0.6,
+        anchor: Anchor.center,
+        paint: Paint()
+          ..color = _isAlive
+              ? const Color(0xFF00FFFF)
+              : const Color(0xFF888888),
+      ),
+    );
   }
 
   @override
@@ -44,14 +49,14 @@ class FishEntity extends PuzzleEntity {
     // Save checkpoint position in room state
     final room = _findRoom();
     if (room != null) {
-      room.updateState(room.state.copyWith(
-        eatenFish: {...room.state.eatenFish, id},
-      ));
+      room.updateState(
+        room.state.copyWith(eatenFish: {...room.state.eatenFish, id}),
+      );
     }
 
     // Save checkpoint in game state (handled by game system)
     _isAlive = false;
-    
+
     // Update visual
     final rect = children.whereType<RectangleComponent>().firstOrNull;
     rect?.paint.color = const Color(0xFF888888);

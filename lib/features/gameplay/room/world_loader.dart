@@ -28,8 +28,12 @@ RoomDefinition _parseRoomDefinition(Map<String, dynamic> json) {
   final exitsJson = json['exits'] as List<dynamic>? ?? [];
   final triggersJson = json['triggers'] as List<dynamic>? ?? [];
 
-  final exits = exitsJson.map<RoomExit>((e) => _parseRoomExit(e as Map<String, dynamic>)).toList();
-  final triggers = triggersJson.map<TriggerZone>((t) => _parseTriggerZone(t as Map<String, dynamic>)).toList();
+  final exits = exitsJson
+      .map<RoomExit>((e) => _parseRoomExit(e as Map<String, dynamic>))
+      .toList();
+  final triggers = triggersJson
+      .map<TriggerZone>((t) => _parseTriggerZone(t as Map<String, dynamic>))
+      .toList();
 
   final spawnPointJson = json['spawnPoint'] as Map<String, dynamic>;
   final spawnPoint = Vector3(

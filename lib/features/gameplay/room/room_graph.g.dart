@@ -9,8 +9,9 @@ part of 'room_graph.dart';
 _$RoomExitImpl _$$RoomExitImplFromJson(Map<String, dynamic> json) =>
     _$RoomExitImpl(
       direction: $enumDecode(_$ExitDirectionEnumMap, json['direction']),
-      targetRoom:
-          const RoomIdConverter().fromJson(json['targetRoom'] as String),
+      targetRoom: const RoomIdConverter().fromJson(
+        json['targetRoom'] as String,
+      ),
       targetEntrance: json['targetEntrance'] as String,
       isLocked: json['isLocked'] as bool,
       keyId: json['keyId'] as String?,
@@ -40,15 +41,18 @@ _$TriggerZoneImpl _$$TriggerZoneImplFromJson(Map<String, dynamic> json) =>
     _$TriggerZoneImpl(
       id: json['id'] as String,
       type: $enumDecode(_$TriggerTypeEnumMap, json['type']),
-      position:
-          const Vector3Converter().fromJson(json['position'] as List<double>),
+      position: const Vector3Converter().fromJson(
+        json['position'] as List<double>,
+      ),
       size: const Vector2Converter().fromJson(json['size'] as List<double>),
       exit: json['exit'] == null
           ? null
           : RoomExit.fromJson(json['exit'] as Map<String, dynamic>),
       targetLevel: (json['targetLevel'] as num?)?.toInt(),
       conveyorDirection: $enumDecodeNullable(
-          _$ExitDirectionEnumMap, json['conveyorDirection']),
+        _$ExitDirectionEnumMap,
+        json['conveyorDirection'],
+      ),
       conveyorSpeed: (json['conveyorSpeed'] as num?)?.toDouble(),
       properties: json['properties'] as Map<String, dynamic>?,
     );
@@ -93,22 +97,23 @@ _$RoomDefinitionImpl _$$RoomDefinitionImplFromJson(Map<String, dynamic> json) =>
       triggers: (json['triggers'] as List<dynamic>)
           .map((e) => TriggerZone.fromJson(e as Map<String, dynamic>))
           .toList(),
-      spawnPoint:
-          const Vector3Converter().fromJson(json['spawnPoint'] as List<double>),
+      spawnPoint: const Vector3Converter().fromJson(
+        json['spawnPoint'] as List<double>,
+      ),
       properties: json['properties'] as Map<String, dynamic>,
     );
 
 Map<String, dynamic> _$$RoomDefinitionImplToJson(
-        _$RoomDefinitionImpl instance) =>
-    <String, dynamic>{
-      'id': const RoomIdConverter().toJson(instance.id),
-      'theme': instance.theme,
-      'tmxFile': instance.tmxFile,
-      'exits': instance.exits,
-      'triggers': instance.triggers,
-      'spawnPoint': const Vector3Converter().toJson(instance.spawnPoint),
-      'properties': instance.properties,
-    };
+  _$RoomDefinitionImpl instance,
+) => <String, dynamic>{
+  'id': const RoomIdConverter().toJson(instance.id),
+  'theme': instance.theme,
+  'tmxFile': instance.tmxFile,
+  'exits': instance.exits,
+  'triggers': instance.triggers,
+  'spawnPoint': const Vector3Converter().toJson(instance.spawnPoint),
+  'properties': instance.properties,
+};
 
 _$WorldGraphImpl _$$WorldGraphImplFromJson(Map<String, dynamic> json) =>
     _$WorldGraphImpl(
@@ -134,8 +139,9 @@ _$RoomStateImpl _$$RoomStateImplFromJson(Map<String, dynamic> json) =>
       activatedSwitches: (json['activatedSwitches'] as List<dynamic>)
           .map((e) => e as String)
           .toSet(),
-      eatenFish:
-          (json['eatenFish'] as List<dynamic>).map((e) => e as String).toSet(),
+      eatenFish: (json['eatenFish'] as List<dynamic>)
+          .map((e) => e as String)
+          .toSet(),
       customFlags: json['customFlags'] as Map<String, dynamic>,
       isCleared: json['isCleared'] as bool,
     );

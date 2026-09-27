@@ -19,24 +19,27 @@ class DoughnutProjectile extends PositionComponent
   int _frameCount;
   MonsterEntity? _target;
 
-  DoughnutProjectile({
-    required Vector3 startPosition,
-  }) : _frameCount = 0,
-       super(
-         position: IsometricCoordinates.gridToScreen(startPosition),
-         size: Vector2(IsometricCoordinates.tileWidth * 0.4,
-                       IsometricCoordinates.tileHeight * 0.4),
-         anchor: Anchor.center,
-       );
+  DoughnutProjectile({required Vector3 startPosition})
+    : _frameCount = 0,
+      super(
+        position: IsometricCoordinates.gridToScreen(startPosition),
+        size: Vector2(
+          IsometricCoordinates.tileWidth * 0.4,
+          IsometricCoordinates.tileHeight * 0.4,
+        ),
+        anchor: Anchor.center,
+      );
 
   @override
   void onLoad() {
     add(RectangleHitbox()..collisionType = CollisionType.passive);
-    add(RectangleComponent(
-      size: size,
-      anchor: Anchor.center,
-      paint: Paint()..color = const Color(0xFFFF8800),
-    ));
+    add(
+      RectangleComponent(
+        size: size,
+        anchor: Anchor.center,
+        paint: Paint()..color = const Color(0xFFFF8800),
+      ),
+    );
     super.onLoad();
   }
 
@@ -66,7 +69,7 @@ class DoughnutProjectile extends PositionComponent
 
     for (final monster in room.entities.whereType<MonsterEntity>()) {
       if (monster.isFrozen) continue;
-      
+
       final dist = (monster.position - position).length;
       if (dist < nearestDist) {
         nearestDist = dist;
@@ -85,7 +88,8 @@ class DoughnutProjectile extends PositionComponent
     position += direction * moveAmount;
 
     // Check collision with target
-    if ((_target!.position - position).length < IsometricCoordinates.tileWidth * 0.5) {
+    if ((_target!.position - position).length <
+        IsometricCoordinates.tileWidth * 0.5) {
       _onHitTarget();
     }
   }

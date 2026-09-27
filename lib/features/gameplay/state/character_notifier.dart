@@ -7,7 +7,8 @@ import 'package:vector_math/vector_math.dart';
 
 /// Notifier for a single character's state (Head or Heels).
 class CharacterStateNotifier extends StateNotifier<CharacterState> {
-  CharacterStateNotifier({required CharacterState initialState}) : super(initialState);
+  CharacterStateNotifier({required CharacterState initialState})
+    : super(initialState);
 
   // Physics constants
   double _accumulator = 0.0;
@@ -36,7 +37,10 @@ class CharacterStateNotifier extends StateNotifier<CharacterState> {
       jumpPhase: 1, // Rising
       jumpFramesRemaining: state.jumpDurationFrames,
       animation: AnimationState.jumpRise,
-      velocity: Vector2(state.velocity.x, -state.jumpHeight / (state.jumpDurationFrames / 60.0)),
+      velocity: Vector2(
+        state.velocity.x,
+        -state.jumpHeight / (state.jumpDurationFrames / 60.0),
+      ),
     );
   }
 
@@ -49,7 +53,7 @@ class CharacterStateNotifier extends StateNotifier<CharacterState> {
   void fire() {
     if (!state.canFire) return;
     if (state.doughnutCount <= 0) return;
-    
+
     state = state.copyWith(
       doughnutCount: state.doughnutCount - 1,
       animation: AnimationState.fire,
@@ -77,28 +81,28 @@ class CharacterStateNotifier extends StateNotifier<CharacterState> {
 
   void _fixedUpdate(double dt) {
     final currentState = state;
-    
+
     // Apply gravity
     final velocity = Vector2(
       currentState.velocity.x,
       currentState.velocity.y + (9.8 * dt * 60.0), // Gravity scaled to tiles
     );
-    
+
     // Update position
     final newPosition = Vector3(
       currentState.position.x + velocity.x * dt,
       currentState.position.y + velocity.y * dt,
       currentState.position.z,
     );
-    
+
     // Ground check (simplified - real impl checks collision)
     final isGrounded = newPosition.z <= 0;
     final newVelocity = isGrounded ? Vector2(velocity.x, 0) : velocity;
-    
+
     // Jump phase update
     int jumpPhase = currentState.jumpPhase;
     int jumpFramesRemaining = currentState.jumpFramesRemaining;
-    
+
     if (jumpPhase > 0) {
       jumpFramesRemaining--;
       if (jumpFramesRemaining <= 0) {
@@ -110,17 +114,19 @@ class CharacterStateNotifier extends StateNotifier<CharacterState> {
         jumpPhase = 3; // Falling
       }
     }
-    
+
     // Animation state
     AnimationState animation;
     if (!isGrounded) {
-      animation = jumpPhase == 1 ? AnimationState.jumpRise : AnimationState.jumpFall;
+      animation = jumpPhase == 1
+          ? AnimationState.jumpRise
+          : AnimationState.jumpFall;
     } else if (currentState.velocity.length > 0.1) {
       animation = AnimationState.walk;
     } else {
       animation = AnimationState.idle;
     }
-    
+
     state = currentState.copyWith(
       position: newPosition,
       velocity: newVelocity,
@@ -138,21 +144,23 @@ class CharacterStateNotifier extends StateNotifier<CharacterState> {
 }
 
 /// Provider for Head character state.
-final headProvider = StateNotifierProvider<CharacterStateNotifier, CharacterState>((ref) {
-  return CharacterStateNotifier(
-    initialState: CharacterState.initial(
-      type: CharacterType.head,
-      startPosition: Vector3(1, 1, 0),
-    ),
-  );
-});
+final headProvider =
+    StateNotifierProvider<CharacterStateNotifier, CharacterState>((ref) {
+      return CharacterStateNotifier(
+        initialState: CharacterState.initial(
+          type: CharacterType.head,
+          startPosition: Vector3(1, 1, 0),
+        ),
+      );
+    });
 
 /// Provider for Heels character state.
-final heelsProvider = StateNotifierProvider<CharacterStateNotifier, CharacterState>((ref) {
-  return CharacterStateNotifier(
-    initialState: CharacterState.initial(
-      type: CharacterType.heels,
-      startPosition: Vector3(2, 2, 0),
-    ),
-  );
-});
+final heelsProvider =
+    StateNotifierProvider<CharacterStateNotifier, CharacterState>((ref) {
+      return CharacterStateNotifier(
+        initialState: CharacterState.initial(
+          type: CharacterType.heels,
+          startPosition: Vector3(2, 2, 0),
+        ),
+      );
+    });

@@ -16,11 +16,7 @@ class GuardianEntity extends MonsterEntity {
     required String id,
     required TriggerZone triggerZone,
     required List<Vector3> patrolPoints,
-  }) : super(
-         id: id,
-         triggerZone: triggerZone,
-         patrolPoints: patrolPoints,
-       );
+  }) : super(id: id, triggerZone: triggerZone, patrolPoints: patrolPoints);
 
   @override
   void onLoad() {

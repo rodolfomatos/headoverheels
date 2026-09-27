@@ -40,13 +40,13 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   Future<void> _initAudio() async {
     final audioSystem = ref.read(audioSystemProvider);
     final settings = await ref.read(audioSettingsProvider.future);
-    
+
     await audioSystem.initialize();
     audioSystem.setMusicEnabled(settings.musicEnabled);
     audioSystem.setSfxEnabled(settings.sfxEnabled);
     audioSystem.setMusicVolume(settings.musicVolume);
     audioSystem.setSfxVolume(settings.sfxVolume);
-    
+
     // Play main menu music initially
     audioSystem.playMusic('main_menu');
   }
@@ -60,7 +60,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final pauseOverlay = _showPauseMenu ? _buildPauseOverlay() : const SizedBox.shrink();
+    final pauseOverlay = _showPauseMenu
+        ? _buildPauseOverlay()
+        : const SizedBox.shrink();
 
     final inputSystem = ref.watch(inputSystemProvider);
 
@@ -181,10 +183,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               const SizedBox(height: AppSpacing.md),
               _buildPauseButton('Quit to Menu', Icons.exit_to_app_rounded, () {
                 ref.read(audioSystemProvider).playMusic('main_menu');
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                  '/main-menu',
-                  (route) => false,
-                );
+                Navigator.of(
+                  context,
+                ).pushNamedAndRemoveUntil('/main-menu', (route) => false);
               }, isDestructive: true),
             ],
           ),

@@ -134,9 +134,7 @@ class MainMenuScreen extends ConsumerWidget {
         const SizedBox(height: AppSpacing.xs),
         Text(
           'Remastered for Android',
-          style: AppTypography.body.copyWith(
-            color: AppColors.darkMuted,
-          ),
+          style: AppTypography.body.copyWith(color: AppColors.darkMuted),
         ),
       ],
     );
@@ -173,7 +171,9 @@ class MainMenuScreen extends ConsumerWidget {
 
   void _continueGame(BuildContext context) {
     // Continue saved game
-    Navigator.of(context).pushReplacementNamed('/game', arguments: {'continue': true});
+    Navigator.of(
+      context,
+    ).pushReplacementNamed('/game', arguments: {'continue': true});
   }
 
   void _openSettings(BuildContext context) {
@@ -226,10 +226,15 @@ class MainMenuScreen extends ConsumerWidget {
       children: [
         Text(title, style: AppTypography.h2),
         const SizedBox(height: AppSpacing.sm),
-        ...items.map((item) => Padding(
-          padding: const EdgeInsets.only(left: AppSpacing.md, bottom: AppSpacing.xs),
-          child: Text('• $item', style: AppTypography.body),
-        )),
+        ...items.map(
+          (item) => Padding(
+            padding: const EdgeInsets.only(
+              left: AppSpacing.md,
+              bottom: AppSpacing.xs,
+            ),
+            child: Text('• $item', style: AppTypography.body),
+          ),
+        ),
         const SizedBox(height: AppSpacing.md),
       ],
     );

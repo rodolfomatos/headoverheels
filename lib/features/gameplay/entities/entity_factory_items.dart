@@ -36,10 +36,7 @@ class EntityFactoryItems {
   }
 
   static PuzzleEntity _createBag(TriggerZone trigger, RoomId roomId) {
-    return BagEntity(
-      id: trigger.id,
-      triggerZone: trigger,
-    );
+    return BagEntity(id: trigger.id, triggerZone: trigger);
   }
 
   static PuzzleEntity _createKey(TriggerZone trigger, RoomId roomId) {
@@ -68,10 +65,7 @@ class EntityFactoryItems {
   }
 
   static PuzzleEntity _createHushPuppy(TriggerZone trigger, RoomId roomId) {
-    return HushPuppyEntity(
-      id: trigger.id,
-      triggerZone: trigger,
-    );
+    return HushPuppyEntity(id: trigger.id, triggerZone: trigger);
   }
 
   static PuzzleEntity _createMonster(TriggerZone trigger, RoomId roomId) {
@@ -97,16 +91,18 @@ class EntityFactoryItems {
     if (properties == null) return [];
     final pointsStr = properties['patrolPoints'] as String?;
     if (pointsStr == null) return [];
-    
+
     // Parse format: "(x1,y1,z1),(x2,y2,z2),..."
     final points = <Vector3>[];
     final regex = RegExp(r'\((-?\d+),(-?\d+),(-?\d+)\)');
     for (final match in regex.allMatches(pointsStr)) {
-      points.add(Vector3(
-        double.parse(match.group(1)!),
-        double.parse(match.group(2)!),
-        double.parse(match.group(3)!),
-      ));
+      points.add(
+        Vector3(
+          double.parse(match.group(1)!),
+          double.parse(match.group(2)!),
+          double.parse(match.group(3)!),
+        ),
+      );
     }
     return points;
   }

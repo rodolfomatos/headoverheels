@@ -81,7 +81,21 @@ abstract class RoomExit with _$RoomExit {
 }
 
 /// Trigger type for room transitions.
-enum TriggerType { door, teleport, ladderUp, ladderDown, conveyor, switchTrigger, bag, key, crown, springItem, hushPuppy, monster, guardian }
+enum TriggerType {
+  door,
+  teleport,
+  ladderUp,
+  ladderDown,
+  conveyor,
+  switchTrigger,
+  bag,
+  key,
+  crown,
+  springItem,
+  hushPuppy,
+  monster,
+  guardian,
+}
 
 /// Trigger zone for room transitions.
 @freezed

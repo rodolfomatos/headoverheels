@@ -10,20 +10,20 @@ import 'package:headoverheels/features/gameplay/entities/puzzle_entity.dart';
 class BagEntity extends PuzzleEntity {
   bool _isCollected;
 
-  BagEntity({
-    required super.id,
-    required super.triggerZone,
-  }) : _isCollected = false;
+  BagEntity({required super.id, required super.triggerZone})
+    : _isCollected = false;
 
   @override
   void onLoad() {
     super.onLoad();
     // Visual indicator for bag
-    add(RectangleComponent(
-      size: size * 0.6,
-      anchor: Anchor.center,
-      paint: Paint()..color = const Color(0xFF8B4513), // Brown
-    ));
+    add(
+      RectangleComponent(
+        size: size * 0.6,
+        anchor: Anchor.center,
+        paint: Paint()..color = const Color(0xFF8B4513), // Brown
+      ),
+    );
   }
 
   @override

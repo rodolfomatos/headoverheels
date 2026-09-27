@@ -86,7 +86,7 @@ class RoomComponent extends PositionComponent with HasGameReference {
   @override
   void update(double dt) {
     super.update(dt);
-    
+
     // Update puzzle entities
     for (final entity in entities) {
       entity.updatePuzzle(dt);
@@ -96,7 +96,7 @@ class RoomComponent extends PositionComponent with HasGameReference {
   /// Check if position is walkable (not a wall).
   bool isWalkable(Vector3 gridPos) {
     if (_tileMap == null) return true;
-    
+
     // Check walls layer (layer index 1 typically)
     final wallsLayer = _tileMap!.getLayer<TileLayer>('Walls');
     if (wallsLayer != null && wallsLayer.id != null) {
@@ -114,10 +114,6 @@ class RoomComponent extends PositionComponent with HasGameReference {
   Gid? getTileAt(String layerName, int x, int y) {
     final layer = _tileMap?.getLayer<TileLayer>(layerName);
     if (layer == null || layer.id == null) return null;
-    return _tileMap!.getTileData(
-      layerId: layer.id!,
-      x: x,
-      y: y,
-    );
+    return _tileMap!.getTileData(layerId: layer.id!, x: x, y: y);
   }
 }

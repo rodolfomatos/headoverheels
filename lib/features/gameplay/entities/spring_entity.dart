@@ -10,20 +10,20 @@ class SpringEntity extends PuzzleEntity {
   static const double boostMultiplier = 1.5;
   bool _isCompressed;
 
-  SpringEntity({
-    required super.id,
-    required super.triggerZone,
-  }) : _isCompressed = false;
+  SpringEntity({required super.id, required super.triggerZone})
+    : _isCompressed = false;
 
   @override
   void onLoad() {
     super.onLoad();
     // Visual indicator for spring
-    add(RectangleComponent(
-      size: size * 0.8,
-      anchor: Anchor.center,
-      paint: Paint()..color = const Color(0xFFFFFF00),
-    ));
+    add(
+      RectangleComponent(
+        size: size * 0.8,
+        anchor: Anchor.center,
+        paint: Paint()..color = const Color(0xFFFFFF00),
+      ),
+    );
   }
 
   @override

@@ -9,15 +9,14 @@ class DualCharacterNotifier extends StateNotifier<DualCharacterState> {
   DualCharacterNotifier({
     required CharacterState initialHead,
     required CharacterState initialHeels,
-  }) : super(DualCharacterState.initial(
-          headStart: initialHead.position,
-          heelsStart: initialHeels.position,
-        )) {
+  }) : super(
+         DualCharacterState.initial(
+           headStart: initialHead.position,
+           heelsStart: initialHeels.position,
+         ),
+       ) {
     // Initialize with provided states
-    state = state.copyWith(
-      head: initialHead,
-      heels: initialHeels,
-    );
+    state = state.copyWith(head: initialHead, heels: initialHeels);
   }
 
   /// Swap control between Head and Heels (or combine/separate).
@@ -46,21 +45,18 @@ class DualCharacterNotifier extends StateNotifier<DualCharacterState> {
 
   /// Update both character states from their notifiers.
   void syncFromNotifiers(CharacterState headState, CharacterState heelsState) {
-    state = state.copyWith(
-      head: headState,
-      heels: heelsState,
-    );
+    state = state.copyWith(head: headState, heels: heelsState);
   }
 }
 
 /// Provider for dual character state management.
 final dualCharacterProvider =
     StateNotifierProvider<DualCharacterNotifier, DualCharacterState>((ref) {
-  final headState = ref.watch(headProvider);
-  final heelsState = ref.watch(heelsProvider);
-  
-  return DualCharacterNotifier(
-    initialHead: headState,
-    initialHeels: heelsState,
-  );
-});
+      final headState = ref.watch(headProvider);
+      final heelsState = ref.watch(heelsProvider);
+
+      return DualCharacterNotifier(
+        initialHead: headState,
+        initialHeels: heelsState,
+      );
+    });

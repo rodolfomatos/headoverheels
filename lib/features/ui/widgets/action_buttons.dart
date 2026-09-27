@@ -135,14 +135,18 @@ class _ActionButton extends StatelessWidget {
                   children: [
                     Icon(
                       icon,
-                      color: enabled ? AppColors.darkBackground : AppColors.darkMuted,
+                      color: enabled
+                          ? AppColors.darkBackground
+                          : AppColors.darkMuted,
                       size: 28,
                     ),
                     const SizedBox(height: 4),
                     Text(
                       label,
                       style: AppTypography.small.copyWith(
-                        color: enabled ? AppColors.darkBackground : AppColors.darkMuted,
+                        color: enabled
+                            ? AppColors.darkBackground
+                            : AppColors.darkMuted,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -192,10 +196,7 @@ class _ActionButton extends StatelessWidget {
 class PauseButton extends StatelessWidget {
   final VoidCallback onPressed;
 
-  const PauseButton({
-    super.key,
-    required this.onPressed,
-  });
+  const PauseButton({super.key, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -211,10 +212,7 @@ class PauseButton extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: AppColors.darkSurface,
-            border: Border.all(
-              color: AppColors.darkBorder,
-              width: 1.5,
-            ),
+            border: Border.all(color: AppColors.darkBorder, width: 1.5),
           ),
           child: const Center(
             child: Icon(

@@ -12,7 +12,8 @@ part of 'character_state.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
+);
 
 /// @nodoc
 mixin _$CarriedItem {
@@ -22,16 +23,14 @@ mixin _$CarriedItem {
     required TResult Function(String keyId) key,
     required TResult Function() crown,
     required TResult Function(String itemId) other,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? none,
     TResult? Function(String keyId)? key,
     TResult? Function()? crown,
     TResult? Function(String itemId)? other,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? none,
@@ -39,24 +38,21 @@ mixin _$CarriedItem {
     TResult Function()? crown,
     TResult Function(String itemId)? other,
     required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_None value) none,
     required TResult Function(_Key value) key,
     required TResult Function(_Crown value) crown,
     required TResult Function(_Other value) other,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_None value)? none,
     TResult? Function(_Key value)? key,
     TResult? Function(_Crown value)? crown,
     TResult? Function(_Other value)? other,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_None value)? none,
@@ -64,15 +60,15 @@ mixin _$CarriedItem {
     TResult Function(_Crown value)? crown,
     TResult Function(_Other value)? other,
     required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 abstract class $CarriedItemCopyWith<$Res> {
   factory $CarriedItemCopyWith(
-          CarriedItem value, $Res Function(CarriedItem) then) =
-      _$CarriedItemCopyWithImpl<$Res, CarriedItem>;
+    CarriedItem value,
+    $Res Function(CarriedItem) then,
+  ) = _$CarriedItemCopyWithImpl<$Res, CarriedItem>;
 }
 
 /// @nodoc
@@ -89,8 +85,9 @@ class _$CarriedItemCopyWithImpl<$Res, $Val extends CarriedItem>
 /// @nodoc
 abstract class _$$NoneImplCopyWith<$Res> {
   factory _$$NoneImplCopyWith(
-          _$NoneImpl value, $Res Function(_$NoneImpl) then) =
-      __$$NoneImplCopyWithImpl<$Res>;
+    _$NoneImpl value,
+    $Res Function(_$NoneImpl) then,
+  ) = __$$NoneImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
@@ -98,7 +95,7 @@ class __$$NoneImplCopyWithImpl<$Res>
     extends _$CarriedItemCopyWithImpl<$Res, _$NoneImpl>
     implements _$$NoneImplCopyWith<$Res> {
   __$$NoneImplCopyWithImpl(_$NoneImpl _value, $Res Function(_$NoneImpl) _then)
-      : super(_value, _then);
+    : super(_value, _then);
 }
 
 /// @nodoc
@@ -212,19 +209,19 @@ class __$$KeyImplCopyWithImpl<$Res>
     extends _$CarriedItemCopyWithImpl<$Res, _$KeyImpl>
     implements _$$KeyImplCopyWith<$Res> {
   __$$KeyImplCopyWithImpl(_$KeyImpl _value, $Res Function(_$KeyImpl) _then)
-      : super(_value, _then);
+    : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? keyId = null,
-  }) {
-    return _then(_$KeyImpl(
-      null == keyId
-          ? _value.keyId
-          : keyId // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
+  $Res call({Object? keyId = null}) {
+    return _then(
+      _$KeyImpl(
+        null == keyId
+            ? _value.keyId
+            : keyId // ignore: cast_nullable_to_non_nullable
+                  as String,
+      ),
+    );
   }
 }
 
@@ -345,8 +342,9 @@ abstract class _Key implements CarriedItem {
 /// @nodoc
 abstract class _$$CrownImplCopyWith<$Res> {
   factory _$$CrownImplCopyWith(
-          _$CrownImpl value, $Res Function(_$CrownImpl) then) =
-      __$$CrownImplCopyWithImpl<$Res>;
+    _$CrownImpl value,
+    $Res Function(_$CrownImpl) then,
+  ) = __$$CrownImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
@@ -354,8 +352,9 @@ class __$$CrownImplCopyWithImpl<$Res>
     extends _$CarriedItemCopyWithImpl<$Res, _$CrownImpl>
     implements _$$CrownImplCopyWith<$Res> {
   __$$CrownImplCopyWithImpl(
-      _$CrownImpl _value, $Res Function(_$CrownImpl) _then)
-      : super(_value, _then);
+    _$CrownImpl _value,
+    $Res Function(_$CrownImpl) _then,
+  ) : super(_value, _then);
 }
 
 /// @nodoc
@@ -459,8 +458,9 @@ abstract class _Crown implements CarriedItem {
 /// @nodoc
 abstract class _$$OtherImplCopyWith<$Res> {
   factory _$$OtherImplCopyWith(
-          _$OtherImpl value, $Res Function(_$OtherImpl) then) =
-      __$$OtherImplCopyWithImpl<$Res>;
+    _$OtherImpl value,
+    $Res Function(_$OtherImpl) then,
+  ) = __$$OtherImplCopyWithImpl<$Res>;
   @useResult
   $Res call({String itemId});
 }
@@ -470,20 +470,21 @@ class __$$OtherImplCopyWithImpl<$Res>
     extends _$CarriedItemCopyWithImpl<$Res, _$OtherImpl>
     implements _$$OtherImplCopyWith<$Res> {
   __$$OtherImplCopyWithImpl(
-      _$OtherImpl _value, $Res Function(_$OtherImpl) _then)
-      : super(_value, _then);
+    _$OtherImpl _value,
+    $Res Function(_$OtherImpl) _then,
+  ) : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? itemId = null,
-  }) {
-    return _then(_$OtherImpl(
-      null == itemId
-          ? _value.itemId
-          : itemId // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
+  $Res call({Object? itemId = null}) {
+    return _then(
+      _$OtherImpl(
+        null == itemId
+            ? _value.itemId
+            : itemId // ignore: cast_nullable_to_non_nullable
+                  as String,
+      ),
+    );
   }
 }
 
@@ -609,16 +610,14 @@ mixin _$PowerUp {
     required TResult Function(int framesRemaining) invulnerable,
     required TResult Function(int framesRemaining) jumpBoost,
     required TResult Function(int framesRemaining) speedBoost,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(int count)? extraLives,
     TResult? Function(int framesRemaining)? invulnerable,
     TResult? Function(int framesRemaining)? jumpBoost,
     TResult? Function(int framesRemaining)? speedBoost,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(int count)? extraLives,
@@ -626,24 +625,21 @@ mixin _$PowerUp {
     TResult Function(int framesRemaining)? jumpBoost,
     TResult Function(int framesRemaining)? speedBoost,
     required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_ExtraLives value) extraLives,
     required TResult Function(_Invulnerable value) invulnerable,
     required TResult Function(_JumpBoost value) jumpBoost,
     required TResult Function(_SpeedBoost value) speedBoost,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_ExtraLives value)? extraLives,
     TResult? Function(_Invulnerable value)? invulnerable,
     TResult? Function(_JumpBoost value)? jumpBoost,
     TResult? Function(_SpeedBoost value)? speedBoost,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_ExtraLives value)? extraLives,
@@ -651,8 +647,7 @@ mixin _$PowerUp {
     TResult Function(_JumpBoost value)? jumpBoost,
     TResult Function(_SpeedBoost value)? speedBoost,
     required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -675,8 +670,9 @@ class _$PowerUpCopyWithImpl<$Res, $Val extends PowerUp>
 /// @nodoc
 abstract class _$$ExtraLivesImplCopyWith<$Res> {
   factory _$$ExtraLivesImplCopyWith(
-          _$ExtraLivesImpl value, $Res Function(_$ExtraLivesImpl) then) =
-      __$$ExtraLivesImplCopyWithImpl<$Res>;
+    _$ExtraLivesImpl value,
+    $Res Function(_$ExtraLivesImpl) then,
+  ) = __$$ExtraLivesImplCopyWithImpl<$Res>;
   @useResult
   $Res call({int count});
 }
@@ -686,20 +682,21 @@ class __$$ExtraLivesImplCopyWithImpl<$Res>
     extends _$PowerUpCopyWithImpl<$Res, _$ExtraLivesImpl>
     implements _$$ExtraLivesImplCopyWith<$Res> {
   __$$ExtraLivesImplCopyWithImpl(
-      _$ExtraLivesImpl _value, $Res Function(_$ExtraLivesImpl) _then)
-      : super(_value, _then);
+    _$ExtraLivesImpl _value,
+    $Res Function(_$ExtraLivesImpl) _then,
+  ) : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? count = null,
-  }) {
-    return _then(_$ExtraLivesImpl(
-      count: null == count
-          ? _value.count
-          : count // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
+  $Res call({Object? count = null}) {
+    return _then(
+      _$ExtraLivesImpl(
+        count: null == count
+            ? _value.count
+            : count // ignore: cast_nullable_to_non_nullable
+                  as int,
+      ),
+    );
   }
 }
 
@@ -820,8 +817,9 @@ abstract class _ExtraLives implements PowerUp {
 /// @nodoc
 abstract class _$$InvulnerableImplCopyWith<$Res> {
   factory _$$InvulnerableImplCopyWith(
-          _$InvulnerableImpl value, $Res Function(_$InvulnerableImpl) then) =
-      __$$InvulnerableImplCopyWithImpl<$Res>;
+    _$InvulnerableImpl value,
+    $Res Function(_$InvulnerableImpl) then,
+  ) = __$$InvulnerableImplCopyWithImpl<$Res>;
   @useResult
   $Res call({int framesRemaining});
 }
@@ -831,20 +829,21 @@ class __$$InvulnerableImplCopyWithImpl<$Res>
     extends _$PowerUpCopyWithImpl<$Res, _$InvulnerableImpl>
     implements _$$InvulnerableImplCopyWith<$Res> {
   __$$InvulnerableImplCopyWithImpl(
-      _$InvulnerableImpl _value, $Res Function(_$InvulnerableImpl) _then)
-      : super(_value, _then);
+    _$InvulnerableImpl _value,
+    $Res Function(_$InvulnerableImpl) _then,
+  ) : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? framesRemaining = null,
-  }) {
-    return _then(_$InvulnerableImpl(
-      framesRemaining: null == framesRemaining
-          ? _value.framesRemaining
-          : framesRemaining // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
+  $Res call({Object? framesRemaining = null}) {
+    return _then(
+      _$InvulnerableImpl(
+        framesRemaining: null == framesRemaining
+            ? _value.framesRemaining
+            : framesRemaining // ignore: cast_nullable_to_non_nullable
+                  as int,
+      ),
+    );
   }
 }
 
@@ -967,8 +966,9 @@ abstract class _Invulnerable implements PowerUp {
 /// @nodoc
 abstract class _$$JumpBoostImplCopyWith<$Res> {
   factory _$$JumpBoostImplCopyWith(
-          _$JumpBoostImpl value, $Res Function(_$JumpBoostImpl) then) =
-      __$$JumpBoostImplCopyWithImpl<$Res>;
+    _$JumpBoostImpl value,
+    $Res Function(_$JumpBoostImpl) then,
+  ) = __$$JumpBoostImplCopyWithImpl<$Res>;
   @useResult
   $Res call({int framesRemaining});
 }
@@ -978,20 +978,21 @@ class __$$JumpBoostImplCopyWithImpl<$Res>
     extends _$PowerUpCopyWithImpl<$Res, _$JumpBoostImpl>
     implements _$$JumpBoostImplCopyWith<$Res> {
   __$$JumpBoostImplCopyWithImpl(
-      _$JumpBoostImpl _value, $Res Function(_$JumpBoostImpl) _then)
-      : super(_value, _then);
+    _$JumpBoostImpl _value,
+    $Res Function(_$JumpBoostImpl) _then,
+  ) : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? framesRemaining = null,
-  }) {
-    return _then(_$JumpBoostImpl(
-      framesRemaining: null == framesRemaining
-          ? _value.framesRemaining
-          : framesRemaining // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
+  $Res call({Object? framesRemaining = null}) {
+    return _then(
+      _$JumpBoostImpl(
+        framesRemaining: null == framesRemaining
+            ? _value.framesRemaining
+            : framesRemaining // ignore: cast_nullable_to_non_nullable
+                  as int,
+      ),
+    );
   }
 }
 
@@ -1114,8 +1115,9 @@ abstract class _JumpBoost implements PowerUp {
 /// @nodoc
 abstract class _$$SpeedBoostImplCopyWith<$Res> {
   factory _$$SpeedBoostImplCopyWith(
-          _$SpeedBoostImpl value, $Res Function(_$SpeedBoostImpl) then) =
-      __$$SpeedBoostImplCopyWithImpl<$Res>;
+    _$SpeedBoostImpl value,
+    $Res Function(_$SpeedBoostImpl) then,
+  ) = __$$SpeedBoostImplCopyWithImpl<$Res>;
   @useResult
   $Res call({int framesRemaining});
 }
@@ -1125,20 +1127,21 @@ class __$$SpeedBoostImplCopyWithImpl<$Res>
     extends _$PowerUpCopyWithImpl<$Res, _$SpeedBoostImpl>
     implements _$$SpeedBoostImplCopyWith<$Res> {
   __$$SpeedBoostImplCopyWithImpl(
-      _$SpeedBoostImpl _value, $Res Function(_$SpeedBoostImpl) _then)
-      : super(_value, _then);
+    _$SpeedBoostImpl _value,
+    $Res Function(_$SpeedBoostImpl) _then,
+  ) : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? framesRemaining = null,
-  }) {
-    return _then(_$SpeedBoostImpl(
-      framesRemaining: null == framesRemaining
-          ? _value.framesRemaining
-          : framesRemaining // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
+  $Res call({Object? framesRemaining = null}) {
+    return _then(
+      _$SpeedBoostImpl(
+        framesRemaining: null == framesRemaining
+            ? _value.framesRemaining
+            : framesRemaining // ignore: cast_nullable_to_non_nullable
+                  as int,
+      ),
+    );
   }
 }
 
@@ -1292,24 +1295,26 @@ mixin _$CharacterState {
 /// @nodoc
 abstract class $CharacterStateCopyWith<$Res> {
   factory $CharacterStateCopyWith(
-          CharacterState value, $Res Function(CharacterState) then) =
-      _$CharacterStateCopyWithImpl<$Res, CharacterState>;
+    CharacterState value,
+    $Res Function(CharacterState) then,
+  ) = _$CharacterStateCopyWithImpl<$Res, CharacterState>;
   @useResult
-  $Res call(
-      {CharacterType type,
-      @Vector3Converter() Vector3 position,
-      @Vector2Converter() Vector2 velocity,
-      AnimationState animation,
-      FacingDirection facing,
-      bool isGrounded,
-      int jumpPhase,
-      int jumpFramesRemaining,
-      @CarriedItemConverter() CarriedItem carriedItem,
-      int doughnutCount,
-      @PowerUpConverter() List<PowerUp> activePowerUps,
-      bool isControllable,
-      bool isInvulnerable,
-      int lives});
+  $Res call({
+    CharacterType type,
+    @Vector3Converter() Vector3 position,
+    @Vector2Converter() Vector2 velocity,
+    AnimationState animation,
+    FacingDirection facing,
+    bool isGrounded,
+    int jumpPhase,
+    int jumpFramesRemaining,
+    @CarriedItemConverter() CarriedItem carriedItem,
+    int doughnutCount,
+    @PowerUpConverter() List<PowerUp> activePowerUps,
+    bool isControllable,
+    bool isInvulnerable,
+    int lives,
+  });
 
   $CarriedItemCopyWith<$Res> get carriedItem;
 }
@@ -1342,64 +1347,67 @@ class _$CharacterStateCopyWithImpl<$Res, $Val extends CharacterState>
     Object? isInvulnerable = null,
     Object? lives = null,
   }) {
-    return _then(_value.copyWith(
-      type: null == type
-          ? _value.type
-          : type // ignore: cast_nullable_to_non_nullable
-              as CharacterType,
-      position: null == position
-          ? _value.position
-          : position // ignore: cast_nullable_to_non_nullable
-              as Vector3,
-      velocity: null == velocity
-          ? _value.velocity
-          : velocity // ignore: cast_nullable_to_non_nullable
-              as Vector2,
-      animation: null == animation
-          ? _value.animation
-          : animation // ignore: cast_nullable_to_non_nullable
-              as AnimationState,
-      facing: null == facing
-          ? _value.facing
-          : facing // ignore: cast_nullable_to_non_nullable
-              as FacingDirection,
-      isGrounded: null == isGrounded
-          ? _value.isGrounded
-          : isGrounded // ignore: cast_nullable_to_non_nullable
-              as bool,
-      jumpPhase: null == jumpPhase
-          ? _value.jumpPhase
-          : jumpPhase // ignore: cast_nullable_to_non_nullable
-              as int,
-      jumpFramesRemaining: null == jumpFramesRemaining
-          ? _value.jumpFramesRemaining
-          : jumpFramesRemaining // ignore: cast_nullable_to_non_nullable
-              as int,
-      carriedItem: null == carriedItem
-          ? _value.carriedItem
-          : carriedItem // ignore: cast_nullable_to_non_nullable
-              as CarriedItem,
-      doughnutCount: null == doughnutCount
-          ? _value.doughnutCount
-          : doughnutCount // ignore: cast_nullable_to_non_nullable
-              as int,
-      activePowerUps: null == activePowerUps
-          ? _value.activePowerUps
-          : activePowerUps // ignore: cast_nullable_to_non_nullable
-              as List<PowerUp>,
-      isControllable: null == isControllable
-          ? _value.isControllable
-          : isControllable // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isInvulnerable: null == isInvulnerable
-          ? _value.isInvulnerable
-          : isInvulnerable // ignore: cast_nullable_to_non_nullable
-              as bool,
-      lives: null == lives
-          ? _value.lives
-          : lives // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            type: null == type
+                ? _value.type
+                : type // ignore: cast_nullable_to_non_nullable
+                      as CharacterType,
+            position: null == position
+                ? _value.position
+                : position // ignore: cast_nullable_to_non_nullable
+                      as Vector3,
+            velocity: null == velocity
+                ? _value.velocity
+                : velocity // ignore: cast_nullable_to_non_nullable
+                      as Vector2,
+            animation: null == animation
+                ? _value.animation
+                : animation // ignore: cast_nullable_to_non_nullable
+                      as AnimationState,
+            facing: null == facing
+                ? _value.facing
+                : facing // ignore: cast_nullable_to_non_nullable
+                      as FacingDirection,
+            isGrounded: null == isGrounded
+                ? _value.isGrounded
+                : isGrounded // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            jumpPhase: null == jumpPhase
+                ? _value.jumpPhase
+                : jumpPhase // ignore: cast_nullable_to_non_nullable
+                      as int,
+            jumpFramesRemaining: null == jumpFramesRemaining
+                ? _value.jumpFramesRemaining
+                : jumpFramesRemaining // ignore: cast_nullable_to_non_nullable
+                      as int,
+            carriedItem: null == carriedItem
+                ? _value.carriedItem
+                : carriedItem // ignore: cast_nullable_to_non_nullable
+                      as CarriedItem,
+            doughnutCount: null == doughnutCount
+                ? _value.doughnutCount
+                : doughnutCount // ignore: cast_nullable_to_non_nullable
+                      as int,
+            activePowerUps: null == activePowerUps
+                ? _value.activePowerUps
+                : activePowerUps // ignore: cast_nullable_to_non_nullable
+                      as List<PowerUp>,
+            isControllable: null == isControllable
+                ? _value.isControllable
+                : isControllable // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            isInvulnerable: null == isInvulnerable
+                ? _value.isInvulnerable
+                : isInvulnerable // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            lives: null == lives
+                ? _value.lives
+                : lives // ignore: cast_nullable_to_non_nullable
+                      as int,
+          )
+          as $Val,
+    );
   }
 
   @override
@@ -1414,26 +1422,28 @@ class _$CharacterStateCopyWithImpl<$Res, $Val extends CharacterState>
 /// @nodoc
 abstract class _$$CharacterStateImplCopyWith<$Res>
     implements $CharacterStateCopyWith<$Res> {
-  factory _$$CharacterStateImplCopyWith(_$CharacterStateImpl value,
-          $Res Function(_$CharacterStateImpl) then) =
-      __$$CharacterStateImplCopyWithImpl<$Res>;
+  factory _$$CharacterStateImplCopyWith(
+    _$CharacterStateImpl value,
+    $Res Function(_$CharacterStateImpl) then,
+  ) = __$$CharacterStateImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {CharacterType type,
-      @Vector3Converter() Vector3 position,
-      @Vector2Converter() Vector2 velocity,
-      AnimationState animation,
-      FacingDirection facing,
-      bool isGrounded,
-      int jumpPhase,
-      int jumpFramesRemaining,
-      @CarriedItemConverter() CarriedItem carriedItem,
-      int doughnutCount,
-      @PowerUpConverter() List<PowerUp> activePowerUps,
-      bool isControllable,
-      bool isInvulnerable,
-      int lives});
+  $Res call({
+    CharacterType type,
+    @Vector3Converter() Vector3 position,
+    @Vector2Converter() Vector2 velocity,
+    AnimationState animation,
+    FacingDirection facing,
+    bool isGrounded,
+    int jumpPhase,
+    int jumpFramesRemaining,
+    @CarriedItemConverter() CarriedItem carriedItem,
+    int doughnutCount,
+    @PowerUpConverter() List<PowerUp> activePowerUps,
+    bool isControllable,
+    bool isInvulnerable,
+    int lives,
+  });
 
   @override
   $CarriedItemCopyWith<$Res> get carriedItem;
@@ -1444,8 +1454,9 @@ class __$$CharacterStateImplCopyWithImpl<$Res>
     extends _$CharacterStateCopyWithImpl<$Res, _$CharacterStateImpl>
     implements _$$CharacterStateImplCopyWith<$Res> {
   __$$CharacterStateImplCopyWithImpl(
-      _$CharacterStateImpl _value, $Res Function(_$CharacterStateImpl) _then)
-      : super(_value, _then);
+    _$CharacterStateImpl _value,
+    $Res Function(_$CharacterStateImpl) _then,
+  ) : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
@@ -1465,86 +1476,88 @@ class __$$CharacterStateImplCopyWithImpl<$Res>
     Object? isInvulnerable = null,
     Object? lives = null,
   }) {
-    return _then(_$CharacterStateImpl(
-      type: null == type
-          ? _value.type
-          : type // ignore: cast_nullable_to_non_nullable
-              as CharacterType,
-      position: null == position
-          ? _value.position
-          : position // ignore: cast_nullable_to_non_nullable
-              as Vector3,
-      velocity: null == velocity
-          ? _value.velocity
-          : velocity // ignore: cast_nullable_to_non_nullable
-              as Vector2,
-      animation: null == animation
-          ? _value.animation
-          : animation // ignore: cast_nullable_to_non_nullable
-              as AnimationState,
-      facing: null == facing
-          ? _value.facing
-          : facing // ignore: cast_nullable_to_non_nullable
-              as FacingDirection,
-      isGrounded: null == isGrounded
-          ? _value.isGrounded
-          : isGrounded // ignore: cast_nullable_to_non_nullable
-              as bool,
-      jumpPhase: null == jumpPhase
-          ? _value.jumpPhase
-          : jumpPhase // ignore: cast_nullable_to_non_nullable
-              as int,
-      jumpFramesRemaining: null == jumpFramesRemaining
-          ? _value.jumpFramesRemaining
-          : jumpFramesRemaining // ignore: cast_nullable_to_non_nullable
-              as int,
-      carriedItem: null == carriedItem
-          ? _value.carriedItem
-          : carriedItem // ignore: cast_nullable_to_non_nullable
-              as CarriedItem,
-      doughnutCount: null == doughnutCount
-          ? _value.doughnutCount
-          : doughnutCount // ignore: cast_nullable_to_non_nullable
-              as int,
-      activePowerUps: null == activePowerUps
-          ? _value._activePowerUps
-          : activePowerUps // ignore: cast_nullable_to_non_nullable
-              as List<PowerUp>,
-      isControllable: null == isControllable
-          ? _value.isControllable
-          : isControllable // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isInvulnerable: null == isInvulnerable
-          ? _value.isInvulnerable
-          : isInvulnerable // ignore: cast_nullable_to_non_nullable
-              as bool,
-      lives: null == lives
-          ? _value.lives
-          : lives // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
+    return _then(
+      _$CharacterStateImpl(
+        type: null == type
+            ? _value.type
+            : type // ignore: cast_nullable_to_non_nullable
+                  as CharacterType,
+        position: null == position
+            ? _value.position
+            : position // ignore: cast_nullable_to_non_nullable
+                  as Vector3,
+        velocity: null == velocity
+            ? _value.velocity
+            : velocity // ignore: cast_nullable_to_non_nullable
+                  as Vector2,
+        animation: null == animation
+            ? _value.animation
+            : animation // ignore: cast_nullable_to_non_nullable
+                  as AnimationState,
+        facing: null == facing
+            ? _value.facing
+            : facing // ignore: cast_nullable_to_non_nullable
+                  as FacingDirection,
+        isGrounded: null == isGrounded
+            ? _value.isGrounded
+            : isGrounded // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        jumpPhase: null == jumpPhase
+            ? _value.jumpPhase
+            : jumpPhase // ignore: cast_nullable_to_non_nullable
+                  as int,
+        jumpFramesRemaining: null == jumpFramesRemaining
+            ? _value.jumpFramesRemaining
+            : jumpFramesRemaining // ignore: cast_nullable_to_non_nullable
+                  as int,
+        carriedItem: null == carriedItem
+            ? _value.carriedItem
+            : carriedItem // ignore: cast_nullable_to_non_nullable
+                  as CarriedItem,
+        doughnutCount: null == doughnutCount
+            ? _value.doughnutCount
+            : doughnutCount // ignore: cast_nullable_to_non_nullable
+                  as int,
+        activePowerUps: null == activePowerUps
+            ? _value._activePowerUps
+            : activePowerUps // ignore: cast_nullable_to_non_nullable
+                  as List<PowerUp>,
+        isControllable: null == isControllable
+            ? _value.isControllable
+            : isControllable // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        isInvulnerable: null == isInvulnerable
+            ? _value.isInvulnerable
+            : isInvulnerable // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        lives: null == lives
+            ? _value.lives
+            : lives // ignore: cast_nullable_to_non_nullable
+                  as int,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$CharacterStateImpl implements _CharacterState {
-  const _$CharacterStateImpl(
-      {required this.type,
-      @Vector3Converter() required this.position,
-      @Vector2Converter() required this.velocity,
-      required this.animation,
-      required this.facing,
-      required this.isGrounded,
-      required this.jumpPhase,
-      required this.jumpFramesRemaining,
-      @CarriedItemConverter() required this.carriedItem,
-      required this.doughnutCount,
-      @PowerUpConverter() required final List<PowerUp> activePowerUps,
-      required this.isControllable,
-      required this.isInvulnerable,
-      required this.lives})
-      : _activePowerUps = activePowerUps;
+  const _$CharacterStateImpl({
+    required this.type,
+    @Vector3Converter() required this.position,
+    @Vector2Converter() required this.velocity,
+    required this.animation,
+    required this.facing,
+    required this.isGrounded,
+    required this.jumpPhase,
+    required this.jumpFramesRemaining,
+    @CarriedItemConverter() required this.carriedItem,
+    required this.doughnutCount,
+    @PowerUpConverter() required final List<PowerUp> activePowerUps,
+    required this.isControllable,
+    required this.isInvulnerable,
+    required this.lives,
+  }) : _activePowerUps = activePowerUps;
 
   factory _$CharacterStateImpl.fromJson(Map<String, dynamic> json) =>
       _$$CharacterStateImplFromJson(json);
@@ -1616,8 +1629,10 @@ class _$CharacterStateImpl implements _CharacterState {
                 other.carriedItem == carriedItem) &&
             (identical(other.doughnutCount, doughnutCount) ||
                 other.doughnutCount == doughnutCount) &&
-            const DeepCollectionEquality()
-                .equals(other._activePowerUps, _activePowerUps) &&
+            const DeepCollectionEquality().equals(
+              other._activePowerUps,
+              _activePowerUps,
+            ) &&
             (identical(other.isControllable, isControllable) ||
                 other.isControllable == isControllable) &&
             (identical(other.isInvulnerable, isInvulnerable) ||
@@ -1628,53 +1643,55 @@ class _$CharacterStateImpl implements _CharacterState {
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
-      runtimeType,
-      type,
-      position,
-      velocity,
-      animation,
-      facing,
-      isGrounded,
-      jumpPhase,
-      jumpFramesRemaining,
-      carriedItem,
-      doughnutCount,
-      const DeepCollectionEquality().hash(_activePowerUps),
-      isControllable,
-      isInvulnerable,
-      lives);
+    runtimeType,
+    type,
+    position,
+    velocity,
+    animation,
+    facing,
+    isGrounded,
+    jumpPhase,
+    jumpFramesRemaining,
+    carriedItem,
+    doughnutCount,
+    const DeepCollectionEquality().hash(_activePowerUps),
+    isControllable,
+    isInvulnerable,
+    lives,
+  );
 
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$CharacterStateImplCopyWith<_$CharacterStateImpl> get copyWith =>
       __$$CharacterStateImplCopyWithImpl<_$CharacterStateImpl>(
-          this, _$identity);
+        this,
+        _$identity,
+      );
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$CharacterStateImplToJson(
-      this,
-    );
+    return _$$CharacterStateImplToJson(this);
   }
 }
 
 abstract class _CharacterState implements CharacterState {
-  const factory _CharacterState(
-      {required final CharacterType type,
-      @Vector3Converter() required final Vector3 position,
-      @Vector2Converter() required final Vector2 velocity,
-      required final AnimationState animation,
-      required final FacingDirection facing,
-      required final bool isGrounded,
-      required final int jumpPhase,
-      required final int jumpFramesRemaining,
-      @CarriedItemConverter() required final CarriedItem carriedItem,
-      required final int doughnutCount,
-      @PowerUpConverter() required final List<PowerUp> activePowerUps,
-      required final bool isControllable,
-      required final bool isInvulnerable,
-      required final int lives}) = _$CharacterStateImpl;
+  const factory _CharacterState({
+    required final CharacterType type,
+    @Vector3Converter() required final Vector3 position,
+    @Vector2Converter() required final Vector2 velocity,
+    required final AnimationState animation,
+    required final FacingDirection facing,
+    required final bool isGrounded,
+    required final int jumpPhase,
+    required final int jumpFramesRemaining,
+    @CarriedItemConverter() required final CarriedItem carriedItem,
+    required final int doughnutCount,
+    @PowerUpConverter() required final List<PowerUp> activePowerUps,
+    required final bool isControllable,
+    required final bool isInvulnerable,
+    required final int lives,
+  }) = _$CharacterStateImpl;
 
   factory _CharacterState.fromJson(Map<String, dynamic> json) =
       _$CharacterStateImpl.fromJson;
@@ -1739,15 +1756,17 @@ mixin _$DualCharacterState {
 /// @nodoc
 abstract class $DualCharacterStateCopyWith<$Res> {
   factory $DualCharacterStateCopyWith(
-          DualCharacterState value, $Res Function(DualCharacterState) then) =
-      _$DualCharacterStateCopyWithImpl<$Res, DualCharacterState>;
+    DualCharacterState value,
+    $Res Function(DualCharacterState) then,
+  ) = _$DualCharacterStateCopyWithImpl<$Res, DualCharacterState>;
   @useResult
-  $Res call(
-      {CharacterState head,
-      CharacterState heels,
-      ControlledEntity controlled,
-      bool areCombined,
-      @Vector3Converter() Vector3 combinedPosition});
+  $Res call({
+    CharacterState head,
+    CharacterState heels,
+    ControlledEntity controlled,
+    bool areCombined,
+    @Vector3Converter() Vector3 combinedPosition,
+  });
 
   $CharacterStateCopyWith<$Res> get head;
   $CharacterStateCopyWith<$Res> get heels;
@@ -1772,28 +1791,31 @@ class _$DualCharacterStateCopyWithImpl<$Res, $Val extends DualCharacterState>
     Object? areCombined = null,
     Object? combinedPosition = null,
   }) {
-    return _then(_value.copyWith(
-      head: null == head
-          ? _value.head
-          : head // ignore: cast_nullable_to_non_nullable
-              as CharacterState,
-      heels: null == heels
-          ? _value.heels
-          : heels // ignore: cast_nullable_to_non_nullable
-              as CharacterState,
-      controlled: null == controlled
-          ? _value.controlled
-          : controlled // ignore: cast_nullable_to_non_nullable
-              as ControlledEntity,
-      areCombined: null == areCombined
-          ? _value.areCombined
-          : areCombined // ignore: cast_nullable_to_non_nullable
-              as bool,
-      combinedPosition: null == combinedPosition
-          ? _value.combinedPosition
-          : combinedPosition // ignore: cast_nullable_to_non_nullable
-              as Vector3,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            head: null == head
+                ? _value.head
+                : head // ignore: cast_nullable_to_non_nullable
+                      as CharacterState,
+            heels: null == heels
+                ? _value.heels
+                : heels // ignore: cast_nullable_to_non_nullable
+                      as CharacterState,
+            controlled: null == controlled
+                ? _value.controlled
+                : controlled // ignore: cast_nullable_to_non_nullable
+                      as ControlledEntity,
+            areCombined: null == areCombined
+                ? _value.areCombined
+                : areCombined // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            combinedPosition: null == combinedPosition
+                ? _value.combinedPosition
+                : combinedPosition // ignore: cast_nullable_to_non_nullable
+                      as Vector3,
+          )
+          as $Val,
+    );
   }
 
   @override
@@ -1816,17 +1838,19 @@ class _$DualCharacterStateCopyWithImpl<$Res, $Val extends DualCharacterState>
 /// @nodoc
 abstract class _$$DualCharacterStateImplCopyWith<$Res>
     implements $DualCharacterStateCopyWith<$Res> {
-  factory _$$DualCharacterStateImplCopyWith(_$DualCharacterStateImpl value,
-          $Res Function(_$DualCharacterStateImpl) then) =
-      __$$DualCharacterStateImplCopyWithImpl<$Res>;
+  factory _$$DualCharacterStateImplCopyWith(
+    _$DualCharacterStateImpl value,
+    $Res Function(_$DualCharacterStateImpl) then,
+  ) = __$$DualCharacterStateImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {CharacterState head,
-      CharacterState heels,
-      ControlledEntity controlled,
-      bool areCombined,
-      @Vector3Converter() Vector3 combinedPosition});
+  $Res call({
+    CharacterState head,
+    CharacterState heels,
+    ControlledEntity controlled,
+    bool areCombined,
+    @Vector3Converter() Vector3 combinedPosition,
+  });
 
   @override
   $CharacterStateCopyWith<$Res> get head;
@@ -1838,9 +1862,10 @@ abstract class _$$DualCharacterStateImplCopyWith<$Res>
 class __$$DualCharacterStateImplCopyWithImpl<$Res>
     extends _$DualCharacterStateCopyWithImpl<$Res, _$DualCharacterStateImpl>
     implements _$$DualCharacterStateImplCopyWith<$Res> {
-  __$$DualCharacterStateImplCopyWithImpl(_$DualCharacterStateImpl _value,
-      $Res Function(_$DualCharacterStateImpl) _then)
-      : super(_value, _then);
+  __$$DualCharacterStateImplCopyWithImpl(
+    _$DualCharacterStateImpl _value,
+    $Res Function(_$DualCharacterStateImpl) _then,
+  ) : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
@@ -1851,40 +1876,43 @@ class __$$DualCharacterStateImplCopyWithImpl<$Res>
     Object? areCombined = null,
     Object? combinedPosition = null,
   }) {
-    return _then(_$DualCharacterStateImpl(
-      head: null == head
-          ? _value.head
-          : head // ignore: cast_nullable_to_non_nullable
-              as CharacterState,
-      heels: null == heels
-          ? _value.heels
-          : heels // ignore: cast_nullable_to_non_nullable
-              as CharacterState,
-      controlled: null == controlled
-          ? _value.controlled
-          : controlled // ignore: cast_nullable_to_non_nullable
-              as ControlledEntity,
-      areCombined: null == areCombined
-          ? _value.areCombined
-          : areCombined // ignore: cast_nullable_to_non_nullable
-              as bool,
-      combinedPosition: null == combinedPosition
-          ? _value.combinedPosition
-          : combinedPosition // ignore: cast_nullable_to_non_nullable
-              as Vector3,
-    ));
+    return _then(
+      _$DualCharacterStateImpl(
+        head: null == head
+            ? _value.head
+            : head // ignore: cast_nullable_to_non_nullable
+                  as CharacterState,
+        heels: null == heels
+            ? _value.heels
+            : heels // ignore: cast_nullable_to_non_nullable
+                  as CharacterState,
+        controlled: null == controlled
+            ? _value.controlled
+            : controlled // ignore: cast_nullable_to_non_nullable
+                  as ControlledEntity,
+        areCombined: null == areCombined
+            ? _value.areCombined
+            : areCombined // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        combinedPosition: null == combinedPosition
+            ? _value.combinedPosition
+            : combinedPosition // ignore: cast_nullable_to_non_nullable
+                  as Vector3,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$DualCharacterStateImpl implements _DualCharacterState {
-  const _$DualCharacterStateImpl(
-      {required this.head,
-      required this.heels,
-      required this.controlled,
-      required this.areCombined,
-      @Vector3Converter() required this.combinedPosition});
+  const _$DualCharacterStateImpl({
+    required this.head,
+    required this.heels,
+    required this.controlled,
+    required this.areCombined,
+    @Vector3Converter() required this.combinedPosition,
+  });
 
   factory _$DualCharacterStateImpl.fromJson(Map<String, dynamic> json) =>
       _$$DualCharacterStateImplFromJson(json);
@@ -1924,31 +1952,37 @@ class _$DualCharacterStateImpl implements _DualCharacterState {
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
-      runtimeType, head, heels, controlled, areCombined, combinedPosition);
+    runtimeType,
+    head,
+    heels,
+    controlled,
+    areCombined,
+    combinedPosition,
+  );
 
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$DualCharacterStateImplCopyWith<_$DualCharacterStateImpl> get copyWith =>
       __$$DualCharacterStateImplCopyWithImpl<_$DualCharacterStateImpl>(
-          this, _$identity);
+        this,
+        _$identity,
+      );
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$DualCharacterStateImplToJson(
-      this,
-    );
+    return _$$DualCharacterStateImplToJson(this);
   }
 }
 
 abstract class _DualCharacterState implements DualCharacterState {
-  const factory _DualCharacterState(
-          {required final CharacterState head,
-          required final CharacterState heels,
-          required final ControlledEntity controlled,
-          required final bool areCombined,
-          @Vector3Converter() required final Vector3 combinedPosition}) =
-      _$DualCharacterStateImpl;
+  const factory _DualCharacterState({
+    required final CharacterState head,
+    required final CharacterState heels,
+    required final ControlledEntity controlled,
+    required final bool areCombined,
+    @Vector3Converter() required final Vector3 combinedPosition,
+  }) = _$DualCharacterStateImpl;
 
   factory _DualCharacterState.fromJson(Map<String, dynamic> json) =
       _$DualCharacterStateImpl.fromJson;

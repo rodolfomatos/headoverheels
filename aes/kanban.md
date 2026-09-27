@@ -147,6 +147,7 @@ current_ticket: "T035"
 | T034 | Sprite browser/animator and asset management UI | done |
 | T036 | TSX authoring: edit tile types/properties and export TSX | pending |
 | T035 | Migrate Head over Heels into games/headoverheels | pending |
+| T049 | Replace the untracked HoH audio with synthesised cues | pending |
 
 ## Sprint 11 — Knight Lore Completion
 **Goal**: turn the second example game into a finished product, then migrate the
@@ -174,6 +175,16 @@ first game onto the same platform
 
 
 ## Notes
+* T049 scope: `assets/audio/music/*.ogg` (8) and `assets/audio/sfx/*.ogg` (22)
+  exist on this machine, untracked, and `lib/features/audio/audio_system.dart`
+  plus the `assets/audio/` entry in the pubspec both depend on them, so the game
+  builds with them and would build mute without them. They are not committed,
+  for one reason: the names are the original game's rooms (bookworld, egyptus,
+  safari, penitentiary) and nothing in this repository produces them, so their
+  provenance is unknown and the project rule is that no asset comes from the
+  original. The Knight Lore audio is synthesised for exactly this reason. T049
+  replaces them with cues computed by a generator like
+  `scripts/generate_knightlore_assets.py` does, and adds the drift test.
 * T048 scope: `test/balance_test.dart` measures the game and prints it: 48 room
   changes for a run that knows the world (2.7 of the 40 days), 20 to walk every
   room, and the spell lifetimes in days from the data. Two invariants keep the

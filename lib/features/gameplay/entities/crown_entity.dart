@@ -20,11 +20,13 @@ class CrownEntity extends PuzzleEntity {
   void onLoad() {
     super.onLoad();
     // Visual indicator for crown
-    add(RectangleComponent(
-      size: size * 0.6,
-      anchor: Anchor.center,
-      paint: Paint()..color = const Color(0xFFFFD700), // Gold
-    ));
+    add(
+      RectangleComponent(
+        size: size * 0.6,
+        anchor: Anchor.center,
+        paint: Paint()..color = const Color(0xFFFFD700), // Gold
+      ),
+    );
   }
 
   @override

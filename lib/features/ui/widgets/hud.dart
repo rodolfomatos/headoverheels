@@ -15,19 +15,19 @@ class HUD extends ConsumerWidget {
     final dualState = ref.watch(dualCharacterProvider);
     final headState = dualState.head;
     final heelsState = dualState.heels;
-    
+
     // Get controlled character from dual state
     final controlledCharacter = dualState.controlled == ControlledEntity.heels
         ? CharacterType.heels
         : dualState.controlled == ControlledEntity.combined
-            ? CharacterType.combined
-            : CharacterType.head;
-    
+        ? CharacterType.combined
+        : CharacterType.head;
+
     // Use Head's state for lives and doughnuts (Head has doughnuts)
     final lives = headState.lives;
     final doughnutCount = headState.doughnutCount;
     final carriedItem = heelsState.carriedItem; // Heels carries items
-    
+
     // Count crowns collected (mock for now - would come from game progress)
     const int crownsCollected = 2;
     const int totalCrowns = 5;
@@ -56,10 +56,10 @@ class HUD extends ConsumerWidget {
               ),
             ],
           ),
-          
+
           // Center: Active character indicator
           _buildCharacterIndicator(controlledCharacter),
-          
+
           // Right side: Doughnuts and Bag
           Row(
             children: [
@@ -80,11 +80,7 @@ class HUD extends ConsumerWidget {
   Widget _buildStatIcon(IconData icon, String count, Color color) {
     return Row(
       children: [
-        Icon(
-          icon,
-          color: color,
-          size: 24,
-        ),
+        Icon(icon, color: color, size: 24),
         const SizedBox(width: AppSpacing.xs),
         Text(
           count,
@@ -100,8 +96,16 @@ class HUD extends ConsumerWidget {
   Widget _buildCharacterIndicator(CharacterType character) {
     final (color, icon, label) = switch (character) {
       CharacterType.head => (AppColors.headColor, Icons.face_rounded, 'HEAD'),
-      CharacterType.heels => (AppColors.heelsColor, Icons.directions_run_rounded, 'HEELS'),
-      CharacterType.combined => (AppColors.combinedColor, Icons.group_rounded, 'HEAD+HEELS'),
+      CharacterType.heels => (
+        AppColors.heelsColor,
+        Icons.directions_run_rounded,
+        'HEELS',
+      ),
+      CharacterType.combined => (
+        AppColors.combinedColor,
+        Icons.group_rounded,
+        'HEAD+HEELS',
+      ),
     };
 
     return Container(
@@ -133,10 +137,16 @@ class HUD extends ConsumerWidget {
 
   Widget _buildBagIcon(CarriedItem item) {
     return item.when(
-      none: () => _buildBagIconContent(Icons.backpack_outlined, AppColors.darkMuted),
-      key: (keyId) => _buildBagIconContent(Icons.key_rounded, AppColors.crownColor),
-      crown: () => _buildBagIconContent(Icons.emoji_events_rounded, AppColors.crownColor),
-      other: (itemId) => _buildBagIconContent(Icons.backpack_rounded, AppColors.heelsColor),
+      none: () =>
+          _buildBagIconContent(Icons.backpack_outlined, AppColors.darkMuted),
+      key: (keyId) =>
+          _buildBagIconContent(Icons.key_rounded, AppColors.crownColor),
+      crown: () => _buildBagIconContent(
+        Icons.emoji_events_rounded,
+        AppColors.crownColor,
+      ),
+      other: (itemId) =>
+          _buildBagIconContent(Icons.backpack_rounded, AppColors.heelsColor),
     );
   }
 

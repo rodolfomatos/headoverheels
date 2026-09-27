@@ -96,5 +96,5 @@ class AudioSettingsNotifier extends StateNotifier<AudioSettings> {
 /// Provider for AudioSettingsNotifier.
 final audioSettingsNotifierProvider =
     StateNotifierProvider<AudioSettingsNotifier, AudioSettings>((ref) {
-  return AudioSettingsNotifier();
-});
+      return AudioSettingsNotifier();
+    });

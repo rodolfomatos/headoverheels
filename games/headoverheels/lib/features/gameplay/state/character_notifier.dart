@@ -44,6 +44,17 @@ class CharacterStateNotifier extends StateNotifier<CharacterState> {
     );
   }
 
+  /// Gives the character something to hold. This is the one slot a character
+  /// carries in, so picking something up replaces what was there.
+  void pickUp(CarriedItem item) {
+    state = state.copyWith(carriedItem: item);
+  }
+
+  /// Puts down whatever was being held.
+  void putDown() {
+    state = state.copyWith(carriedItem: const CarriedItem.none());
+  }
+
   // Actions
   void carry() {
     if (!state.canCarry) return;

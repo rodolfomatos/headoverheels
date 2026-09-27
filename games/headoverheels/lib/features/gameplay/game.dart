@@ -12,10 +12,25 @@ import 'package:headoverheels/features/gameplay/room/world_loader.dart';
 import 'package:headoverheels/features/gameplay/state/character_notifier.dart';
 import 'package:headoverheels/features/audio/audio_system.dart';
 import 'package:headoverheels/entities/character_state.dart';
+import 'package:headoverheels/features/gameplay/entities/bag_entity.dart';
+import 'package:headoverheels/features/gameplay/entities/crown_entity.dart';
+import 'package:headoverheels/features/gameplay/entities/dropped_item_entity.dart';
+import 'package:headoverheels/features/gameplay/entities/guardian_entity.dart';
 
 /// Main game class that manages the game world and loop.
-class HeadOverHeelsGame extends FlameGame {
+class HeadOverHeelsGame extends FlameGame
+    implements
+        BagCollector,
+        CrownCollector,
+        ItemPicker,
+        GuardianDefeatedNotifier {
   final Ref ref;
+
+  /// Crowns collected, per planet. The throne room wants four of them.
+  final Map<String, int> crownsByPlanet = {};
+
+  /// Set once the guardian is beaten, which is what opens the throne room.
+  bool guardianDefeated = false;
   final WorldGraph _worldGraph;
   final InteractionSystem _interactionSystem = InteractionSystem();
   late final InputSystem _inputSystem;
@@ -162,6 +177,47 @@ class HeadOverHeelsGame extends FlameGame {
 
     _currentRoom?.removeFromParent();
     _currentRoom = null;
+  }
+
+  /// The notifier behind a character, so a pickup can reach its state.
+  CharacterStateNotifier? _notifierFor(CharacterComponent character) {
+    final provider = character.type == CharacterType.head
+        ? headProvider
+        : heelsProvider;
+    return ref.read(provider.notifier);
+  }
+
+  @override
+  void onBagCollected(CharacterComponent character) {
+    // The bag changes nothing yet, which is T056. Recording it means the item
+    // is not lost, and a character has a slot to hold it in.
+    _notifierFor(character)?.pickUp(const CarriedItem.other('bag'));
+  }
+
+  @override
+  void collectCrown(String planetId) {
+    crownsByPlanet.update(planetId, (count) => count + 1, ifAbsent: () => 1);
+  }
+
+  @override
+  void onItemPickedUp(CharacterComponent character, CarriedItem item) {
+    _notifierFor(character)?.pickUp(item);
+  }
+
+  /// How many crowns a planet has collected.
+  int crownsFor(String planetId) => crownsByPlanet[planetId] ?? 0;
+
+  /// Every crown collected so far. The world's guardian trigger does not say
+  /// which planet its throne room belongs to, so the guardian counts them all:
+  /// see T057 for the data that would fix it properly.
+
+  /// Every crown collected, across the planets.
+  int get crownsCollected =>
+      crownsByPlanet.values.fold(0, (total, count) => total + count);
+
+  @override
+  void onGuardianDefeated() {
+    guardianDefeated = true;
   }
 
   /// Add characters to the game world.

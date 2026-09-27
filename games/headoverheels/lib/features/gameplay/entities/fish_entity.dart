@@ -1,9 +1,8 @@
 // Reincarnation fish entity for Head over Heels.
 
+import 'package:collection/collection.dart';
 import 'package:flame/components.dart';
-import 'package:flame/collisions.dart';
 import 'package:flutter/painting.dart' show Color, Paint;
-import 'package:headoverheels/core/isometric.dart';
 import 'package:headoverheels/features/gameplay/entities/character_component.dart';
 import 'package:headoverheels/features/gameplay/entities/puzzle_entity.dart';
 import 'package:headoverheels/features/gameplay/room/room_component.dart';
@@ -70,8 +69,7 @@ class FishEntity extends PuzzleEntity {
   }
 
   RoomComponent? _findRoom() {
-    // ignore: undefined_identifier
-    return gameRef.world.children.whereType<RoomComponent>().firstOrNull;
+    return game.currentRoom;
   }
 
   @override

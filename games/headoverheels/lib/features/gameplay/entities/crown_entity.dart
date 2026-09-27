@@ -2,7 +2,6 @@
 
 import 'package:flame/components.dart';
 import 'package:flutter/painting.dart' show Color, Paint;
-import 'package:headoverheels/core/isometric.dart';
 import 'package:headoverheels/features/gameplay/entities/character_component.dart';
 import 'package:headoverheels/features/gameplay/entities/puzzle_entity.dart';
 
@@ -36,11 +35,8 @@ class CrownEntity extends PuzzleEntity {
 
   void _collectCrown(CharacterComponent character) {
     // Notify game to collect crown
-    // ignore: undefined_identifier
-    final game = gameRef;
-    if (game is CrownCollector) {
-      game.collectCrown(planetId);
-    }
+    final game = this.game;
+    game.collectCrown(planetId);
     removeFromParent();
   }
 

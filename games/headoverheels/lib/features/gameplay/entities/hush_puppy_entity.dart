@@ -1,13 +1,12 @@
 // Hush Puppy entity for Head over Heels.
 
+import 'package:collection/collection.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/painting.dart' show Color, Paint;
 import 'package:headoverheels/core/isometric.dart';
 import 'package:headoverheels/entities/character_state.dart';
 import 'package:headoverheels/features/gameplay/entities/character_component.dart';
 import 'package:headoverheels/features/gameplay/entities/puzzle_entity.dart';
-import 'package:headoverheels/features/gameplay/room/room_component.dart';
-import 'package:headoverheels/features/gameplay/room/room_graph.dart';
 
 /// Hush Puppy entity - sleeps, teleports away when Head approaches.
 class HushPuppyEntity extends PuzzleEntity {
@@ -49,9 +48,7 @@ class HushPuppyEntity extends PuzzleEntity {
   }
 
   void _checkHeadProximity() {
-    // ignore: undefined_identifier
-    final game = gameRef;
-    if (game == null) return;
+    final game = this.game;
 
     // Find Head character
     final head = game.world.children
@@ -93,8 +90,7 @@ class HushPuppyEntity extends PuzzleEntity {
   }
 
   Vector3? _findSafeTile() {
-    // ignore: undefined_identifier
-    final room = gameRef.world.children.whereType<RoomComponent>().firstOrNull;
+    final room = game.currentRoom;
     if (room == null) return null;
 
     // Search in expanding radius for walkable tile

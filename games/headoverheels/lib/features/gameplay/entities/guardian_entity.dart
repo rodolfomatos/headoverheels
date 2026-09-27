@@ -1,12 +1,10 @@
 // Guardian entity for Head over Heels.
 
 import 'package:flame/components.dart';
-import 'package:flutter/painting.dart' show Color, Paint;
+import 'package:flutter/painting.dart' show Color;
 import 'package:headoverheels/core/isometric.dart';
 import 'package:headoverheels/features/gameplay/entities/character_component.dart';
 import 'package:headoverheels/features/gameplay/entities/monster_entity.dart';
-import 'package:headoverheels/features/gameplay/entities/puzzle_entity.dart';
-import 'package:headoverheels/features/gameplay/room/room_graph.dart';
 
 /// Guardian entity - blocks throne room, immune to doughnuts, defeated by 4 crowns.
 class GuardianEntity extends MonsterEntity {
@@ -43,11 +41,9 @@ class GuardianEntity extends MonsterEntity {
   @override
   void onInteract(CharacterComponent character) {
     // Check if player has required crowns
-    // ignore: undefined_identifier
-    final game = gameRef;
-    if (game == null) return;
+    final game = this.game;
 
-    final crownCount = game.getCrownCount?.call() ?? 0;
+    final crownCount = game.crownsCollected;
     if (crownCount >= requiredCrowns) {
       _defeatGuardian();
     } else {
@@ -60,11 +56,8 @@ class GuardianEntity extends MonsterEntity {
     // Guardian defeated - remove from room
     removeFromParent();
     // Notify game
-    // ignore: undefined_identifier
-    final game = gameRef;
-    if (game is GuardianDefeatedNotifier) {
-      game.onGuardianDefeated();
-    }
+    final game = this.game;
+    game.onGuardianDefeated();
   }
 
   void _blockPassage(CharacterComponent character) {

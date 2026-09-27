@@ -36,8 +36,8 @@ current_ticket: "T050"
 | T024 | Validation Pipeline | medium | done |
 | T025 | Atlas Pipeline | medium | not needed |
 | T026 | Flutter Sprite Registry | medium | split |
-| T027 | Gameplay Integration | medium | done |
-| T028 | Visual QA | high | pending |
+| T027 | Gameplay Integration | medium | compiles now |
+| T028 | Visual QA: the renderer has never been drawn | high | in progress |
 | T029 | Final Asset Migration | low | done |
 | T030 | Builder architecture & reusable iso_core foundation | high | done |
 | T031 | Editor document, storage, undo/redo & sprite import foundation | high | done |
@@ -130,11 +130,13 @@ current_ticket: "T050"
 |----|-------|--------|
 | T025 | Atlas Pipeline | not needed |
 | T026 | Flutter Sprite Registry | split |
-| T027 | Gameplay Integration | done |
+| T027 | Gameplay Integration | compiles now |
 | T028 | Visual QA | pending |
 | T029 | Final Asset Migration | done |
 | T053 | The sprite registry should read the manifest, not repeat it | pending |
-| T054 | Gameplay tests: the rules run unverified | pending |
+| T055 | Show the game on the game screen: it is a placeholder | pending |
+| T056 | The bag is carried but does nothing yet | pending |
+| T057 | The guardian trigger does not say which planet it guards | pending |
 
 ## Sprint 10 — Builder Platform
 **Goal**: Extract a reusable isometric engine and build editor/CLI foundations
@@ -170,16 +172,44 @@ first game onto the same platform
 | T036 | TSX authoring: edit tile types/properties and export TSX | done |
 
 ## In Progress
-* T052: The Palette panel squeezes its controls out of reach, and adding a tab
-  to it breaks the shell layout
+* T028: Visual QA. The renderer has never been drawn, and the screen shows a
+  placeholder instead of the game (T055)
 
 ## Queued
-* T028: Visual QA: prove what Head over Heels draws, as Knight Lore does
+* T052: The Palette panel squeezes its controls out of reach, and adding a tab
+  to it breaks the shell layout
 * T053: The sprite registry should read the manifest, not repeat it
-* T054: Gameplay tests: the rules run unverified
+* T054: Gameplay tests: the rules are barely covered
+* T055: Show the game on the game screen: it is a placeholder
+* T056: The bag is carried but does nothing yet
+* T057: The guardian trigger does not say which planet it guards
 
 
 ## Notes
+* T028, first finding, and the most serious thing found in this project. Ten
+  `// ignore: undefined_identifier` comments sat over `gameRef`, a name that does
+  not exist anywhere. The analyzer was clean because those comments silenced it,
+  `flutter test` could not compile the layer, and the web build passed because
+  nothing reachable imported it. The gameplay code has never compiled.
+  The game screen makes it plain: `_buildGameCanvas` returns a container with the
+  text "Game Canvas (Flame GameWidget goes here)", and `gameProvider` is declared
+  and never read, so the game object is never even constructed. The game as it
+  stands cannot be played, and no test noticed because none of them imported the
+  gameplay layer.
+  What is fixed here: the ten silences are gone, the entities reach the game
+  through a typed `HasGameReference<HeadOverHeelsGame>` and ask it for
+  `currentRoom` instead of hunting the component tree, and the game implements the
+  four interfaces the entities notify (`BagCollector`, `CrownCollector`,
+  `ItemPicker`, `GuardianDefeatedNotifier`) and forwards them to the character
+  state that already exists. `PuzzleEntity` gained the `onSwitchToggled` hook a
+  switch target needs, `collection` became a direct dependency because the
+  entities import it, and `test/gameplay_compiles_test.dart` exists mostly to
+  import the layer so a compiler error can never hide behind an ignore comment
+  again. Seven tests, the analyzer clean.
+  What is not: the screen still shows a placeholder, which is T055 and the
+  prerequisite for the visual proof this ticket is really after. The bag is
+  recorded and does nothing, T056. The guardian counts every crown because its
+  trigger does not say which planet it guards, T057.
 * Audit of the Sprint 09 backlog, checked against the code rather than the
   board. T025, the atlas: `scripts/pack_atlas.py` is referenced by nothing, the
   Makefile never runs it, and `assets/sprites/atlases/` is empty. The game loads

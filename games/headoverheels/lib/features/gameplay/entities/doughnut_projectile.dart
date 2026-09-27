@@ -4,14 +4,12 @@ import 'package:flame/components.dart';
 import 'package:flame/collisions.dart';
 import 'package:flutter/painting.dart' show Color, Paint;
 import 'package:headoverheels/core/isometric.dart';
-import 'package:headoverheels/features/gameplay/entities/character_component.dart';
 import 'package:headoverheels/features/gameplay/entities/monster_entity.dart';
-import 'package:headoverheels/features/gameplay/entities/puzzle_entity.dart';
-import 'package:headoverheels/features/gameplay/room/room_component.dart';
+import 'package:headoverheels/features/gameplay/game.dart';
 
 /// Doughnut projectile fired by Head - homing, freezes monsters.
 class DoughnutProjectile extends PositionComponent
-    with CollisionCallbacks, HasGameReference {
+    with CollisionCallbacks, HasGameReference<HeadOverHeelsGame> {
   static const double speed = 8.0; // tiles/sec
   static const int lifetimeFrames = 180; // 3 seconds @ 60Hz
   static const double homingRange = 8.0; // tiles
@@ -58,8 +56,7 @@ class DoughnutProjectile extends PositionComponent
   }
 
   void _findTarget() {
-    // ignore: undefined_identifier
-    final room = gameRef.world.children.whereType<RoomComponent>().firstOrNull;
+    final room = game.currentRoom;
     if (room == null) return;
 
     if (_target != null && !_target!.isFrozen) return;

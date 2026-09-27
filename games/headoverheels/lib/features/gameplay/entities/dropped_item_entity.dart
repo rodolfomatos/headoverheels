@@ -3,7 +3,6 @@
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart' show Color, Icons, IconData;
 import 'package:flutter/painting.dart' show Color, Paint;
-import 'package:headoverheels/core/isometric.dart';
 import 'package:headoverheels/features/gameplay/entities/character_component.dart';
 import 'package:headoverheels/features/gameplay/entities/puzzle_entity.dart';
 import 'package:headoverheels/entities/character_state.dart';
@@ -41,11 +40,8 @@ class DroppedItemEntity extends PuzzleEntity {
   }
 
   void _pickupItem(CharacterComponent character) {
-    // ignore: undefined_identifier
-    final game = gameRef;
-    if (game is ItemPicker) {
-      game.onItemPickedUp(character, item);
-    }
+    final game = this.game;
+    game.onItemPickedUp(character, item);
     removeFromParent();
   }
 

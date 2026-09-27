@@ -1,13 +1,11 @@
 // Switch entity for Head over Heels.
 
+import 'package:collection/collection.dart';
 import 'package:flame/components.dart';
-import 'package:flame/collisions.dart';
 import 'package:flutter/painting.dart' show Color, Paint;
-import 'package:headoverheels/core/isometric.dart';
 import 'package:headoverheels/entities/character_state.dart';
 import 'package:headoverheels/features/gameplay/entities/character_component.dart';
 import 'package:headoverheels/features/gameplay/entities/puzzle_entity.dart';
-import 'package:headoverheels/features/gameplay/room/room_component.dart';
 
 /// Switch entity - toggles target on/off when activated.
 class SwitchEntity extends PuzzleEntity {
@@ -72,8 +70,7 @@ class SwitchEntity extends PuzzleEntity {
 
   void _notifyTarget() {
     // Find target entity in the same room
-    // ignore: undefined_identifier
-    final room = gameRef.world.children.whereType<RoomComponent>().firstOrNull;
+    final room = game.currentRoom;
     if (room == null) return;
 
     final target = room.entities.whereType<PuzzleEntity>().firstWhereOrNull(
@@ -101,6 +98,7 @@ mixin Togglable on PuzzleEntity {
   bool get isActive;
   void setActive(bool active);
 
+  @override
   void onSwitchToggled(bool isOn, String switchId) {
     setActive(isOn);
   }

@@ -2,7 +2,6 @@
 
 import 'package:flame/components.dart';
 import 'package:flutter/painting.dart' show Color, Paint;
-import 'package:headoverheels/core/isometric.dart';
 import 'package:headoverheels/features/gameplay/entities/character_component.dart';
 import 'package:headoverheels/features/gameplay/entities/puzzle_entity.dart';
 
@@ -37,11 +36,8 @@ class BagEntity extends PuzzleEntity {
   void _collectBag(CharacterComponent character) {
     _isCollected = true;
     // Notify character state to update bag possession
-    // ignore: undefined_identifier
-    final game = gameRef;
-    if (game is BagCollector) {
-      game.onBagCollected(character);
-    }
+    final game = this.game;
+    game.onBagCollected(character);
     removeFromParent();
   }
 

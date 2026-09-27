@@ -1,0 +1,847 @@
+{
+  "startRoom": "castle_gatehouse",
+  "rooms": {
+    "castle_gatehouse": {
+      "file": "rooms/castle/castle_gatehouse.tmx",
+      "theme": "castle",
+      "spawnPoint": {
+        "x": 4.0,
+        "y": 7.0,
+        "z": 0.0
+      },
+      "exits": [
+        {
+          "direction": "north",
+          "room": "castle_great_hall",
+          "entrance": "south",
+          "isLocked": false,
+          "keyId": null,
+          "oneWay": false
+        },
+        {
+          "direction": "east",
+          "room": "jungle_entrance",
+          "entrance": "west",
+          "isLocked": false,
+          "keyId": null,
+          "oneWay": false
+        }
+      ],
+      "triggers": [
+        {
+          "id": "ball_1",
+          "type": "ball",
+          "position": {
+            "x": 2.0,
+            "y": 3.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          }
+        },
+        {
+          "id": "chest_1",
+          "type": "chest",
+          "position": {
+            "x": 6.0,
+            "y": 3.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          },
+          "properties": {
+            "itemId": "diamond"
+          }
+        }
+      ]
+    },
+    "castle_great_hall": {
+      "file": "rooms/castle/castle_great_hall.tmx",
+      "theme": "castle",
+      "spawnPoint": {
+        "x": 4.0,
+        "y": 7.0,
+        "z": 0.0
+      },
+      "exits": [
+        {
+          "direction": "south",
+          "room": "castle_gatehouse",
+          "entrance": "north",
+          "isLocked": false,
+          "keyId": null,
+          "oneWay": false
+        },
+        {
+          "direction": "west",
+          "room": "castle_corridor",
+          "entrance": "east",
+          "isLocked": false,
+          "keyId": null,
+          "oneWay": false
+        },
+        {
+          "direction": "down",
+          "room": "castle_underground",
+          "entrance": "up",
+          "isLocked": false,
+          "keyId": null,
+          "oneWay": false
+        }
+      ],
+      "triggers": [
+        {
+          "id": "ball_2",
+          "type": "ball",
+          "position": {
+            "x": 3.0,
+            "y": 4.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          }
+        },
+        {
+          "id": "statue_1",
+          "type": "statue",
+          "position": {
+            "x": 5.0,
+            "y": 4.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          },
+          "properties": {
+            "itemId": "jewel",
+            "state": "holding"
+          }
+        },
+        {
+          "id": "witch_1",
+          "type": "witch",
+          "position": {
+            "x": 6.0,
+            "y": 6.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          }
+        }
+      ]
+    },
+    "castle_corridor": {
+      "file": "rooms/castle/castle_corridor.tmx",
+      "theme": "castle",
+      "spawnPoint": {
+        "x": 4.0,
+        "y": 7.0,
+        "z": 0.0
+      },
+      "exits": [
+        {
+          "direction": "east",
+          "room": "castle_great_hall",
+          "entrance": "west",
+          "isLocked": false,
+          "keyId": null,
+          "oneWay": false
+        },
+        {
+          "direction": "north",
+          "room": "castle_laboratory",
+          "entrance": "south",
+          "isLocked": false,
+          "keyId": null,
+          "oneWay": false
+        },
+        {
+          "direction": "west",
+          "room": "mine_entrance",
+          "entrance": "east",
+          "isLocked": true,
+          "keyId": "jewel_key",
+          "oneWay": false
+        }
+      ],
+      "triggers": [
+        {
+          "id": "portcullis_1",
+          "type": "portcullis",
+          "position": {
+            "x": 3.0,
+            "y": 2.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          }
+        },
+        {
+          "id": "ball_3",
+          "type": "ball",
+          "position": {
+            "x": 5.0,
+            "y": 5.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          }
+        }
+      ]
+    },
+    "castle_laboratory": {
+      "file": "rooms/castle/castle_laboratory.tmx",
+      "theme": "castle",
+      "spawnPoint": {
+        "x": 4.0,
+        "y": 7.0,
+        "z": 0.0
+      },
+      "exits": [
+        {
+          "direction": "south",
+          "room": "castle_corridor",
+          "entrance": "north",
+          "isLocked": false,
+          "keyId": null,
+          "oneWay": false
+        }
+      ],
+      "triggers": [
+        {
+          "id": "wizard_1",
+          "type": "wizard",
+          "position": {
+            "x": 4.0,
+            "y": 3.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          },
+          "properties": {
+            "name": "Melkhior",
+            "requiresForm": "sabreman"
+          }
+        },
+        {
+          "id": "cauldron_1",
+          "type": "cauldron",
+          "position": {
+            "x": 5.0,
+            "y": 5.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          },
+          "properties": {
+            "ingredientsRequired": 6
+          }
+        },
+        {
+          "id": "cauldron_2",
+          "type": "cauldron",
+          "position": {
+            "x": 3.0,
+            "y": 5.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          },
+          "properties": {
+            "ingredientsRequired": 6
+          }
+        }
+      ]
+    },
+    "castle_underground": {
+      "file": "rooms/castle/castle_underground.tmx",
+      "theme": "castle",
+      "spawnPoint": {
+        "x": 4.0,
+        "y": 7.0,
+        "z": 0.0
+      },
+      "exits": [
+        {
+          "direction": "up",
+          "room": "castle_great_hall",
+          "entrance": "down",
+          "isLocked": false,
+          "keyId": null,
+          "oneWay": false
+        }
+      ],
+      "triggers": [
+        {
+          "id": "chest_2",
+          "type": "chest",
+          "position": {
+            "x": 2.0,
+            "y": 4.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          },
+          "properties": {
+            "itemId": "jinx_clothing"
+          }
+        },
+        {
+          "id": "ball_4",
+          "type": "ball",
+          "position": {
+            "x": 6.0,
+            "y": 6.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          }
+        }
+      ]
+    },
+    "jungle_entrance": {
+      "file": "rooms/jungle/jungle_entrance.tmx",
+      "theme": "jungle",
+      "spawnPoint": {
+        "x": 4.0,
+        "y": 7.0,
+        "z": 0.0
+      },
+      "exits": [
+        {
+          "direction": "west",
+          "room": "castle_gatehouse",
+          "entrance": "east",
+          "isLocked": false,
+          "keyId": null,
+          "oneWay": false
+        },
+        {
+          "direction": "north",
+          "room": "jungle_track",
+          "entrance": "south",
+          "isLocked": false,
+          "keyId": null,
+          "oneWay": false
+        },
+        {
+          "direction": "down",
+          "room": "cauldron_entrance",
+          "entrance": "up",
+          "isLocked": false,
+          "keyId": null,
+          "oneWay": false
+        }
+      ],
+      "triggers": [
+        {
+          "id": "chest_3",
+          "type": "chest",
+          "position": {
+            "x": 3.0,
+            "y": 5.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          },
+          "properties": {
+            "itemId": "gold"
+          }
+        },
+        {
+          "id": "witch_2",
+          "type": "witch",
+          "position": {
+            "x": 6.0,
+            "y": 3.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          }
+        }
+      ]
+    },
+    "jungle_track": {
+      "file": "rooms/jungle/jungle_track.tmx",
+      "theme": "jungle",
+      "spawnPoint": {
+        "x": 4.0,
+        "y": 7.0,
+        "z": 0.0
+      },
+      "exits": [
+        {
+          "direction": "south",
+          "room": "jungle_entrance",
+          "entrance": "north",
+          "isLocked": false,
+          "keyId": null,
+          "oneWay": false
+        },
+        {
+          "direction": "east",
+          "room": "jungle_ruins",
+          "entrance": "west",
+          "isLocked": false,
+          "keyId": null,
+          "oneWay": false
+        },
+        {
+          "direction": "down",
+          "room": "mine_entrance",
+          "entrance": "up",
+          "isLocked": false,
+          "keyId": null,
+          "oneWay": false
+        }
+      ],
+      "triggers": [
+        {
+          "id": "ball_5",
+          "type": "ball",
+          "position": {
+            "x": 4.0,
+            "y": 2.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          }
+        },
+        {
+          "id": "statue_2",
+          "type": "statue",
+          "position": {
+            "x": 2.0,
+            "y": 5.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          },
+          "properties": {
+            "itemId": "emerald",
+            "state": "empty"
+          }
+        }
+      ]
+    },
+    "jungle_ruins": {
+      "file": "rooms/jungle/jungle_ruins.tmx",
+      "theme": "jungle",
+      "spawnPoint": {
+        "x": 4.0,
+        "y": 7.0,
+        "z": 0.0
+      },
+      "exits": [
+        {
+          "direction": "west",
+          "room": "jungle_track",
+          "entrance": "east",
+          "isLocked": false,
+          "keyId": null,
+          "oneWay": false
+        }
+      ],
+      "triggers": [
+        {
+          "id": "chest_4",
+          "type": "chest",
+          "position": {
+            "x": 5.0,
+            "y": 4.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          },
+          "properties": {
+            "itemId": "casket"
+          }
+        }
+      ]
+    },
+    "cauldron_entrance": {
+      "file": "rooms/cauldron/cauldron_entrance.tmx",
+      "theme": "cauldron",
+      "spawnPoint": {
+        "x": 4.0,
+        "y": 7.0,
+        "z": 0.0
+      },
+      "exits": [
+        {
+          "direction": "up",
+          "room": "jungle_entrance",
+          "entrance": "down",
+          "isLocked": false,
+          "keyId": null,
+          "oneWay": false
+        },
+        {
+          "direction": "north",
+          "room": "cauldron_cave",
+          "entrance": "south",
+          "isLocked": false,
+          "keyId": null,
+          "oneWay": false
+        }
+      ],
+      "triggers": [
+        {
+          "id": "ball_6",
+          "type": "ball",
+          "position": {
+            "x": 4.0,
+            "y": 5.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          }
+        }
+      ]
+    },
+    "cauldron_cave": {
+      "file": "rooms/cauldron/cauldron_cave.tmx",
+      "theme": "cauldron",
+      "spawnPoint": {
+        "x": 4.0,
+        "y": 7.0,
+        "z": 0.0
+      },
+      "exits": [
+        {
+          "direction": "south",
+          "room": "cauldron_entrance",
+          "entrance": "north",
+          "isLocked": false,
+          "keyId": null,
+          "oneWay": false
+        }
+      ],
+      "triggers": [
+        {
+          "id": "cauldron_3",
+          "type": "cauldron",
+          "position": {
+            "x": 4.0,
+            "y": 4.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          },
+          "properties": {
+            "ingredientsRequired": 6
+          }
+        },
+        {
+          "id": "witch_3",
+          "type": "witch",
+          "position": {
+            "x": 2.0,
+            "y": 2.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          }
+        }
+      ]
+    },
+    "mine_entrance": {
+      "file": "rooms/mine/mine_entrance.tmx",
+      "theme": "mine",
+      "spawnPoint": {
+        "x": 4.0,
+        "y": 7.0,
+        "z": 0.0
+      },
+      "exits": [
+        {
+          "direction": "east",
+          "room": "castle_corridor",
+          "entrance": "west",
+          "isLocked": false,
+          "keyId": null,
+          "oneWay": false
+        },
+        {
+          "direction": "up",
+          "room": "jungle_track",
+          "entrance": "down",
+          "isLocked": false,
+          "keyId": null,
+          "oneWay": false
+        },
+        {
+          "direction": "north",
+          "room": "mine_shaft",
+          "entrance": "south",
+          "isLocked": false,
+          "keyId": null,
+          "oneWay": false
+        }
+      ],
+      "triggers": [
+        {
+          "id": "chest_5",
+          "type": "chest",
+          "position": {
+            "x": 2.0,
+            "y": 4.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          },
+          "properties": {
+            "itemId": "jewel"
+          }
+        }
+      ]
+    },
+    "mine_shaft": {
+      "file": "rooms/mine/mine_shaft.tmx",
+      "theme": "mine",
+      "spawnPoint": {
+        "x": 4.0,
+        "y": 7.0,
+        "z": 0.0
+      },
+      "exits": [
+        {
+          "direction": "south",
+          "room": "mine_entrance",
+          "entrance": "north",
+          "isLocked": false,
+          "keyId": null,
+          "oneWay": false
+        },
+        {
+          "direction": "west",
+          "room": "mine_vault",
+          "entrance": "east",
+          "isLocked": false,
+          "keyId": null,
+          "oneWay": false
+        }
+      ],
+      "triggers": [
+        {
+          "id": "ball_7",
+          "type": "ball",
+          "position": {
+            "x": 3.0,
+            "y": 3.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          }
+        },
+        {
+          "id": "ball_8",
+          "type": "ball",
+          "position": {
+            "x": 5.0,
+            "y": 5.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          }
+        }
+      ]
+    },
+    "mine_vault": {
+      "file": "rooms/mine/mine_vault.tmx",
+      "theme": "mine",
+      "spawnPoint": {
+        "x": 4.0,
+        "y": 7.0,
+        "z": 0.0
+      },
+      "exits": [
+        {
+          "direction": "east",
+          "room": "mine_shaft",
+          "entrance": "west",
+          "isLocked": false,
+          "keyId": null,
+          "oneWay": false
+        },
+        {
+          "direction": "north",
+          "room": "tower_entrance",
+          "entrance": "south",
+          "isLocked": false,
+          "keyId": null,
+          "oneWay": false
+        }
+      ],
+      "triggers": [
+        {
+          "id": "chest_6",
+          "type": "chest",
+          "position": {
+            "x": 4.0,
+            "y": 3.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          },
+          "properties": {
+            "itemId": "golden_key"
+          }
+        }
+      ]
+    },
+    "tower_entrance": {
+      "file": "rooms/tower/tower_entrance.tmx",
+      "theme": "tower",
+      "spawnPoint": {
+        "x": 4.0,
+        "y": 7.0,
+        "z": 0.0
+      },
+      "exits": [
+        {
+          "direction": "south",
+          "room": "mine_vault",
+          "entrance": "north",
+          "isLocked": false,
+          "keyId": null,
+          "oneWay": false
+        },
+        {
+          "direction": "north",
+          "room": "tower_top",
+          "entrance": "south",
+          "isLocked": false,
+          "keyId": null,
+          "oneWay": false
+        }
+      ],
+      "triggers": [
+        {
+          "id": "witch_4",
+          "type": "witch",
+          "position": {
+            "x": 6.0,
+            "y": 2.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          }
+        }
+      ]
+    },
+    "tower_top": {
+      "file": "rooms/tower/tower_top.tmx",
+      "theme": "tower",
+      "spawnPoint": {
+        "x": 4.0,
+        "y": 7.0,
+        "z": 0.0
+      },
+      "exits": [
+        {
+          "direction": "south",
+          "room": "tower_entrance",
+          "entrance": "north",
+          "isLocked": false,
+          "keyId": null,
+          "oneWay": false
+        }
+      ],
+      "triggers": [
+        {
+          "id": "chest_7",
+          "type": "chest",
+          "position": {
+            "x": 4.0,
+            "y": 2.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          },
+          "properties": {
+            "itemId": "chalice"
+          }
+        }
+      ]
+    }
+  },
+  "planets": [
+    {
+      "id": "castle",
+      "name": "Knightlore Castle",
+      "area": "castle"
+    },
+    {
+      "id": "jungle",
+      "name": "The Jungle",
+      "area": "jungle"
+    },
+    {
+      "id": "cauldron",
+      "name": "Witches' Cauldron",
+      "area": "cauldron"
+    },
+    {
+      "id": "mine",
+      "name": "Abandoned Mine",
+      "area": "mine"
+    },
+    {
+      "id": "tower",
+      "name": "Wizard's Tower",
+      "area": "tower"
+    }
+  ]
+}

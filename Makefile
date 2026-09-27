@@ -34,6 +34,7 @@ test-packages:
 	@cd packages/iso_core && flutter test
 	@cd packages/iso_editor && flutter test
 	@cd packages/iso_builder_cli && dart test
+	@cd games/knightlore && flutter test
 
 assets-check:
 	@python3 scripts/validation_pipeline.py

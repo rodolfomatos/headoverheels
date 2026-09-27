@@ -1,0 +1,19 @@
+name: knightlore
+description: Knight Lore as a second example game built on the reusable iso_core runtime.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ">=3.6.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  iso_core:
+    path: ../../packages/iso_core
+  vector_math: ^2.1.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0

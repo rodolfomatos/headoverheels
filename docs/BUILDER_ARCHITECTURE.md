@@ -6,6 +6,11 @@
 - `iso_editor`: desktop/web map editor, sprite browser/animator and asset importer.
 - `iso_builder_cli`: project scaffolding, validation and build orchestration.
 - `games/headoverheels`: first game package; keeps Head, Heels and original puzzle logic out of the generic core.
+- `games/knightlore`: second example game, used to prove the core is not tailored to one game.
+  It contributes the knight classes, the six decaying spells, the sixteen slot inventory, the
+  curse and day/night rules, the filmation rule and a 15 room world in the same `world.json`
+  format. Room names, topology, spell timings and all art are ours; see its README for the
+  line between what is canonical to the 1984 game and what is our design.
 
 ## Runtime
 

@@ -47,7 +47,7 @@ current_ticket: "T037"
 | T035 | Migrate Head over Heels into games/headoverheels | high | pending |
 | T036 | TSX authoring: edit tile types/properties and export TSX | medium | pending |
 | T037 | World graph viewer/editor with topology validation | high | done |
-| T038 | Second example game (Knight Lore) on iso_core | medium | pending |
+| T038 | Second example game (Knight Lore) on iso_core | medium | in-progress |
 | T039 | Puzzle trigger inspector (switch/target links) in the graph tab | medium | done |
 
 ## Sprint 01 — Foundation & Research
@@ -151,7 +151,8 @@ current_ticket: "T037"
 ## In Progress
 * T035: Migrate Head over Heels into games/headoverheels
 * T036: TSX authoring (edit tile `type`/properties, write TSX)
-* T038: Knight Lore as the second example game
+* T038: Knight Lore as the second example game — rules, spells, inventory, curse and a validated
+  15 room world shipped; room TMX files, assets and a runnable loop still pending
 
 ## Notes
 * T033 scope: TMX/TSX import, pan/zoom dimetric canvas with tileset image preview, paint/place/erase

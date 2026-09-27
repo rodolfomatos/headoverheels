@@ -288,6 +288,7 @@ The repository is being structured as a reusable isometric game builder:
 
 - `packages/iso_core` — platform-neutral Flutter/Flame runtime: dimetric coordinates, physics, entity contracts, manifest-driven assets, level loading and sprite resolution.
 - `packages/iso_editor` — editor: serializable map document, undo/redo, storage abstraction, dimetric map view with tileset preview, TMX import/export, TSX palette browser, file-picker gateways, sprite manager/animator with manifest editing and frame import, and a world graph viewer/editor with topology validation, all inside an `EditorShell` with tools, layers and inspector.
+- `games/knightlore` — second example game on `iso_core`: knight classes, six decaying spells, sixteen slot inventory, curse/day-night and filmation rules, and a 15 room world in the shared `world.json` format.
 - `packages/iso_builder_cli` — project scaffolding and validation:
   ```bash
   dart run packages/iso_builder_cli/bin/iso_builder.dart create "My Game"

@@ -170,7 +170,8 @@ first game onto the same platform
 | T036 | TSX authoring: edit tile types/properties and export TSX | done |
 
 ## In Progress
-* T052: The Palette panel squeezes its controls out of reach
+* T052: The Palette panel squeezes its controls out of reach, and adding a tab
+  to it breaks the shell layout
 
 ## Queued
 * T028: Visual QA: prove what Head over Heels draws, as Knight Lore does
@@ -213,12 +214,20 @@ first game onto the same platform
   an unbounded width, so a row of `Expanded` grew to 100 000 pixels, and
   `TsxBrowser` overflowed by 10 pixels whenever its panel was short, which the
   existing shell test caught as soon as the inspector took part of the height.
-* T052 scope: with the inspector sharing the Palette panel, the save and delete
-  controls sit in a 320 pixel column below a browser that wants the space. The
-  inspector scrolls, the browser drops its search box under 130 pixels, and the
-  buttons are inside the inspector, but driving them from a widget test is a
-  fight with hit testing rather than with the code. The panel wants a proper
-  layout pass: a tab of its own, or a resizable split.
+* T052 scope, second attempt, and what it proved. The inspector now has a tab of
+  its own, which is the obvious fix, and it does not work: a fifth tab in the
+  320 pixel panel makes six existing shell tests fail, a control land at x of
+  1523 in a 1500 pixel window, and a RenderFlex overflow to the right by 98822
+  pixels. Widening the panel to 420 did not help, and narrowing the tab bar made
+  it scrollable, which is correct on its own. The retype-and-save flow itself
+  works: a test drove the inspector, changed a tile's type, saved, and read the
+  file back, so the feature is fine and the container is not.
+  So the panel is the bug, and it needs a real pass before anything else goes in
+  it: a fixed 320 pixel column carrying five tabs, a sprite manager, a world
+  graph and a tile form. The work is to make the panel resizable and the tab bar
+  fit, then move the inspector into a tab of its own, and only then wire the
+  shell tests. Everything from this attempt was reverted rather than shipped, so
+  T036 stands as it was.
 * T051 scope: a pubspec entry ending in `/` ships the files directly inside that
   directory and nothing below it, so `assets/sprites/` shipped the manifest and
   none of the sprites. Both games were broken in the browser and neither build

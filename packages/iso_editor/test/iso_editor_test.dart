@@ -965,6 +965,123 @@ void main() {
     expect(find.textContaining('1 exits'), findsOneWidget);
   });
 
+  testWidgets('graph panel shows and edits puzzle triggers', (tester) async {
+    final storage = MemoryEditorStorage();
+    await storage.writeText(
+      'assets/levels/world.json',
+      jsonEncode({
+        'startRoom': 'a',
+        'rooms': {
+          'a': {
+            'file': 'a.tmx',
+            'theme': 'castle',
+            'triggers': [
+              {
+                'id': 'switch_1',
+                'type': 'switch',
+                'position': {'x': 3, 'y': 3, 'z': 0},
+                'size': {'width': 1, 'height': 1},
+                'properties': {'targetId': 'door_secret_1'},
+              },
+            ],
+          },
+          'b': {'file': 'b.tmx', 'theme': 'castle'},
+        },
+      }),
+    );
+
+    tester.view.physicalSize = const Size(1400, 1200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: WorldGraphPanel(
+          source: () => storage.readText('assets/levels/world.json'),
+          onSave: (json) => storage.writeText('assets/levels/world.json', json),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tapAt(const Offset(105, 53));
+    await tester.pumpAndSettle();
+    expect(find.text('Triggers (1)'), findsOneWidget);
+    expect(find.text('switch · switch_1'), findsOneWidget);
+    expect(
+      tester
+          .widget<TextField>(find.byKey(const Key('trigger-target-switch_1')))
+          .controller
+          ?.text,
+      'door_secret_1',
+    );
+
+    await tester.enterText(
+      find.byKey(const Key('trigger-target-switch_1')),
+      'door_open_1',
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('world-save-button')));
+    await tester.pumpAndSettle();
+
+    final saved = WorldGraph.fromJson(
+      jsonDecode(await storage.readText('assets/levels/world.json'))
+          as Map<String, dynamic>,
+    );
+    final trigger = saved.getRoom('a')!.triggers.single;
+    expect(trigger.id, 'switch_1');
+    expect(
+      (trigger.properties['properties'] as Map)['targetId'],
+      'door_open_1',
+    );
+  });
+
+  testWidgets('graph panel removes a trigger', (tester) async {
+    final storage = MemoryEditorStorage();
+    await storage.writeText(
+      'assets/levels/world.json',
+      jsonEncode({
+        'startRoom': 'a',
+        'rooms': {
+          'a': {
+            'file': 'a.tmx',
+            'theme': 'castle',
+            'triggers': [
+              {
+                'id': 'crown_1',
+                'type': 'crown',
+                'position': {'x': 1, 'y': 1, 'z': 0},
+                'size': {'width': 1, 'height': 1},
+              },
+            ],
+          },
+        },
+      }),
+    );
+
+    tester.view.physicalSize = const Size(1400, 1200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: WorldGraphPanel(
+          source: () => storage.readText('assets/levels/world.json'),
+          onSave: (json) => storage.writeText('assets/levels/world.json', json),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tapAt(const Offset(105, 53));
+    await tester.pumpAndSettle();
+    expect(find.text('Triggers (1)'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('trigger-remove-crown_1')));
+    await tester.pumpAndSettle();
+    expect(find.text('Triggers (0)'), findsOneWidget);
+  });
+
   testWidgets('graph panel reports an unreadable world file', (tester) async {
     await tester.pumpWidget(
       MaterialApp(

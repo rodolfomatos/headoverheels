@@ -80,6 +80,10 @@ EditorController
 - The editor's **Graph** tab draws rooms as nodes grouped in theme columns, draws exits as
   direction arrows (locked exits are marked), and allows editing direction, target and lock state,
   adding and removing exits, then writes `world.json` back through `EditorStorage`.
+- Triggers are the puzzle layer and also live in `world.json`: `id`, `type`, `position`, `size`
+  and a nested `properties` map (`targetId` for a local object, `room` for another room,
+  `patrolPoints`, `waitTime`, `planetId`). The Graph tab lists them per room and edits those
+  targets without inventing a schema.
 - Puzzle semantics (what a switch powers, how a guardian reacts) stay in the game package. The
   graph stores identity and topology; the game binds behaviour to it.
 

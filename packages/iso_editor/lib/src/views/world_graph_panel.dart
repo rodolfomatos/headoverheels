@@ -127,7 +127,7 @@ class _WorldGraphPanelState extends State<WorldGraphPanel> {
                   const SizedBox(height: 8),
                   if (_room == null)
                     const Text('Select a room to edit its exits')
-                  else
+                  else ...[
                     _RoomExits(
                       room: _room!,
                       rooms: graph.rooms,
@@ -135,6 +135,15 @@ class _WorldGraphPanelState extends State<WorldGraphPanel> {
                         graph.upsertRoom(_room!.copyWith(exits: exits)),
                       ),
                     ),
+                    const Divider(),
+                    _RoomTriggers(
+                      room: _room!,
+                      rooms: graph.rooms,
+                      onChange: (triggers) => _update(
+                        graph.upsertRoom(_room!.copyWith(triggers: triggers)),
+                      ),
+                    ),
+                  ],
                   const Divider(),
                   Text('Issues', style: Theme.of(context).textTheme.titleSmall),
                   if (validation.issues.isEmpty)
@@ -258,6 +267,197 @@ class _RoomExits extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Triggers are the puzzle layer: switches, doors, teleports, monsters. The
+/// graph stores identity and targets; the game binds behaviour to them.
+class _RoomTriggers extends StatelessWidget {
+  const _RoomTriggers({
+    required this.room,
+    required this.rooms,
+    required this.onChange,
+  });
+
+  final RoomInfo room;
+  final Map<String, RoomInfo> rooms;
+  final ValueChanged<List<RoomTrigger>> onChange;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Triggers (${room.triggers.length})',
+          style: Theme.of(context).textTheme.titleSmall,
+        ),
+        if (room.triggers.isEmpty) const Text('No triggers in this room'),
+        for (var index = 0; index < room.triggers.length; index++)
+          _TriggerRow(
+            key: ValueKey('${room.id}-trigger-$index'),
+            trigger: room.triggers[index],
+            rooms: rooms,
+            onChanged: (updated) {
+              final triggers = [...room.triggers];
+              triggers[index] = updated;
+              onChange(triggers);
+            },
+            onRemoved: () {
+              final triggers = [...room.triggers]..removeAt(index);
+              onChange(triggers);
+            },
+          ),
+      ],
+    );
+  }
+}
+
+class _TriggerRow extends StatefulWidget {
+  const _TriggerRow({
+    required this.trigger,
+    required this.rooms,
+    required this.onChanged,
+    required this.onRemoved,
+    super.key,
+  });
+
+  final RoomTrigger trigger;
+  final Map<String, RoomInfo> rooms;
+  final ValueChanged<RoomTrigger> onChanged;
+  final VoidCallback onRemoved;
+
+  @override
+  State<_TriggerRow> createState() => _TriggerRowState();
+}
+
+class _TriggerRowState extends State<_TriggerRow> {
+  late final TextEditingController _target;
+  String? _roomTarget;
+
+  @override
+  void initState() {
+    super.initState();
+    _target = TextEditingController(text: localTargetOf(widget.trigger) ?? '');
+    _roomTarget = roomTargetOf(widget.trigger);
+  }
+
+  @override
+  void didUpdateWidget(_TriggerRow oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.trigger.id != widget.trigger.id) {
+      _target.text = localTargetOf(widget.trigger) ?? '';
+      _roomTarget = roomTargetOf(widget.trigger);
+    }
+  }
+
+  @override
+  void dispose() {
+    _target.dispose();
+    super.dispose();
+  }
+
+  void _writeTargets() {
+    final target = _target.text.trim();
+    final roomTarget = _roomTarget;
+    final properties = Map<String, dynamic>.from(widget.trigger.properties);
+    final nested = Map<String, dynamic>.from(
+      (properties['properties'] as Map?) ?? const {},
+    );
+    if (target.isEmpty) {
+      nested.remove('targetId');
+    } else {
+      nested['targetId'] = target;
+    }
+    if (roomTarget == null) {
+      nested.remove('room');
+    } else {
+      nested['room'] = roomTarget;
+    }
+    if (nested.isEmpty) {
+      properties.remove('properties');
+    } else {
+      properties['properties'] = nested;
+    }
+    widget.onChanged(widget.trigger.copyWith(properties: properties));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final trigger = widget.trigger;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  '${trigger.type} · ${trigger.id}',
+                  style: const TextStyle(fontSize: 11),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Text(
+                '(${trigger.position.x.toInt()}, ${trigger.position.y.toInt()})',
+                style: const TextStyle(fontSize: 10),
+              ),
+              IconButton(
+                key: Key('trigger-remove-${trigger.id}'),
+                iconSize: 16,
+                onPressed: widget.onRemoved,
+                icon: const Icon(Icons.close),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  key: Key('trigger-target-${trigger.id}'),
+                  controller: _target,
+                  onChanged: (_) => _writeTargets(),
+                  decoration: const InputDecoration(
+                    isDense: true,
+                    labelText: 'targetId',
+                  ),
+                ),
+              ),
+              const SizedBox(width: 4),
+              SizedBox(
+                width: 96,
+                child: DropdownButton<String>(
+                  key: Key('trigger-room-${trigger.id}'),
+                  isExpanded: true,
+                  value:
+                      _roomTarget != null &&
+                          widget.rooms.containsKey(_roomTarget)
+                      ? _roomTarget
+                      : null,
+                  hint: const Text('room', style: TextStyle(fontSize: 10)),
+                  onChanged: (value) {
+                    setState(() => _roomTarget = value);
+                    _writeTargets();
+                  },
+                  items: [
+                    for (final id in widget.rooms.keys)
+                      DropdownMenuItem(
+                        value: id,
+                        child: Text(
+                          id,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontSize: 10),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

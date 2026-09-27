@@ -11,7 +11,6 @@ enum WorldIssueKind {
   deadEnd,
   missingFile,
   emptyTheme,
-  triggerWithoutRoom,
   triggerUnknownRoom,
   asymmetricExit,
   emptyGraph,
@@ -179,23 +178,14 @@ WorldValidation validateWorld(WorldGraph graph) {
     }
 
     for (final trigger in room.triggers) {
-      final targetRoom = trigger.properties['room'];
-      if (targetRoom is String && targetRoom.isNotEmpty) {
-        if (!graph.rooms.containsKey(targetRoom)) {
-          add(
-            WorldIssueKind.triggerUnknownRoom,
-            WorldIssueSeverity.warning,
-            room.id,
-            'Trigger "${trigger.id}" targets unknown room "$targetRoom"',
-            targetRoom,
-          );
-        }
-      } else {
+      final targetRoom = roomTargetOf(trigger);
+      if (targetRoom != null && !graph.rooms.containsKey(targetRoom)) {
         add(
-          WorldIssueKind.triggerWithoutRoom,
-          WorldIssueSeverity.info,
+          WorldIssueKind.triggerUnknownRoom,
+          WorldIssueSeverity.warning,
           room.id,
-          'Trigger "${trigger.id}" (${trigger.type}) has no target room',
+          'Trigger "${trigger.id}" targets unknown room "$targetRoom"',
+          targetRoom,
         );
       }
     }
@@ -214,6 +204,31 @@ WorldValidation validateWorld(WorldGraph graph) {
   }
 
   return WorldValidation(issues);
+}
+
+/// Room a trigger points at, if any. Accepts both a top level `room` and the
+/// nested `properties: {room: ...}` shape used by generated world files.
+String? roomTargetOf(RoomTrigger trigger) {
+  final direct = _asString(trigger.properties['room']);
+  if (direct != null) return direct;
+  final nested = trigger.properties['properties'];
+  if (nested is Map) return _asString(nested['room']);
+  return null;
+}
+
+/// Object/entity a trigger points at inside its own room, if any.
+String? localTargetOf(RoomTrigger trigger) {
+  final direct = _asString(trigger.properties['targetId']);
+  if (direct != null) return direct;
+  final nested = trigger.properties['properties'];
+  if (nested is Map) return _asString(nested['targetId']);
+  return null;
+}
+
+String? _asString(Object? value) {
+  if (value is! String) return null;
+  final trimmed = value.trim();
+  return trimmed.isEmpty ? null : trimmed;
 }
 
 bool _hasExitBack(RoomInfo room, String targetId) =>

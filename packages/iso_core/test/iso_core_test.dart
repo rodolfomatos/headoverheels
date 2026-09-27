@@ -344,6 +344,67 @@ assets:
       );
     });
 
+    test('resolves trigger targets from nested properties', () {
+      final trigger = RoomTrigger(
+        id: 'switch_1',
+        type: 'switch',
+        position: Vector3(1, 1, 0),
+        size: Vector2(1, 1),
+        properties: {
+          'id': 'switch_1',
+          'type': 'switch',
+          'properties': {'targetId': 'door_secret_1'},
+        },
+      );
+      expect(localTargetOf(trigger), 'door_secret_1');
+      expect(roomTargetOf(trigger), isNull);
+
+      final toRoom = RoomTrigger(
+        id: 'teleporter_1',
+        type: 'teleport',
+        position: Vector3(1, 1, 0),
+        size: Vector2(1, 1),
+        properties: {
+          'id': 'teleporter_1',
+          'properties': {'room': 'moonbase_hq'},
+        },
+      );
+      expect(roomTargetOf(toRoom), 'moonbase_hq');
+      expect(localTargetOf(toRoom), isNull);
+    });
+
+    test('ignores triggers that only point at local objects', () {
+      final validation = validateWorld(
+        graphWith({
+          'a': {
+            'file': 'a.tmx',
+            'theme': 'castle',
+            'exits': [
+              {'direction': 'east', 'room': 'b', 'entrance': 'west'},
+            ],
+            'triggers': [
+              {
+                'id': 'switch_1',
+                'type': 'switch',
+                'position': {'x': 1, 'y': 1, 'z': 0},
+                'size': {'width': 1, 'height': 1},
+                'properties': {'targetId': 'door_secret_1'},
+              },
+            ],
+          },
+          'b': {
+            'file': 'b.tmx',
+            'theme': 'castle',
+            'exits': [
+              {'direction': 'west', 'room': 'a', 'entrance': 'east'},
+            ],
+          },
+        }),
+      );
+
+      expect(validation.issues, isEmpty);
+    });
+
     test('flags trigger targets and empty graphs', () {
       final validation = validateWorld(
         graphWith({
@@ -372,12 +433,6 @@ assets:
       expect(
         validation.issues.where(
           (i) => i.kind == WorldIssueKind.triggerUnknownRoom,
-        ),
-        hasLength(1),
-      );
-      expect(
-        validation.issues.where(
-          (i) => i.kind == WorldIssueKind.triggerWithoutRoom,
         ),
         hasLength(1),
       );

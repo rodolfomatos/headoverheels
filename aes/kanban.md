@@ -48,6 +48,7 @@ current_ticket: "T037"
 | T036 | TSX authoring: edit tile types/properties and export TSX | medium | pending |
 | T037 | World graph viewer/editor with topology validation | high | done |
 | T038 | Second example game (Knight Lore) on iso_core | medium | pending |
+| T039 | Puzzle trigger inspector (switch/target links) in the graph tab | medium | done |
 
 ## Sprint 01 — Foundation & Research
 **Goal**: Understand original game, establish core architecture, prove isometric rendering
@@ -188,3 +189,4 @@ current_ticket: "T037"
 * T033: Visual isometric map editor (palette/TSX browser, file gateways, canvas preview)
 * T034: Sprite browser/animator and asset management UI (manifest editor, frame import, delete)
 * T037: World graph viewer/editor with topology validation (Graph tab, world.json round trip)
+* T039: Puzzle trigger inspector in the graph tab (targetId and target room editing)

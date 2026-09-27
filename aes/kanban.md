@@ -148,6 +148,7 @@ current_ticket: "T036"
 | T036 | TSX authoring: edit tile types/properties and export TSX | pending |
 | T035 | Migrate Head over Heels into games/headoverheels | done |
 | T049 | Replace the untracked HoH audio with synthesised cues | pending |
+| T050 | Clear the 34 analyzer warnings in the HoH code | pending |
 
 ## Sprint 11 — Knight Lore Completion
 **Goal**: turn the second example game into a finished product, then migrate the
@@ -171,9 +172,17 @@ first game onto the same platform
 
 ## Queued (after T036)
 * T049: Replace the untracked HoH audio with synthesised cues
+* T050: Clear the analyzer warnings in the migrated code
 
 
 ## Notes
+* T050 scope: `make lint` passes because the gate runs with
+  `--no-fatal-infos --no-fatal-warnings`, and it reports 34 findings in the
+  migrated HoH code: 3 unused imports, an unused local in
+  `sprite_registry.dart`, and the rest deprecations, mostly `withOpacity` in
+  `app_theme.dart` and `main_menu_screen.dart`, which Flutter wants written as
+  `withValues`. None of them fail a build, and none of them are mine, so they
+  are a ticket rather than a drive-by edit inside the migration commit.
 * T035 scope: the root package is now `games/headoverheels`. `lib`, `assets`,
   `style`, `test`, the five platform directories, `analysis_options.yaml`,
   `.metadata` and the pubspec moved with `git mv`, so the history follows the

@@ -7,6 +7,7 @@ environment:
   sdk: ">=3.6.0 <4.0.0"
 
 dependencies:
+  flame: ^1.38.2
   flutter:
     sdk: flutter
   iso_core:
@@ -18,3 +19,11 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/world/knightlore_world.json
+    - assets/world/tiles/
+    - assets/world/rooms/
+    - assets/sprites/

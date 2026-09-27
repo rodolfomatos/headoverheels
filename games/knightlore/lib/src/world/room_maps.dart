@@ -38,16 +38,24 @@ class RoomMap {
   /// Objects written to the Tiled object layer.
   final List<RoomMapObject> objects;
 
-  int tileAt(int x, int y) =>
-      (x < 0 || y < 0 || x >= width || y >= height) ? KlTiles.wall : tiles[y][x];
+  int tileAt(int x, int y) => (x < 0 || y < 0 || x >= width || y >= height)
+      ? KlTiles.wall
+      : tiles[y][x];
 
   bool isWalkable(int x, int y) =>
-      x >= 0 && y >= 0 && x < width && y < height && tileAt(x, y) == KlTiles.floor;
+      x >= 0 &&
+      y >= 0 &&
+      x < width &&
+      y < height &&
+      tileAt(x, y) == KlTiles.floor;
 
   RoomTerrain get terrain => RoomTerrain(
         width,
         height,
-        [for (final row in tiles) for (final tile in row) tile != KlTiles.floor],
+        [
+          for (final row in tiles)
+            for (final tile in row) tile != KlTiles.floor
+        ],
       );
 
   Map<String, Vector3> get objectPositions => {
@@ -323,8 +331,7 @@ RoomMap parseRoomMap(String source, String roomId, RoomInfo room) {
   final tiles = <List<int>>[
     for (var y = 0; y < height; y++)
       [
-        for (var x = 0; x < width; x++)
-          values[y * width + x] - firstGid + 1,
+        for (var x = 0; x < width; x++) values[y * width + x] - firstGid + 1,
       ],
   ];
 

@@ -1,4 +1,4 @@
-.PHONY: setup run test test-packages test-coverage lint format format-check check assets-check doctor help build build-release build-release-apk build-release-appbundle build-release-all build-version generate clean security-scan install
+.PHONY: setup run run-knightlore build-knightlore test test-packages test-coverage lint format format-check check assets-check doctor help build build-release build-release-apk build-release-appbundle build-release-all build-version generate clean security-scan install
 
 AES_LANGUAGE ?= flutter
 AES_LINT ?= flutter analyze --no-fatal-infos --no-fatal-warnings
@@ -15,6 +15,12 @@ setup:
 
 run:
 	@$(AES_RUN)
+
+run-knightlore:
+	@cd games/knightlore && flutter run -d web-server --web-port 8081
+
+build-knightlore:
+	@cd games/knightlore && flutter build web
 
 test:
 	@$(AES_TEST)

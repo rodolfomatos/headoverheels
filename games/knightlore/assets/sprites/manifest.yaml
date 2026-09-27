@@ -1,0 +1,777 @@
+version: "1.0"
+assets:
+  -
+    id: "character.sabreman.idle.down"
+    file: "knights/sabreman_idle.png"
+    category: "character"
+    character: "sabreman"
+    animation: "idle"
+    direction: "down"
+    frames: 4
+    frame_duration: 160
+    loop: true
+    runtime_size:
+      width: 80
+      height: 32
+    anchor:
+      x: 40
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+  -
+    id: "character.jinx.walk.down"
+    file: "knights/jinx_walk.png"
+    category: "character"
+    character: "jinx"
+    animation: "walk"
+    direction: "down"
+    frames: 4
+    frame_duration: 120
+    loop: true
+    runtime_size:
+      width: 80
+      height: 32
+    anchor:
+      x: 40
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+  -
+    id: "character.joronie.walk.down"
+    file: "knights/joronie_walk.png"
+    category: "character"
+    character: "joronie"
+    animation: "walk"
+    direction: "down"
+    frames: 4
+    frame_duration: 120
+    loop: true
+    runtime_size:
+      width: 80
+      height: 32
+    anchor:
+      x: 40
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+  -
+    id: "character.achinda.walk.down"
+    file: "knights/achinda_walk.png"
+    category: "character"
+    character: "achinda"
+    animation: "walk"
+    direction: "down"
+    frames: 4
+    frame_duration: 120
+    loop: true
+    runtime_size:
+      width: 80
+      height: 32
+    anchor:
+      x: 40
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+  -
+    id: "character.celist.walk.down"
+    file: "knights/celist_walk.png"
+    category: "character"
+    character: "celist"
+    animation: "walk"
+    direction: "down"
+    frames: 4
+    frame_duration: 120
+    loop: true
+    runtime_size:
+      width: 80
+      height: 32
+    anchor:
+      x: 40
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+  -
+    id: "prop.ball.idle.down"
+    file: "props/ball_castle.png"
+    category: "prop"
+    entity: "ball"
+    theme: "castle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "castle"
+  -
+    id: "prop.cauldron.idle.down"
+    file: "props/cauldron_castle.png"
+    category: "prop"
+    entity: "cauldron"
+    theme: "castle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "castle"
+  -
+    id: "prop.chest.idle.down"
+    file: "props/chest_castle.png"
+    category: "prop"
+    entity: "chest"
+    theme: "castle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "castle"
+  -
+    id: "prop.diamond.idle.down"
+    file: "props/diamond_castle.png"
+    category: "prop"
+    entity: "diamond"
+    theme: "castle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "castle"
+  -
+    id: "prop.portcullis.idle.down"
+    file: "props/portcullis_castle.png"
+    category: "prop"
+    entity: "portcullis"
+    theme: "castle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "castle"
+  -
+    id: "prop.statue.idle.down"
+    file: "props/statue_castle.png"
+    category: "prop"
+    entity: "statue"
+    theme: "castle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "castle"
+  -
+    id: "prop.witch.idle.down"
+    file: "props/witch_castle.png"
+    category: "prop"
+    entity: "witch"
+    theme: "castle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "castle"
+  -
+    id: "prop.wizard.idle.down"
+    file: "props/wizard_castle.png"
+    category: "prop"
+    entity: "wizard"
+    theme: "castle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "castle"
+  -
+    id: "prop.ball.idle.down"
+    file: "props/ball_jungle.png"
+    category: "prop"
+    entity: "ball"
+    theme: "jungle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "jungle"
+  -
+    id: "prop.cauldron.idle.down"
+    file: "props/cauldron_jungle.png"
+    category: "prop"
+    entity: "cauldron"
+    theme: "jungle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "jungle"
+  -
+    id: "prop.chest.idle.down"
+    file: "props/chest_jungle.png"
+    category: "prop"
+    entity: "chest"
+    theme: "jungle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "jungle"
+  -
+    id: "prop.diamond.idle.down"
+    file: "props/diamond_jungle.png"
+    category: "prop"
+    entity: "diamond"
+    theme: "jungle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "jungle"
+  -
+    id: "prop.portcullis.idle.down"
+    file: "props/portcullis_jungle.png"
+    category: "prop"
+    entity: "portcullis"
+    theme: "jungle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "jungle"
+  -
+    id: "prop.statue.idle.down"
+    file: "props/statue_jungle.png"
+    category: "prop"
+    entity: "statue"
+    theme: "jungle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "jungle"
+  -
+    id: "prop.witch.idle.down"
+    file: "props/witch_jungle.png"
+    category: "prop"
+    entity: "witch"
+    theme: "jungle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "jungle"
+  -
+    id: "prop.wizard.idle.down"
+    file: "props/wizard_jungle.png"
+    category: "prop"
+    entity: "wizard"
+    theme: "jungle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "jungle"
+  -
+    id: "prop.ball.idle.down"
+    file: "props/ball_cauldron.png"
+    category: "prop"
+    entity: "ball"
+    theme: "cauldron"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "cauldron"
+  -
+    id: "prop.cauldron.idle.down"
+    file: "props/cauldron_cauldron.png"
+    category: "prop"
+    entity: "cauldron"
+    theme: "cauldron"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "cauldron"
+  -
+    id: "prop.chest.idle.down"
+    file: "props/chest_cauldron.png"
+    category: "prop"
+    entity: "chest"
+    theme: "cauldron"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "cauldron"
+  -
+    id: "prop.diamond.idle.down"
+    file: "props/diamond_cauldron.png"
+    category: "prop"
+    entity: "diamond"
+    theme: "cauldron"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "cauldron"
+  -
+    id: "prop.portcullis.idle.down"
+    file: "props/portcullis_cauldron.png"
+    category: "prop"
+    entity: "portcullis"
+    theme: "cauldron"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "cauldron"
+  -
+    id: "prop.statue.idle.down"
+    file: "props/statue_cauldron.png"
+    category: "prop"
+    entity: "statue"
+    theme: "cauldron"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "cauldron"
+  -
+    id: "prop.witch.idle.down"
+    file: "props/witch_cauldron.png"
+    category: "prop"
+    entity: "witch"
+    theme: "cauldron"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "cauldron"
+  -
+    id: "prop.wizard.idle.down"
+    file: "props/wizard_cauldron.png"
+    category: "prop"
+    entity: "wizard"
+    theme: "cauldron"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "cauldron"
+  -
+    id: "prop.ball.idle.down"
+    file: "props/ball_mine.png"
+    category: "prop"
+    entity: "ball"
+    theme: "mine"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "mine"
+  -
+    id: "prop.cauldron.idle.down"
+    file: "props/cauldron_mine.png"
+    category: "prop"
+    entity: "cauldron"
+    theme: "mine"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "mine"
+  -
+    id: "prop.chest.idle.down"
+    file: "props/chest_mine.png"
+    category: "prop"
+    entity: "chest"
+    theme: "mine"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "mine"
+  -
+    id: "prop.diamond.idle.down"
+    file: "props/diamond_mine.png"
+    category: "prop"
+    entity: "diamond"
+    theme: "mine"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "mine"
+  -
+    id: "prop.portcullis.idle.down"
+    file: "props/portcullis_mine.png"
+    category: "prop"
+    entity: "portcullis"
+    theme: "mine"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "mine"
+  -
+    id: "prop.statue.idle.down"
+    file: "props/statue_mine.png"
+    category: "prop"
+    entity: "statue"
+    theme: "mine"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "mine"
+  -
+    id: "prop.witch.idle.down"
+    file: "props/witch_mine.png"
+    category: "prop"
+    entity: "witch"
+    theme: "mine"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "mine"
+  -
+    id: "prop.wizard.idle.down"
+    file: "props/wizard_mine.png"
+    category: "prop"
+    entity: "wizard"
+    theme: "mine"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "mine"
+  -
+    id: "prop.ball.static.down"
+    file: "props/ball_tower.png"
+    category: "prop"
+    entity: "ball"
+    theme: "tower"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "tower"
+  -
+    id: "prop.cauldron.static.down"
+    file: "props/cauldron_tower.png"
+    category: "prop"
+    entity: "cauldron"
+    theme: "tower"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "tower"
+  -
+    id: "prop.chest.static.down"
+    file: "props/chest_tower.png"
+    category: "prop"
+    entity: "chest"
+    theme: "tower"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "tower"
+  -
+    id: "prop.diamond.static.down"
+    file: "props/diamond_tower.png"
+    category: "prop"
+    entity: "diamond"
+    theme: "tower"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "tower"
+  -
+    id: "prop.portcullis.static.down"
+    file: "props/portcullis_tower.png"
+    category: "prop"
+    entity: "portcullis"
+    theme: "tower"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "tower"
+  -
+    id: "prop.statue.static.down"
+    file: "props/statue_tower.png"
+    category: "prop"
+    entity: "statue"
+    theme: "tower"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "tower"
+  -
+    id: "prop.witch.static.down"
+    file: "props/witch_tower.png"
+    category: "prop"
+    entity: "witch"
+    theme: "tower"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "tower"
+  -
+    id: "prop.wizard.static.down"
+    file: "props/wizard_tower.png"
+    category: "prop"
+    entity: "wizard"
+    theme: "tower"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "tower"

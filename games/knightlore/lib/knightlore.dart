@@ -14,3 +14,7 @@ export 'src/world/knight_lore_world.dart';
 export 'src/world/room_maps.dart';
 export 'src/game/room_session.dart';
 export 'src/game/terrain.dart';
+export 'src/assets/knight_lore_manifest.dart';
+export 'src/game/knight_lore_game.dart';
+export 'src/render/room_view.dart';
+export 'src/ui/knight_lore_screen.dart';

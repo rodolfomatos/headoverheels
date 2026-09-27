@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:knightlore/knightlore.dart';
+import 'package:vector_math/vector_math.dart' show Vector3;
 
 import 'test_asset_bundle.dart';
 
@@ -41,6 +42,73 @@ void main() {
     expect(game.session, isNotNull);
     expect(game.session!.roomId, KlRooms.gatehouse);
     expect(game.session!.terrain.width, 8);
+    expect(game.screen, GameScreen.title,
+        reason: 'the game opens on the title');
+  });
+
+  test('the title screen hands over to the game and back', () async {
+    final game = KnightLoreGame(
+      config: const KnightLoreGameConfig(daySeconds: 1000, autoCycle: false),
+      bundle: TestAssetBundle(),
+    );
+    addTearDown(game.dispose);
+    await game.onLoad();
+
+    game.handleKey(' ');
+    expect(game.screen, GameScreen.playing);
+
+    game.handleKey('p');
+    expect(game.screen, GameScreen.paused);
+    game.handleKey('p');
+    expect(game.screen, GameScreen.playing);
+
+    game.handleKey('i');
+    expect(game.screen, GameScreen.status);
+    game.handleKey('i');
+    expect(game.screen, GameScreen.playing);
+
+    game.handleKey('escape');
+    expect(game.screen, GameScreen.paused);
+    game.handleKey('escape');
+    expect(game.screen, GameScreen.playing);
+  });
+
+  test('winning and running out of days change the screen', () async {
+    final game = KnightLoreGame(
+      config: const KnightLoreGameConfig(daySeconds: 1000, autoCycle: false),
+      bundle: TestAssetBundle(),
+    );
+    addTearDown(game.dispose);
+    await game.onLoad();
+    game.handleKey(' ');
+
+    // Deliver the six ingredients the same way the cauldron does.
+    final session = game.session!;
+    for (var trip = 0; trip < KlItems.ingredients.length; trip++) {
+      session.curse.demandIngredient(KlItems.ingredients[trip]);
+      session.inventory.pickUp(KlItems.ingredients[trip]);
+      session.enterRoom(KlRooms.laboratory);
+      final cauldron = session.room.triggers
+          .firstWhere((trigger) => trigger.type == 'cauldron');
+      session.leader.position = Vector3(
+        cauldron.position.x,
+        cauldron.position.y + 1,
+        0,
+      );
+      session.leader.facing = Facing.north;
+      game.handleKey(' ');
+    }
+    expect(game.isWon, isTrue);
+    expect(game.screen, GameScreen.victory);
+    expect(game.message, contains('curse is broken'));
+
+    // Back to the title, then lose on time.
+    game.handleKey(' ');
+    expect(game.screen, GameScreen.title);
+    game.handleKey(' ');
+    game.session!.curse.daysLeft = 0;
+    game.update(0.016);
+    expect(game.screen, GameScreen.defeat);
   });
 
   test('the game responds to keys and to the day cycle', () async {
@@ -51,6 +119,7 @@ void main() {
     addTearDown(game.dispose);
     await game.onLoad();
 
+    game.handleKey(' ');
     final start = game.session!.leader.position.clone();
     game.handleKey('arrowRight');
     expect(game.session!.leader.position.x, start.x + 1);

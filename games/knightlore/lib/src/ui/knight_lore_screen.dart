@@ -5,10 +5,16 @@ import 'package:knightlore/knightlore.dart';
 
 /// The game screen: the Flame world, the heads up display and the keyboard.
 class KnightLoreScreen extends StatefulWidget {
-  const KnightLoreScreen(
-      {super.key, this.config = const KnightLoreGameConfig()});
+  const KnightLoreScreen({
+    super.key,
+    this.config = const KnightLoreGameConfig(),
+    this.game,
+  });
 
   final KnightLoreGameConfig config;
+
+  /// A pre-built game, used by tests that have already loaded the assets.
+  final KnightLoreGame? game;
 
   @override
   State<KnightLoreScreen> createState() => _KnightLoreScreenState();
@@ -16,17 +22,24 @@ class KnightLoreScreen extends StatefulWidget {
 
 class _KnightLoreScreenState extends State<KnightLoreScreen> {
   late final KnightLoreGame _game;
+  late final bool _ownsGame;
   final FocusNode _focus = FocusNode();
 
   @override
   void initState() {
     super.initState();
-    _game = KnightLoreGame(config: widget.config);
+    _game = widget.game ?? KnightLoreGame(config: widget.config);
+    _ownsGame = widget.game == null;
+    // The game widget can take the focus, so ask for it on the first frame
+    // instead of relying on autofocus alone.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && !_focus.hasFocus) _focus.requestFocus();
+    });
   }
 
   @override
   void dispose() {
-    _game.dispose();
+    if (_ownsGame) _game.dispose();
     _focus.dispose();
     super.dispose();
   }
@@ -35,34 +48,49 @@ class _KnightLoreScreenState extends State<KnightLoreScreen> {
     if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
       return KeyEventResult.ignored;
     }
-    final key = _keyFor(event.logicalKey);
+    final key = _keyFor(event);
     if (key == null) return KeyEventResult.ignored;
     _game.handleKey(key);
     setState(() {});
     return KeyEventResult.handled;
   }
 
-  String? _keyFor(final key) {
+  String? _keyFor(KeyEvent event) {
+    final key = event.logicalKey;
     if (key.keyId == LogicalKeyboardKey.arrowUp.keyId) return 'arrowUp';
     if (key.keyId == LogicalKeyboardKey.arrowDown.keyId) return 'arrowDown';
     if (key.keyId == LogicalKeyboardKey.arrowLeft.keyId) return 'arrowLeft';
     if (key.keyId == LogicalKeyboardKey.arrowRight.keyId) return 'arrowRight';
     if (key.keyId == LogicalKeyboardKey.space.keyId) return ' ';
     if (key.keyId == LogicalKeyboardKey.enter.keyId) return 'enter';
-    final character = key.character;
-    if (character == null || character.isEmpty) return null;
+    if (key.keyId == LogicalKeyboardKey.escape.keyId) return 'escape';
+    if (key.keyId == LogicalKeyboardKey.keyP.keyId) return 'p';
+    if (key.keyId == LogicalKeyboardKey.keyI.keyId) return 'i';
+    if (key.keyId == LogicalKeyboardKey.keyF.keyId) return 'f';
+    for (var digit = 1; digit <= 9; digit++) {
+      if (key.keyId == LogicalKeyboardKey.digit0.keyId + digit) {
+        return '$digit';
+      }
+    }
+    // A letter key reports its character; a few platforms leave it empty, so
+    // the key label is the fallback.
+    final character =
+        event.character?.isNotEmpty ?? false ? event.character : key.keyLabel;
+    if (character == null || character.length != 1) return null;
     return character.toLowerCase();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF101216),
-      body: Focus(
-        focusNode: _focus,
-        autofocus: true,
-        onKeyEvent: _onKey,
-        child: Stack(
+    // The focus sits above the game widget: key events bubble up from the
+    // primary focus, and the game widget may hold it.
+    return Focus(
+      focusNode: _focus,
+      autofocus: true,
+      onKeyEvent: _onKey,
+      child: Scaffold(
+        backgroundColor: const Color(0xFF101216),
+        body: Stack(
           children: [
             Positioned.fill(
               child: GameWidget(
@@ -72,6 +100,10 @@ class _KnightLoreScreenState extends State<KnightLoreScreen> {
             Positioned.fill(child: _NightVeil(isNight: _game.isNight)),
             Positioned.fill(
                 child: _Hud(game: _game, onRefresh: () => setState(() {}))),
+            if (_game.assetsReady && _game.screen != GameScreen.playing)
+              Positioned.fill(
+                child: IgnorePointer(child: GameOverlay(game: _game)),
+              ),
             if (!_game.assetsReady) const _Loader(),
           ],
         ),
@@ -318,9 +350,16 @@ class _InventoryStrip extends StatelessWidget {
 
 /// The app, so `flutter run` and the web build share one entry point.
 class KnightLoreApp extends StatelessWidget {
-  const KnightLoreApp({super.key, this.config = const KnightLoreGameConfig()});
+  const KnightLoreApp({
+    super.key,
+    this.config = const KnightLoreGameConfig(),
+    this.game,
+  });
 
   final KnightLoreGameConfig config;
+
+  /// A pre-built game, used by tests and by embedding the editor elsewhere.
+  final KnightLoreGame? game;
 
   @override
   Widget build(BuildContext context) {
@@ -328,7 +367,7 @@ class KnightLoreApp extends StatelessWidget {
       title: 'Knight Lore',
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark(useMaterial3: true),
-      home: KnightLoreScreen(config: config),
+      home: KnightLoreScreen(config: config, game: game),
     );
   }
 }

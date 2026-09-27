@@ -27,6 +27,10 @@ class KnightLoreGameConfig {
   final String spritesBasePath;
 }
 
+/// Which screen the player is looking at. The state machine lives in the game
+/// so it can be tested without a widget tree.
+enum GameScreen { title, playing, paused, status, victory, defeat }
+
 /// The playable game. All rules live in [RoomSession]; this class only turns
 /// input into session calls, draws the room and runs the sundial.
 class KnightLoreGame extends FlameGame {
@@ -48,6 +52,7 @@ class KnightLoreGame extends FlameGame {
   /// Trap cycles per second.
   static const double trapTicksPerSecond = 6;
 
+  GameScreen screen = GameScreen.title;
   double _dayProgress = 0;
   double _trapAccumulator = 0;
   bool _nightHandled = false;
@@ -67,6 +72,19 @@ class KnightLoreGame extends FlameGame {
 
   /// True once the six ingredients are in the cauldron.
   bool get isWon => session?.isWon ?? false;
+
+  /// True when the forty days are up.
+  bool get isOutOfTime => (session?.curse.daysLeft ?? 1) <= 0;
+
+  bool get isPlaying => screen == GameScreen.playing;
+
+  /// The status the title screen advertises.
+  String get objective {
+    final session = this.session;
+    if (session == null) return 'Find the wizard and break the curse.';
+    final wanted = session.curse.demandedIngredient;
+    return 'The cauldron wants ${wanted ?? KlItems.ingredients.first}.';
+  }
 
   /// True once the world, the maps and the art are loaded.
   bool get assetsReady => _loaded;
@@ -206,12 +224,15 @@ class KnightLoreGame extends FlameGame {
         };
       }
     }
+    _checkEnd();
   }
 
   /// Called by the keyboard layer.
   void handleKey(String key) {
     final current = session;
     if (current == null) return;
+    if (_handleUiKey(key)) return;
+    if (screen != GameScreen.playing) return;
     final facing = _facingFor(key);
     if (facing != null) {
       _applyStep(current.step(facing));
@@ -245,11 +266,11 @@ class KnightLoreGame extends FlameGame {
     return session.chestInFront;
   }
 
-  Facing? _facingFor(String key) => switch (key) {
-        'arrowUp' => Facing.north,
-        'arrowRight' => Facing.east,
-        'arrowDown' => Facing.south,
-        'arrowLeft' => Facing.west,
+  Facing? _facingFor(String key) => switch (key.toLowerCase()) {
+        'arrowup' => Facing.north,
+        'arrowright' => Facing.east,
+        'arrowdown' => Facing.south,
+        'arrowleft' => Facing.west,
         'w' => Facing.north,
         'd' => Facing.east,
         's' => Facing.south,
@@ -262,11 +283,82 @@ class KnightLoreGame extends FlameGame {
       };
 
   /// Digits one to nine cast the scroll in that inventory slot.
+  /// Screen keys first: they work whatever screen is open. Keys are matched
+  /// case insensitively, because a keyboard may report a capital letter.
+  bool _handleUiKey(String key) {
+    switch (key.toLowerCase()) {
+      case 'escape':
+        screen = switch (screen) {
+          GameScreen.playing => GameScreen.paused,
+          GameScreen.paused => GameScreen.playing,
+          GameScreen.status => GameScreen.playing,
+          _ => screen,
+        };
+        return true;
+      case 'p':
+        if (screen == GameScreen.playing) {
+          screen = GameScreen.paused;
+        } else if (screen == GameScreen.paused) {
+          screen = GameScreen.playing;
+        }
+        return true;
+      case 'i':
+        if (screen == GameScreen.playing) {
+          screen = GameScreen.status;
+        } else if (screen == GameScreen.status) {
+          screen = GameScreen.playing;
+        }
+        return true;
+      case ' ':
+      case 'enter':
+        switch (screen) {
+          case GameScreen.title:
+            screen = GameScreen.playing;
+          case GameScreen.paused:
+            screen = GameScreen.playing;
+          case GameScreen.victory:
+          case GameScreen.defeat:
+            screen = GameScreen.title;
+            _reset();
+          default:
+            return false;
+        }
+        return true;
+    }
+    return false;
+  }
+
+  void _reset() {
+    _dayProgress = 0;
+    _nightHandled = false;
+    _won = false;
+    _lastChestItem = null;
+    message = 'Find the wizard. Six ingredients, forty days.';
+    session = newKnightLoreSession();
+    roomView = null;
+  }
+
   int? _slotFor(String key) {
     if (key.length != 1) return null;
+    key = key.toLowerCase();
     final digit = int.tryParse(key);
     if (digit == null || digit < 1 || digit > 9) return null;
     return digit - 1;
+  }
+
+  /// The game ends when the curse is broken or the days run out.
+  void _checkEnd() {
+    final current = session;
+    if (current == null) return;
+    if (isWon && screen != GameScreen.victory) {
+      screen = GameScreen.victory;
+      message = 'The curse is broken. You ride out of the castle a man again.';
+      return;
+    }
+    if (isOutOfTime && screen != GameScreen.defeat) {
+      screen = GameScreen.defeat;
+      message = 'The forty days are over and the wolf keeps you.';
+    }
   }
 
   void _applyCast(CastOutcome outcome) {
@@ -322,8 +414,7 @@ class KnightLoreGame extends FlameGame {
   bool _won = false;
 
   void _applyInteract(InteractOutcome outcome) {
-    final session = this.session;
-    if (session != null && session.isWon && !_won) {
+    if (isWon && !_won) {
       _won = true;
       message = 'The curse is broken. You ride out of the castle a man again.';
     }
@@ -344,5 +435,7 @@ class KnightLoreGame extends FlameGame {
       InteractOutcome.dropped => 'An empty chest.',
       InteractOutcome.nothing => '',
     };
+    // The end of the game has the last word on the message.
+    _checkEnd();
   }
 }

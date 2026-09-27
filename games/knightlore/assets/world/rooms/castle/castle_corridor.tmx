@@ -23,6 +23,7 @@
   </layer>
   <objectgroup id="2" name="Objects">
     <object id="1" name="portcullis_1" type="portcullis" x="192.0" y="96.0" width="32" height="32"/>
-    <object id="2" name="ball_3" type="ball" x="320.0" y="192.0" width="32" height="32"/>
+    <object id="2" name="spikes_1" type="spikes" x="256.0" y="160.0" width="32" height="32"/>
+    <object id="3" name="ball_3" type="ball" x="320.0" y="192.0" width="32" height="32"/>
   </objectgroup>
 </map>

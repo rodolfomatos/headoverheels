@@ -130,6 +130,13 @@ class KnightLoreWorld {
       triggers: [
         trigger('ball_2', 'ball', 3, 4),
         trigger(
+          'falling_1',
+          'fallingBlock',
+          6,
+          2,
+          properties: {'period': 24, 'activeFor': 14, 'phase': 6},
+        ),
+        trigger(
           'statue_1',
           'statue',
           5,
@@ -150,6 +157,13 @@ class KnightLoreWorld {
       ],
       triggers: [
         trigger('portcullis_1', 'portcullis', 3, 2),
+        trigger(
+          'spikes_1',
+          'spikes',
+          4,
+          4,
+          properties: {'period': 16, 'activeFor': 8, 'phase': 0},
+        ),
         trigger('ball_3', 'ball', 5, 5),
       ],
     );
@@ -304,6 +318,20 @@ class KnightLoreWorld {
       ],
       triggers: [
         trigger('ball_7', 'ball', 3, 3),
+        trigger(
+          'demon_1',
+          'demon',
+          4,
+          4,
+          properties: {'period': 20, 'activeFor': 7, 'phase': 10},
+        ),
+        trigger(
+          'bounce_1',
+          'bouncingBlock',
+          6,
+          4,
+          properties: {'period': 14, 'activeFor': 5, 'phase': 3},
+        ),
         trigger('ball_8', 'ball', 5, 5),
         trigger(
           'chest_8',
@@ -336,6 +364,13 @@ class KnightLoreWorld {
           4,
           3,
           properties: {'itemId': 'golden_key'},
+        ),
+        trigger(
+          'spikes_2',
+          'spikes',
+          2,
+          4,
+          properties: {'period': 12, 'activeFor': 5, 'phase': 7},
         ),
       ],
     );

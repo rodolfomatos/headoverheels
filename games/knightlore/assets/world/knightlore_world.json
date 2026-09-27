@@ -108,6 +108,24 @@
           }
         },
         {
+          "id": "falling_1",
+          "type": "fallingBlock",
+          "position": {
+            "x": 6.0,
+            "y": 2.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          },
+          "properties": {
+            "period": 24,
+            "activeFor": 14,
+            "phase": 6
+          }
+        },
+        {
           "id": "statue_1",
           "type": "statue",
           "position": {
@@ -185,6 +203,24 @@
           "size": {
             "width": 1.0,
             "height": 1.0
+          }
+        },
+        {
+          "id": "spikes_1",
+          "type": "spikes",
+          "position": {
+            "x": 4.0,
+            "y": 4.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          },
+          "properties": {
+            "period": 16,
+            "activeFor": 8,
+            "phase": 0
           }
         },
         {
@@ -694,6 +730,42 @@
           }
         },
         {
+          "id": "demon_1",
+          "type": "demon",
+          "position": {
+            "x": 4.0,
+            "y": 4.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          },
+          "properties": {
+            "period": 20,
+            "activeFor": 7,
+            "phase": 10
+          }
+        },
+        {
+          "id": "bounce_1",
+          "type": "bouncingBlock",
+          "position": {
+            "x": 6.0,
+            "y": 4.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          },
+          "properties": {
+            "period": 14,
+            "activeFor": 5,
+            "phase": 3
+          }
+        },
+        {
           "id": "ball_8",
           "type": "ball",
           "position": {
@@ -781,6 +853,24 @@
           },
           "properties": {
             "itemId": "golden_key"
+          }
+        },
+        {
+          "id": "spikes_2",
+          "type": "spikes",
+          "position": {
+            "x": 2.0,
+            "y": 4.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          },
+          "properties": {
+            "period": 12,
+            "activeFor": 5,
+            "phase": 7
           }
         }
       ]

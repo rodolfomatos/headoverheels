@@ -66,4 +66,30 @@ void main() {
     expect(game.session!.party, hasLength(4),
         reason: 'the curse splits the party at night');
   });
+
+  test('traps catch a party that stands still', () async {
+    final game = KnightLoreGame(
+      config: const KnightLoreGameConfig(daySeconds: 1000, autoCycle: false),
+      bundle: TestAssetBundle(),
+    );
+    addTearDown(game.dispose);
+    await game.onLoad();
+
+    // Stand the sabreman on the corridor spikes and let the clock run.
+    game.session!.enterRoom(KlRooms.corridor);
+    final spikes = game.session!.room.triggers
+        .firstWhere((trigger) => trigger.id == 'spikes_1');
+    game.session!.leader.position = spikes.position.clone();
+    final days = game.session!.curse.daysLeft;
+
+    for (var i = 0; i < 200; i++) {
+      game.update(1 / 60);
+      if (game.session!.lastHazardOutcome == HazardOutcome.hurt) break;
+    }
+
+    expect(game.session!.lastHazardOutcome, HazardOutcome.hurt);
+    expect(game.session!.lastHazardId, 'spikes_1');
+    expect(game.session!.curse.daysLeft, days - 1);
+    expect(game.message, contains('day is gone'));
+  });
 }

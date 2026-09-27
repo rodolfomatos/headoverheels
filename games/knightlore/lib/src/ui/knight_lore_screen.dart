@@ -203,6 +203,12 @@ class _StatusBar extends StatelessWidget {
           width: 120,
           child: LinearProgressIndicator(value: game.dayProgress.clamp(0, 1)),
         ),
+        if ((session?.hazards.hazards.length ?? 0) > 0)
+          _Chip(
+            label: '${session!.hazards.hazards.length} trap'
+                '${session.hazards.hazards.length == 1 ? '' : 's'}',
+            colour: const Color(0xFFE08A5A),
+          ),
       ],
     );
   }

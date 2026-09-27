@@ -2,6 +2,7 @@ import 'package:iso_core/iso_core.dart';
 import 'package:vector_math/vector_math.dart' show Vector2, Vector3;
 
 import '../curse.dart';
+import 'hazards.dart';
 import '../inventory.dart';
 import '../knight.dart';
 import '../spells.dart';
@@ -78,6 +79,9 @@ enum MoveOutcome {
   noExit,
 }
 
+/// What a trap did to the party.
+enum HazardOutcome { none, blocked, hurt }
+
 enum InteractOutcome {
   nothing,
   pickedUp,
@@ -124,6 +128,7 @@ class RoomSession {
     CurseState? curse,
     FilmRule filmRule = const FilmRule(),
     List<String> initialItems = const [],
+    this.ticksPerStep = 8,
   })  : _terrain = terrain,
         _filmRule = filmRule {
     // One inventory only: the curse state owns it, so an item the party picks
@@ -154,11 +159,48 @@ class RoomSession {
 
   String _roomId = '';
 
+  /// Game ticks per movement step, so the traps cycle at a readable speed.
+  final int ticksPerStep;
+
+  int _tick = 0;
+  HazardOutcome lastHazardOutcome = HazardOutcome.none;
+  String? lastHazardId;
+  final Map<String, HazardField> _hazards = {};
+
   String get roomId => _roomId;
 
   RoomInfo get room => world.getRoom(_roomId)!;
 
   RoomTerrain get terrain => _terrainOf(_roomId);
+
+  /// The terrain of any room, for route checks and previews.
+  RoomTerrain terrainOf(String roomId) => _terrainOf(roomId);
+
+  /// The current trap clock. Traps are a pure function of this.
+  int get tick => _tick;
+
+  HazardField get hazards => _hazards.putIfAbsent(
+        _roomId,
+        () => HazardField.forRoom(room),
+      );
+
+  /// Advances the trap clock, and therefore the traps themselves. A party
+  /// standing still is still caught by a trap that comes out under it.
+  void advanceTick([int by = 1]) {
+    _tick += by;
+    hazards.rearm(leader.position);
+    final hit = hazards.hitAt(leader.position, _tick);
+    if (hit == null) return;
+    lastHazardOutcome = HazardOutcome.hurt;
+    lastHazardId = hit.id;
+    _applyHazard(hit);
+  }
+
+  /// Clears what the last step did to the party, at the start of the next one.
+  void _clearHazardReport() {
+    lastHazardOutcome = HazardOutcome.none;
+    lastHazardId = null;
+  }
 
   /// The knight the player is steering.
   Adventurer get leader => _party.first;
@@ -207,6 +249,7 @@ class RoomSession {
 
   /// Walks the party one tile in [direction].
   MoveOutcome step(Facing direction) {
+    _clearHazardReport();
     for (final knight in _party) {
       knight.facing = direction;
     }
@@ -225,13 +268,47 @@ class RoomSession {
       if (bounds.isBlocked(target.x.round(), target.y.round())) {
         return MoveOutcome.blocked;
       }
+      if (hazards.blocksAt(target, _tick)) {
+        lastHazardOutcome = HazardOutcome.blocked;
+        lastHazardId = _blockingHazard(target)?.id;
+        return MoveOutcome.blocked;
+      }
       for (final knight in _party) {
         knight.position = target.clone();
       }
+      // The trap is judged on arrival, before the clock moves on.
+      final hit = hazards.hitAt(leader.position, _tick);
+      if (hit != null) {
+        lastHazardOutcome = HazardOutcome.hurt;
+        lastHazardId = hit.id;
+        _applyHazard(hit);
+      }
+      advanceTick(ticksPerStep);
       return MoveOutcome.moved;
     }
     return _leaveRoom(direction);
   }
+
+  Hazard? _blockingHazard(Vector3 position) {
+    for (final hazard in hazards.hazards) {
+      if (hazard.isBlocking && hazard.covers(position, _tick)) return hazard;
+    }
+    return null;
+  }
+
+  /// A trap costs a day and puts the party back at the door it came through,
+  /// which is what the original does when a trap catches you.
+  void _applyHazard(Hazard hazard) {
+    hazards.spend(hazard);
+    if (!hazard.costsADay) return;
+    curse.daysLeft -= 1;
+    final entrance = _entranceTile();
+    for (final knight in _party) {
+      knight.position = entrance.clone();
+    }
+  }
+
+  Vector3 _entranceTile() => room.spawnPosition.clone();
 
   MoveOutcome _leaveRoom(Facing direction) {
     final names = exitNamesFor(direction);

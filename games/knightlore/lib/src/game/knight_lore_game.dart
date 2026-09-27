@@ -45,7 +45,11 @@ class KnightLoreGame extends FlameGame {
 
   bool _loaded = false;
 
+  /// Trap cycles per second.
+  static const double trapTicksPerSecond = 6;
+
   double _dayProgress = 0;
+  double _trapAccumulator = 0;
   bool _nightHandled = false;
   final Map<String, ui.Image> _tilesets = {};
   final Map<String, ui.Image> _sprites = {};
@@ -167,6 +171,17 @@ class KnightLoreGame extends FlameGame {
   void update(double dt) {
     super.update(dt);
     roomView?.tick();
+    // The traps keep their own time so a party standing still still gets
+    // caught, and so the renderer can draw a spike that is currently out.
+    final session = this.session;
+    if (session != null && _loaded) {
+      _trapAccumulator += dt * trapTicksPerSecond;
+      while (_trapAccumulator >= 1) {
+        _trapAccumulator -= 1;
+        session.advanceTick();
+        _reportHazard();
+      }
+    }
     final current = session;
     if (current == null || !_loaded) return;
 
@@ -263,12 +278,33 @@ class KnightLoreGame extends FlameGame {
     };
   }
 
+  /// A trap that caught the party costs a day; say so.
+  void _reportHazard() {
+    final session = this.session;
+    if (session == null || session.lastHazardOutcome != HazardOutcome.hurt) {
+      return;
+    }
+    final hazard = session.hazards.byId(session.lastHazardId ?? '');
+    message = switch (hazard?.kind) {
+      HazardKind.spikes => 'The spikes catch you. A day is gone.',
+      HazardKind.demon => 'The demon surfaces on you. A day is gone.',
+      HazardKind.fallingBlock => 'The block lands on you. A day is gone.',
+      HazardKind.bouncingBlock => 'The block bounces into you. A day is gone.',
+      HazardKind.ball => '',
+      null => 'Something catches you. A day is gone.',
+    };
+  }
+
   void _applyStep(MoveOutcome outcome) {
+    if (session?.lastHazardOutcome == HazardOutcome.hurt) {
+      _reportHazard();
+    }
     switch (outcome) {
       case MoveOutcome.moved:
         message = '';
       case MoveOutcome.blocked:
-        message = 'A wall.';
+        message =
+            session?.lastHazardId != null ? 'A ball is in the way.' : 'A wall.';
       case MoveOutcome.noExit:
         message = 'No way out that way.';
       case MoveOutcome.refused:

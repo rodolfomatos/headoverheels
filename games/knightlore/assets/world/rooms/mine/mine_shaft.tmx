@@ -23,8 +23,10 @@
   </layer>
   <objectgroup id="2" name="Objects">
     <object id="1" name="ball_7" type="ball" x="192.0" y="128.0" width="32" height="32"/>
-    <object id="2" name="ball_8" type="ball" x="320.0" y="192.0" width="32" height="32"/>
-    <object id="3" name="chest_8" type="chest" x="128.0" y="96.0" width="32" height="32"/>
-    <object id="4" name="chest_9" type="chest" x="320.0" y="96.0" width="32" height="32"/>
+    <object id="2" name="demon_1" type="demon" x="256.0" y="160.0" width="32" height="32"/>
+    <object id="3" name="bounce_1" type="bouncingBlock" x="384.0" y="160.0" width="32" height="32"/>
+    <object id="4" name="ball_8" type="ball" x="320.0" y="192.0" width="32" height="32"/>
+    <object id="5" name="chest_8" type="chest" x="128.0" y="96.0" width="32" height="32"/>
+    <object id="6" name="chest_9" type="chest" x="320.0" y="96.0" width="32" height="32"/>
   </objectgroup>
 </map>

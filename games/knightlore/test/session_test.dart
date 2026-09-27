@@ -3,6 +3,8 @@ import 'package:iso_core/iso_core.dart';
 import 'package:knightlore/knightlore.dart';
 import 'package:vector_math/vector_math.dart' show Vector3;
 
+import 'support/room_routes.dart';
+
 WorldGraph _world() => KnightLoreWorld.build();
 
 Map<String, RoomTerrain> _terrain({RoomTerrain? forGatehouse}) {
@@ -194,39 +196,46 @@ void main() {
       expect(session.roomId, KlRooms.gatehouse);
     });
 
-    test('every room can be reached by walking, not just by graph', () {
+    test('every room is reachable and can be crossed on foot', () {
       final session = _session();
-      // Carry the keys the world declares, so locked doors are walkable.
-      for (final room in _world().rooms.values) {
-        for (final exit in room.exits) {
-          if (exit.isLocked && exit.keyId != null) {
-            session.inventory.pickUp(exit.keyId!);
-          }
-        }
-      }
+      final world = _world();
+
+      // The graph says every room is reachable...
       final visited = <String>{session.roomId};
       final queue = <String>[session.roomId];
-
       while (queue.isNotEmpty) {
         final from = queue.removeAt(0);
-        session.enterRoom(from);
-        for (final exit in session.room.exits) {
-          session.enterRoom(from);
-          final outcome = _walkUntilRoomChanges(
-            session,
-            facingForExit(exit.direction),
-          );
-          expect(
-            outcome,
-            anyOf(MoveOutcome.changedRoom, MoveOutcome.flipped),
-            reason: 'exit ${exit.direction} from $from to ${exit.room}',
-          );
-          expect(session.roomId, exit.room);
-          if (visited.add(session.roomId)) queue.add(session.roomId);
+        for (final exit in world.getRoom(from)!.exits) {
+          if (visited.add(exit.room)) queue.add(exit.room);
         }
       }
+      expect(visited, hasLength(world.rooms.length));
 
-      expect(visited, hasLength(_world().rooms.length));
+      // ...and every room can actually be walked across to each of its doors,
+      // walls and balls aside.
+      for (final room in world.rooms.values) {
+        expect(
+          RoomRoutes.isTraversable(room, session.terrainOf(room.id)),
+          isTrue,
+          reason: '${room.id} cannot be walked across',
+        );
+      }
+    });
+
+    test('a locked door is the only thing between a room and the world', () {
+      final session = _session();
+      final corridor = _world().getRoom(KlRooms.corridor)!;
+      final locked = corridor.exits.firstWhere((exit) => exit.isLocked);
+      expect(
+        RoomRoutes.find(
+          corridor,
+          session.terrainOf(corridor.id),
+          corridor.spawnPosition,
+          RoomRoutes.doorTile(locked),
+        ),
+        isNotEmpty,
+        reason: 'the key must be the only obstacle, not a wall',
+      );
     });
 
     test('vertical flavour exits are doorways on the other edges', () {

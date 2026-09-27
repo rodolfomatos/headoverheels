@@ -23,7 +23,8 @@
   </layer>
   <objectgroup id="2" name="Objects">
     <object id="1" name="ball_2" type="ball" x="192.0" y="160.0" width="32" height="32"/>
-    <object id="2" name="statue_1" type="statue" x="320.0" y="160.0" width="32" height="32"/>
-    <object id="3" name="witch_1" type="witch" x="384.0" y="224.0" width="32" height="32"/>
+    <object id="2" name="falling_1" type="fallingBlock" x="384.0" y="96.0" width="32" height="32"/>
+    <object id="3" name="statue_1" type="statue" x="320.0" y="160.0" width="32" height="32"/>
+    <object id="4" name="witch_1" type="witch" x="384.0" y="224.0" width="32" height="32"/>
   </objectgroup>
 </map>

@@ -23,5 +23,6 @@
   </layer>
   <objectgroup id="2" name="Objects">
     <object id="1" name="chest_6" type="chest" x="256.0" y="128.0" width="32" height="32"/>
+    <object id="2" name="spikes_2" type="spikes" x="128.0" y="160.0" width="32" height="32"/>
   </objectgroup>
 </map>

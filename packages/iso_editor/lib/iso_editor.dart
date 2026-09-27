@@ -1,3 +1,4 @@
+export 'src/app/editor_project.dart';
 export 'src/app/editor_shell.dart';
 export 'src/assets/asset_import_service.dart';
 export 'src/assets/asset_manifest_service.dart';

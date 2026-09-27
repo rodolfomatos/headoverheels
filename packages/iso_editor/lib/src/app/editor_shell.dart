@@ -8,6 +8,7 @@ import 'package:path/path.dart' as p;
 import '../assets/asset_import_service.dart';
 import '../assets/asset_manifest_service.dart';
 import '../document/editor_document.dart';
+import 'editor_project.dart';
 import '../state/editor_controller.dart';
 import '../storage/editor_file_gateway.dart';
 import '../storage/editor_storage.dart';
@@ -28,6 +29,8 @@ class IsoEditorApp extends StatefulWidget {
     this.tilesetImageBasePath = 'assets/tilesets',
     this.fileGateway,
     this.worldKey = 'assets/levels/world.json',
+    this.project = EditorProject.headoverheels,
+    this.projects = EditorProject.shipped,
     super.key,
   });
 
@@ -40,6 +43,13 @@ class IsoEditorApp extends StatefulWidget {
   final EditorFileGateway? fileGateway;
   final String worldKey;
 
+  /// The game the editor opens. The default keeps the old behaviour of reading
+  /// [worldKey] only.
+  final EditorProject project;
+
+  /// The games offered in the picker.
+  final List<EditorProject> projects;
+
   @override
   State<IsoEditorApp> createState() => _IsoEditorAppState();
 }
@@ -47,6 +57,8 @@ class IsoEditorApp extends StatefulWidget {
 class _IsoEditorAppState extends State<IsoEditorApp> {
   late final EditorController _controller;
   late final TsxCatalog _tilesets;
+  late EditorProject _project;
+  AssetManifest? _manifest;
 
   @override
   void initState() {
@@ -56,12 +68,27 @@ class _IsoEditorAppState extends State<IsoEditorApp> {
       document: widget.initialDocument,
     );
     _tilesets = widget.tilesets ?? TsxCatalog(const []);
+    _project = widget.project;
+    _manifest = widget.manifest;
   }
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  /// Opens [project]: its sprite manifest, and its world through the shell.
+  Future<void> _openProject(EditorProject project) async {
+    if (project.id == _project.id) return;
+    setState(() => _project = project);
+    final service = AssetManifestService(
+      storage: widget.storage,
+      manifestKey: project.manifestKey,
+    );
+    final manifest = await service.load();
+    if (!mounted) return;
+    setState(() => _manifest = manifest);
   }
 
   @override
@@ -71,12 +98,19 @@ class _IsoEditorAppState extends State<IsoEditorApp> {
       theme: ThemeData.dark(useMaterial3: true),
       home: EditorShell(
         controller: _controller,
-        manifest: widget.manifest,
-        assetsBasePath: widget.assetsBasePath,
+        manifest: _manifest,
+        assetsBasePath: _project.assetsBasePath,
         tilesets: _tilesets,
-        tilesetImageBasePath: widget.tilesetImageBasePath,
+        tilesetImageBasePath: _project.tilesetImageBasePath,
         fileGateway: widget.fileGateway ?? const FileSelectorEditorGateway(),
-        worldKey: widget.worldKey,
+        // Only the explicit argument wins: a caller that passes a world key is
+        // pointing at a file of its own, not at one of the shipped projects.
+        worldKey: widget.worldKey == EditorProject.headoverheels.worldKey
+            ? _project.worldKey
+            : widget.worldKey,
+        project: _project,
+        projects: widget.projects,
+        onProjectChanged: _openProject,
       ),
     );
   }
@@ -91,6 +125,9 @@ class EditorShell extends StatefulWidget {
     this.tilesetImageBasePath = 'assets/tilesets',
     this.fileGateway,
     this.worldKey = 'assets/levels/world.json',
+    this.project = EditorProject.headoverheels,
+    this.projects = EditorProject.shipped,
+    this.onProjectChanged,
     super.key,
   });
 
@@ -102,11 +139,63 @@ class EditorShell extends StatefulWidget {
   final EditorFileGateway? fileGateway;
   final String worldKey;
 
+  /// The game currently open, and the games the picker offers.
+  final EditorProject project;
+  final List<EditorProject> projects;
+
+  /// Called when the player picks another game. The app owns reloading, because
+  /// only it knows how to read the new world.
+  final void Function(EditorProject project)? onProjectChanged;
+
   @override
   State<EditorShell> createState() => _EditorShellState();
 }
 
+/// Lets the player move between the games. Switching is the app's job, so this
+/// only reports the choice.
+class _ProjectPicker extends StatelessWidget {
+  const _ProjectPicker({
+    required this.projects,
+    required this.current,
+    required this.onChanged,
+  });
+
+  final List<EditorProject> projects;
+  final EditorProject current;
+  final void Function(EditorProject project) onChanged;
+
+  @override
+  Widget build(BuildContext context) => PopupMenuButton<String>(
+    key: const Key('project-picker'),
+    tooltip: 'Game',
+    onSelected: (id) => onChanged(EditorProject.byId(id)),
+    itemBuilder: (context) => [
+      for (final project in projects)
+        PopupMenuItem<String>(
+          value: project.id,
+          child: Row(
+            children: [
+              if (project.id == current.id)
+                const Icon(Icons.check, size: 16)
+              else
+                const SizedBox(width: 16),
+              const SizedBox(width: 8),
+              Text(project.label),
+            ],
+          ),
+        ),
+    ],
+    child: Chip(
+      label: Text(current.label),
+      avatar: const Icon(Icons.sports_esports, size: 16),
+    ),
+  );
+}
+
 class _EditorShellState extends State<EditorShell> {
+  /// The key of the project this shell is showing.
+  String get projectId => widget.project.id;
+
   int _tileId = 1;
   String _objectType = 'entity';
   AssetManifest? _manifest;
@@ -133,7 +222,22 @@ class _EditorShellState extends State<EditorShell> {
       builder: (context, _) {
         return Scaffold(
           appBar: AppBar(
-            title: Text(_controller.document.projectName),
+            title: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(child: Text(_controller.document.projectName)),
+                if (widget.projects.length > 1)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12),
+                    child: _ProjectPicker(
+                      projects: widget.projects,
+                      current: widget.project,
+                      onChanged: (project) =>
+                          widget.onProjectChanged?.call(project),
+                    ),
+                  ),
+              ],
+            ),
             actions: [
               IconButton(
                 key: const Key('undo-button'),
@@ -217,6 +321,7 @@ class _EditorShellState extends State<EditorShell> {
                   onSaveAsset: _saveAsset,
                   onDeleteAsset: _deleteAsset,
                   onAddFrames: _addFrames,
+                  projectId: projectId,
                 ),
               ),
             ],
@@ -643,11 +748,16 @@ class _InspectorPanel extends StatelessWidget {
     required this.onSaveAsset,
     required this.onDeleteAsset,
     required this.onAddFrames,
+    required this.projectId,
   });
 
   final EditorController controller;
   final AssetManifest? manifest;
   final String assetsBasePath;
+
+  /// Which game is open, so the graph panel reloads when it changes.
+  final String projectId;
+
   final TsxCatalog? tilesets;
   final int selectedTileId;
   final ValueChanged<TsxTileDefinition> onTileSelected;
@@ -792,10 +902,16 @@ class _InspectorPanel extends StatelessWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.all(4),
-                  child: WorldGraphPanel(
-                    key: const Key('world-graph-panel'),
-                    source: () => storage.readText(worldKey),
-                    onSave: (json) => storage.writeText(worldKey, json),
+                  // Keyed on the game, so switching projects reads the new
+                  // world instead of keeping the graph already in memory. The
+                  // panel keeps its own stable key for anything looking for it.
+                  child: KeyedSubtree(
+                    key: ValueKey('world-graph-project:$projectId'),
+                    child: WorldGraphPanel(
+                      key: const Key('world-graph-panel'),
+                      source: () => storage.readText(worldKey),
+                      onSave: (json) => storage.writeText(worldKey, json),
+                    ),
                   ),
                 ),
               ],

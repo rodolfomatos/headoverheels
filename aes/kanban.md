@@ -2,7 +2,7 @@
 project: headoverheels
 created: 2026-09-18
 current_sprint: sprint-11
-current_ticket: "T046"
+current_ticket: "T048"
 ---
 
 # Kanban — headoverheels
@@ -160,22 +160,34 @@ first game onto the same platform
 | T043 | Screens: title, status scroll, pause, victory, defeat | done |
 | T044 | Procedural audio: effects and one ambient loop | done |
 | T045 | Visual polish: shadows, room transitions, ambience, sundial | done |
-| T046 | Editor reads both games: world and sprite manifest | pending |
+| T046 | Editor reads both games: world and sprite manifest | done |
 | T047 | Visual proof: render the game to images and inspect them | done |
 | T048 | Balance pass: days, spell decay, treasure placement | pending |
 | T035 | Migrate Head over Heels into games/headoverheels | pending |
 | T036 | TSX authoring: edit tile types/properties and export TSX | pending |
 
 ## In Progress
-* T046: Editor reads both games: world and sprite manifest
-
-## Queued (after T046)
 * T048: Balance pass: days, spell decay, treasure placement
+
+## Queued (after T048)
 * T035: Migrate Head over Heels into games/headoverheels
 * T036: TSX authoring (edit tile `type`/properties, write TSX)
 
 
 ## Notes
+* T046 scope: `EditorProject` (`packages/iso_editor/lib/src/app/editor_project.dart`)
+  is a name plus the paths a game keeps its files in, and the two shipped games
+  are declared there as data. The shell has a picker that switches between them,
+  the app reloads the sprite manifest of the game being opened, and the graph
+  panel is keyed on the project so it reads the new world instead of keeping the
+  old graph. `test/editor_projects_test.dart` (6 tests) reads the repository
+  through an `EditorStorage`, so the paths are proved against the files the
+  games actually write: it opens the Knight Lore world (15 rooms, 5 themes, no
+  validation errors), checks its manifest names sheets that exist, and switches
+  the picker in a widget test.
+  The test found the paths were wrong: Knight Lore's files live inside
+  `games/knightlore`, so every key needs the game directory, which is now what
+  makes the two projects differ by one string.
 * T045 scope: four things, all data or geometry rather than new state.
   `lib/src/render/ambience.dart` holds the light of each area and the shape of a
   shadow; the room view draws a shadow under every figure and washes the finished

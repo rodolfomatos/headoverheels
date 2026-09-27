@@ -113,7 +113,14 @@ void main() {
       final session = _session();
       session.enterRoom(KlRooms.gatehouse);
       // The gatehouse only exits north and east.
-      expect(session.step(Facing.south), MoveOutcome.noExit);
+      expect(
+        _walkUntilRoomChanges(session, Facing.south),
+        MoveOutcome.noExit,
+      );
+      expect(
+        _walkUntilRoomChanges(session, Facing.west),
+        MoveOutcome.noExit,
+      );
       expect(session.roomId, KlRooms.gatehouse);
     });
 

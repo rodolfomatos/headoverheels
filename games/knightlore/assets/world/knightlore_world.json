@@ -6,7 +6,7 @@
       "theme": "castle",
       "spawnPoint": {
         "x": 4.0,
-        "y": 7.0,
+        "y": 3.0,
         "z": 0.0
       },
       "exits": [
@@ -64,7 +64,7 @@
       "theme": "castle",
       "spawnPoint": {
         "x": 4.0,
-        "y": 7.0,
+        "y": 3.0,
         "z": 0.0
       },
       "exits": [
@@ -144,7 +144,7 @@
       "theme": "castle",
       "spawnPoint": {
         "x": 4.0,
-        "y": 7.0,
+        "y": 3.0,
         "z": 0.0
       },
       "exits": [
@@ -207,7 +207,7 @@
       "theme": "castle",
       "spawnPoint": {
         "x": 4.0,
-        "y": 7.0,
+        "y": 3.0,
         "z": 0.0
       },
       "exits": [
@@ -277,7 +277,7 @@
       "theme": "castle",
       "spawnPoint": {
         "x": 4.0,
-        "y": 7.0,
+        "y": 3.0,
         "z": 0.0
       },
       "exits": [
@@ -327,7 +327,7 @@
       "theme": "jungle",
       "spawnPoint": {
         "x": 4.0,
-        "y": 7.0,
+        "y": 3.0,
         "z": 0.0
       },
       "exits": [
@@ -393,7 +393,7 @@
       "theme": "jungle",
       "spawnPoint": {
         "x": 4.0,
-        "y": 7.0,
+        "y": 3.0,
         "z": 0.0
       },
       "exits": [
@@ -460,7 +460,7 @@
       "theme": "jungle",
       "spawnPoint": {
         "x": 4.0,
-        "y": 7.0,
+        "y": 3.0,
         "z": 0.0
       },
       "exits": [
@@ -497,7 +497,7 @@
       "theme": "cauldron",
       "spawnPoint": {
         "x": 4.0,
-        "y": 7.0,
+        "y": 3.0,
         "z": 0.0
       },
       "exits": [
@@ -539,7 +539,7 @@
       "theme": "cauldron",
       "spawnPoint": {
         "x": 4.0,
-        "y": 7.0,
+        "y": 3.0,
         "z": 0.0
       },
       "exits": [
@@ -589,7 +589,7 @@
       "theme": "mine",
       "spawnPoint": {
         "x": 4.0,
-        "y": 7.0,
+        "y": 3.0,
         "z": 0.0
       },
       "exits": [
@@ -642,7 +642,7 @@
       "theme": "mine",
       "spawnPoint": {
         "x": 4.0,
-        "y": 7.0,
+        "y": 3.0,
         "z": 0.0
       },
       "exits": [
@@ -697,7 +697,7 @@
       "theme": "mine",
       "spawnPoint": {
         "x": 4.0,
-        "y": 7.0,
+        "y": 3.0,
         "z": 0.0
       },
       "exits": [
@@ -742,7 +742,7 @@
       "theme": "tower",
       "spawnPoint": {
         "x": 4.0,
-        "y": 7.0,
+        "y": 3.0,
         "z": 0.0
       },
       "exits": [
@@ -784,7 +784,7 @@
       "theme": "tower",
       "spawnPoint": {
         "x": 4.0,
-        "y": 7.0,
+        "y": 3.0,
         "z": 0.0
       },
       "exits": [

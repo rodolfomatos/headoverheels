@@ -64,7 +64,7 @@ class KnightLoreWorld {
         id: id,
         file: 'rooms/$area/$id.tmx',
         theme: area,
-        spawnPosition: spawn ?? Vector3(4, 7, 0),
+        spawnPosition: spawn ?? Vector3(4, 3, 0),
         exits: exits,
         triggers: triggers,
       );
@@ -108,7 +108,7 @@ class KnightLoreWorld {
     room(
       KlRooms.gatehouse,
       KlAreas.castle,
-      spawn: Vector3(4, 7, 0),
+      spawn: Vector3(4, 3, 0),
       exits: [
         exit('north', KlRooms.greatHall, 'south'),
         exit('east', KlRooms.jungleEntrance, 'west'),

@@ -1,5 +1,6 @@
 // Main game class for Head over Heels using Flame.
 
+import '../../core/audio/hoh_cues.dart';
 import 'package:flame/game.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:headoverheels/features/gameplay/state/input_system.dart';
@@ -177,8 +178,8 @@ class HeadOverHeelsGame extends FlameGame {
   }
 
   /// Play a sound effect through the audio system.
-  void playSfx(String sfxFile, {double? volume}) {
-    ref.read(audioSystemProvider).playSfx(sfxFile, volume: volume);
+  void playSfx(HohCue cue, {double? volume}) {
+    ref.read(audioSystemProvider).playSfx(cue, volume: volume);
   }
 
   /// Convenience methods for common game sound effects.

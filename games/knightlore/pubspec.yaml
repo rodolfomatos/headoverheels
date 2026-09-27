@@ -24,8 +24,16 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/world/knightlore_world.json
-    - assets/world/tiles/
-    - assets/world/rooms/
-    - assets/sprites/
+    # BEGIN GENERATED ASSETS
     - assets/audio/
+    - assets/sprites/
+    - assets/sprites/knights/
+    - assets/sprites/props/
+    - assets/world/
+    - assets/world/rooms/castle/
+    - assets/world/rooms/cauldron/
+    - assets/world/rooms/jungle/
+    - assets/world/rooms/mine/
+    - assets/world/rooms/tower/
+    - assets/world/tiles/
+# END GENERATED ASSETS

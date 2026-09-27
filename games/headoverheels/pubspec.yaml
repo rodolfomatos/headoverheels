@@ -61,10 +61,55 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/levels/tilesets/
-    - assets/levels/rooms/
-    - assets/levels/world.json
+    # BEGIN GENERATED ASSETS
     - assets/audio/
+    - assets/audio/music/
+    - assets/audio/sfx/
+    - assets/levels/
+    - assets/levels/rooms/
+    - assets/levels/rooms/bookworld/
+    - assets/levels/rooms/castle/
+    - assets/levels/rooms/egyptus/
+    - assets/levels/rooms/penitentiary/
+    - assets/levels/rooms/safari/
+    - assets/levels/tilesets/
     - assets/sprites/
+    - assets/sprites/characters/duo/
+    - assets/sprites/characters/head/
+    - assets/sprites/characters/head/frames/
+    - assets/sprites/characters/heels/
+    - assets/sprites/characters/heels/frames/
+    - assets/sprites/entities/bag/
+    - assets/sprites/entities/conveyor/
+    - assets/sprites/entities/crown/
+    - assets/sprites/entities/door/
+    - assets/sprites/entities/doughnut/
+    - assets/sprites/entities/fish/
+    - assets/sprites/entities/guardian/
+    - assets/sprites/entities/hush_puppy/
+    - assets/sprites/entities/key/
+    - assets/sprites/entities/monster/
+    - assets/sprites/entities/rabbit/
+    - assets/sprites/entities/spring/
+    - assets/sprites/entities/switch/
+    - assets/sprites/entities/teleport/
+    - assets/sprites/props/banner/
+    - assets/sprites/props/barrel/
+    - assets/sprites/props/chain/
+    - assets/sprites/props/crate/
+    - assets/sprites/props/crate_broken/
+    - assets/sprites/props/lever/
+    - assets/sprites/props/pressure_plate/
+    - assets/sprites/props/sign/
+    - assets/sprites/props/skull/
+    - assets/sprites/props/torch/
+    - assets/sprites/tiles/
+    - assets/sprites/tiles/castle/
+    - style/geometry.json
+    - style/lighting.json
+    - style/naming.md
     - style/palette.json
+    - style/proportions.json
+    - style/style-guide.md
+# END GENERATED ASSETS
     - style/geometry.json

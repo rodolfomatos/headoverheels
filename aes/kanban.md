@@ -147,7 +147,8 @@ current_ticket: "T036"
 | T034 | Sprite browser/animator and asset management UI | done |
 | T036 | TSX authoring: edit tile types/properties and export TSX | pending |
 | T035 | Migrate Head over Heels into games/headoverheels | done |
-| T049 | Replace the untracked HoH audio with synthesised cues | pending |
+| T049 | Replace the untracked HoH audio with synthesised cues | done |
+| T051 | Publish nested assets: a pubspec entry ships only its own files | done |
 | T050 | Clear the 34 analyzer warnings in the HoH code | pending |
 
 ## Sprint 11 — Knight Lore Completion
@@ -171,11 +172,21 @@ first game onto the same platform
 * T036: TSX authoring: edit a tile's type and properties, write the TSX
 
 ## Queued (after T036)
-* T049: Replace the untracked HoH audio with synthesised cues
 * T050: Clear the analyzer warnings in the migrated code
 
 
 ## Notes
+* T051 scope: a pubspec entry ending in `/` ships the files directly inside that
+  directory and nothing below it, so `assets/sprites/` shipped the manifest and
+  none of the sprites. Both games were broken in the browser and neither build
+  complained: Head over Heels published 1 of 157 files, Knight Lore 34 of 99.
+  `scripts/publish_assets.py` now writes the leaf list from the tree between
+  markers in each pubspec, and `make check` fails when the two disagree. Head over
+  Heels publishes 122 files, which is every file except the gitignored
+  `assets/sprites_normalized/` cache; Knight Lore publishes 99 of 99.
+  Found while checking that T049's audio reached the web build: the 30 WAVs were
+  correctly ignored by the bundler because `assets/audio/` said nothing about
+  `assets/audio/music/`.
 * T050 scope: `make lint` passes because the gate runs with
   `--no-fatal-infos --no-fatal-warnings`, and it reports 34 findings in the
   migrated HoH code: 3 unused imports, an unused local in
@@ -199,16 +210,18 @@ first game onto the same platform
   stopped being true once both live under `games/`, so the invariant is now the
   stronger one: the sprite paths are parallel and no project can read the other
   game's files.
-* T049 scope: `assets/audio/music/*.ogg` (8) and `assets/audio/sfx/*.ogg` (22)
-  exist on this machine, untracked, and `lib/features/audio/audio_system.dart`
-  plus the `assets/audio/` entry in the pubspec both depend on them, so the game
-  builds with them and would build mute without them. They are not committed,
-  for one reason: the names are the original game's rooms (bookworld, egyptus,
-  safari, penitentiary) and nothing in this repository produces them, so their
-  provenance is unknown and the project rule is that no asset comes from the
-  original. The Knight Lore audio is synthesised for exactly this reason. T049
-  replaces them with cues computed by a generator like
-  `scripts/generate_knightlore_assets.py` does, and adds the drift test.
+* T049 scope: the thirty sounds of Head over Heels are now computed, in
+  `lib/core/audio/hoh_cues.dart`, and `tool/generate_audio.dart` writes them as
+  WAVs under `assets/audio`. The synthesiser moved to `iso_core`, exported as
+  `package:iso_core/audio.dart` so a generator can run it on the plain Dart VM
+  without Flame, and both games share it. The thirty path constants in
+  `AudioSystem` are gone: the class asks `HohCue` for a path, so a sound cannot
+  be named without a file behind it, and `test/audio_test.dart` (49 tests) checks
+  every cue against the file on disk, that the file is the same sound the cue
+  renders, that the eight music loops do not click at the loop point, and that
+  nothing under `assets/audio` is anything but a WAV this repository produces.
+  The original `.ogg` tracks are not in the repository: nothing produced them and
+  their names are the original game's rooms.
 * T048 scope: `test/balance_test.dart` measures the game and prints it: 48 room
   changes for a run that knows the world (2.7 of the 40 days), 20 to walk every
   room, and the spell lifetimes in days from the data. Two invariants keep the

@@ -4,87 +4,34 @@ import 'package:flutter/foundation.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/audio/hoh_cues.dart';
+
 /// Audio system managing all game sounds and music.
+///
+/// The sounds themselves are not chosen here. Every path lives with the cue
+/// that computes it, in `HohCue`, so a sound cannot be named in this class
+/// without a file behind it: `test/audio_test.dart` checks the list below against
+/// what `tool/generate_audio.dart` writes.
 class AudioSystem {
-  static const String _musicPrefix = 'music/';
-  static const String _sfxPrefix = 'sfx/';
+  /// Every sound the game can make, and nothing else.
+  static List<String> get allAssets =>
+      HohCue.values.map(assetFor).map(relativeAsset).toList(growable: false);
 
-  // Music tracks
-  static const String _musicMainMenu = '${_musicPrefix}main_menu.ogg';
-  static const String _musicCastle = '${_musicPrefix}castle.ogg';
-  static const String _musicEgyptus = '${_musicPrefix}egyptus.ogg';
-  static const String _musicPenitentiary = '${_musicPrefix}penitentiary.ogg';
-  static const String _musicSafari = '${_musicPrefix}safari.ogg';
-  static const String _musicBookworld = '${_musicPrefix}bookworld.ogg';
-  static const String _musicBoss = '${_musicPrefix}boss.ogg';
-  static const String _musicGameOver = '${_musicPrefix}game_over.ogg';
-
-  // Sound effects
-  static const String _sfxJump = '${_sfxPrefix}jump.ogg';
-  static const String _sfxLand = '${_sfxPrefix}land.ogg';
-  static const String _sfxPickup = '${_sfxPrefix}pickup.ogg';
-  static const String _sfxSwitch = '${_sfxPrefix}switch.ogg';
-  static const String _sfxDoor = '${_sfxPrefix}door.ogg';
-  static const String _sfxTeleport = '${_sfxPrefix}teleport.ogg';
-  static const String _sfxSpring = '${_sfxPrefix}spring.ogg';
-  static const String _sfxConveyor = '${_sfxPrefix}conveyor.ogg';
-  static const String _sfxFire = '${_sfxPrefix}fire.ogg';
-  static const String _sfxDoughnutHit = '${_sfxPrefix}doughnut_hit.ogg';
-  static const String _sfxEnemyHit = '${_sfxPrefix}enemy_hit.ogg';
-  static const String _sfxPlayerHit = '${_sfxPrefix}player_hit.ogg';
-  static const String _sfxPlayerDeath = '${_sfxPrefix}player_death.ogg';
-  static const String _sfxFishEat = '${_sfxPrefix}fish_eat.ogg';
-  static const String _sfxFishPoison = '${_sfxPrefix}fish_poison.ogg';
-  static const String _sfxCrown = '${_sfxPrefix}crown.ogg';
-  static const String _sfxBag = '${_sfxPrefix}bag.ogg';
-  static const String _sfxHushPuppy = '${_sfxPrefix}hush_puppy.ogg';
-  static const String _sfxSwop = '${_sfxPrefix}swop.ogg';
-  static const String _sfxPause = '${_sfxPrefix}pause.ogg';
-  static const String _sfxMenuSelect = '${_sfxPrefix}menu_select.ogg';
-  static const String _sfxMenuNavigate = '${_sfxPrefix}menu_navigate.ogg';
+  /// FlameAudio resolves assets from the bundle root, so a path loses its
+  /// `assets/` prefix.
+  static String relativeAsset(String asset) =>
+      asset.startsWith('assets/') ? asset.substring('assets/'.length) : asset;
 
   bool _musicEnabled = true;
   bool _sfxEnabled = true;
   double _musicVolume = 0.7;
   double _sfxVolume = 0.8;
   String? _currentMusic;
+  HohCue? _currentMusicCue;
 
   /// Initialize audio system - preload all assets gracefully.
   Future<void> initialize() async {
-    const assets = [
-      _musicMainMenu,
-      _musicCastle,
-      _musicEgyptus,
-      _musicPenitentiary,
-      _musicSafari,
-      _musicBookworld,
-      _musicBoss,
-      _musicGameOver,
-      _sfxJump,
-      _sfxLand,
-      _sfxPickup,
-      _sfxSwitch,
-      _sfxDoor,
-      _sfxTeleport,
-      _sfxSpring,
-      _sfxConveyor,
-      _sfxFire,
-      _sfxDoughnutHit,
-      _sfxEnemyHit,
-      _sfxPlayerHit,
-      _sfxPlayerDeath,
-      _sfxFishEat,
-      _sfxFishPoison,
-      _sfxCrown,
-      _sfxBag,
-      _sfxHushPuppy,
-      _sfxSwop,
-      _sfxPause,
-      _sfxMenuSelect,
-      _sfxMenuNavigate,
-    ];
-
-    for (final asset in assets) {
+    for (final asset in allAssets) {
       try {
         await FlameAudio.audioCache.load(asset);
       } catch (e) {
@@ -97,38 +44,18 @@ class AudioSystem {
   /// Play background music for a specific planet/theme.
   void playMusic(String planetId, {bool loop = true, double? volume}) {
     if (!_musicEnabled) return;
+    playLooping(musicForPlanet(planetId), volume: volume);
+  }
 
-    String musicFile;
-    switch (planetId) {
-      case 'castle':
-        musicFile = _musicCastle;
-        break;
-      case 'egyptus':
-        musicFile = _musicEgyptus;
-        break;
-      case 'penitentiary':
-        musicFile = _musicPenitentiary;
-        break;
-      case 'safari':
-        musicFile = _musicSafari;
-        break;
-      case 'bookworld':
-        musicFile = _musicBookworld;
-        break;
-      case 'boss':
-        musicFile = _musicBoss;
-        break;
-      default:
-        musicFile = _musicMainMenu;
-    }
-
-    if (_currentMusic == musicFile) return;
-    _currentMusic = musicFile;
-
+  /// Starts a looping cue, unless it is already the one playing.
+  void playLooping(HohCue cue, {double? volume}) {
+    if (_currentMusicCue == cue) return;
+    _currentMusicCue = cue;
+    _currentMusic = relativeAsset(assetFor(cue));
     try {
-      FlameAudio.bgm.play(musicFile, volume: (volume ?? _musicVolume));
+      FlameAudio.bgm.play(_currentMusic!, volume: (volume ?? _musicVolume));
     } catch (e) {
-      debugPrint('Failed to play music $musicFile: $e');
+      debugPrint('Failed to play music $_currentMusic: $e');
     }
   }
 
@@ -136,6 +63,7 @@ class AudioSystem {
   void stopMusic() {
     FlameAudio.bgm.stop();
     _currentMusic = null;
+    _currentMusicCue = null;
   }
 
   /// Pause background music.
@@ -149,40 +77,44 @@ class AudioSystem {
   }
 
   /// Play a sound effect.
-  void playSfx(String sfxFile, {double? volume}) {
+  void playSfx(HohCue cue, {double? volume}) {
     if (!_sfxEnabled) return;
+    final asset = relativeAsset(assetFor(cue));
     try {
-      FlameAudio.play(sfxFile, volume: (volume ?? _sfxVolume));
+      FlameAudio.play(asset, volume: (volume ?? _sfxVolume));
     } catch (e) {
-      debugPrint('Failed to play SFX $sfxFile: $e');
+      debugPrint('Failed to play SFX $asset: $e');
     }
   }
 
   // Convenience methods for common sound effects
 
-  void playJump() => playSfx(_sfxJump);
-  void playLand() => playSfx(_sfxLand, volume: _sfxVolume * 0.7);
-  void playPickup() => playSfx(_sfxPickup);
-  void playSwitch() => playSfx(_sfxSwitch);
-  void playDoor() => playSfx(_sfxDoor);
-  void playTeleport() => playSfx(_sfxTeleport);
-  void playSpring() => playSfx(_sfxSpring);
-  void playConveyor() => playSfx(_sfxConveyor, volume: _sfxVolume * 0.3);
-  void playFire() => playSfx(_sfxFire);
-  void playDoughnutHit() => playSfx(_sfxDoughnutHit);
-  void playEnemyHit() => playSfx(_sfxEnemyHit);
-  void playPlayerHit() => playSfx(_sfxPlayerHit);
-  void playPlayerDeath() => playSfx(_sfxPlayerDeath);
-  void playFishEat() => playSfx(_sfxFishEat);
-  void playFishPoison() => playSfx(_sfxFishPoison);
-  void playCrown() => playSfx(_sfxCrown);
-  void playBag() => playSfx(_sfxBag);
-  void playHushPuppy() => playSfx(_sfxHushPuppy);
-  void playSwop() => playSfx(_sfxSwop);
-  void playPause() => playSfx(_sfxPause);
-  void playMenuSelect() => playSfx(_sfxMenuSelect);
+  void playJump() => playSfx(HohCue.jump);
+  void playLand() => playSfx(HohCue.land, volume: _sfxVolume * 0.7);
+  void playPickup() => playSfx(HohCue.pickup);
+  void playSwitch() => playSfx(HohCue.toggleSwitch);
+  void playDoor() => playSfx(HohCue.door);
+  void playTeleport() => playSfx(HohCue.teleport);
+  void playSpring() => playSfx(HohCue.spring);
+  void playConveyor() => playSfx(HohCue.conveyor, volume: _sfxVolume * 0.3);
+  void playFire() => playSfx(HohCue.fire);
+  void playDoughnutHit() => playSfx(HohCue.doughnutHit);
+  void playEnemyHit() => playSfx(HohCue.enemyHit);
+  void playPlayerHit() => playSfx(HohCue.playerHit);
+  void playPlayerDeath() => playSfx(HohCue.playerDeath);
+  void playFishEat() => playSfx(HohCue.fishEat);
+  void playFishPoison() => playSfx(HohCue.fishPoison);
+  void playCrown() => playSfx(HohCue.crown);
+  void playBag() => playSfx(HohCue.bag);
+  void playHushPuppy() => playSfx(HohCue.hushPuppy);
+  void playSwop() => playSfx(HohCue.swop);
+  void playPause() => playSfx(HohCue.pause);
+  void playMenuSelect() => playSfx(HohCue.menuSelect);
   void playMenuNavigate() =>
-      playSfx(_sfxMenuNavigate, volume: _sfxVolume * 0.5);
+      playSfx(HohCue.menuNavigate, volume: _sfxVolume * 0.5);
+
+  /// The cue whose loop is playing, if any.
+  HohCue? get currentMusic => _currentMusicCue;
 
   /// Set music enabled state.
   void setMusicEnabled(bool enabled) {
@@ -200,12 +132,12 @@ class AudioSystem {
   /// Set music volume (0.0 to 1.0).
   void setMusicVolume(double volume) {
     _musicVolume = volume.clamp(0.0, 1.0);
-    // Note: FlameAudio Bgm doesn't have setVolume, volume is set on play
-    // Replay current music with new volume
-    if (_currentMusic != null) {
-      playMusic(
-        _currentMusic!.replaceFirst(_musicPrefix, '').replaceFirst('.ogg', ''),
-      );
+    // Bgm has no setVolume, the volume is set on play, so the track has to
+    // start again to hear the new one.
+    final cue = _currentMusicCue;
+    if (cue != null) {
+      _currentMusicCue = null;
+      playLooping(cue);
     }
   }
 

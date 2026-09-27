@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'audio_synth.dart';
+import 'package:iso_core/audio.dart';
 
 /// Every sound the game can make.
 ///

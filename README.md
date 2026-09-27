@@ -104,6 +104,7 @@ headoverheels/
 ├── scripts/                    # Generators and validators
 │   ├── generate_knightlore_assets.py   # Draws the Knight Lore art
 │   ├── generate_rooms.dart             # TMX from world.json
+│   ├── publish_assets.py               # Writes each pubspec's asset list
 │   ├── validation_pipeline.py          # Sprite pipeline checks
 │   └── validate_sprites.py             # Manifest, palette and naming checks
 ├── prompts/                    # AES prompt library

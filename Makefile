@@ -57,6 +57,7 @@ test-packages:
 assets-check:
 	@python3 scripts/validation_pipeline.py $(GAME)
 	@python3 scripts/validate_sprites.py $(GAME)
+	@for game in $(GAMES); do python3 scripts/publish_assets.py $$game --check || exit 1; done
 
 build:
 	@cd $(GAME) && $(AES_BUILD)

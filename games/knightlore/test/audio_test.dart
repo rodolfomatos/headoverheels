@@ -3,8 +3,8 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
-// The synthesiser is pure Dart, so the test needs no widget layer.
-import 'package:knightlore/src/audio/audio_synth.dart';
+// The synthesiser lives in iso_core now, and the cues are the game's.
+import 'package:iso_core/audio.dart' show decodeWav;
 import 'package:knightlore/src/audio/knight_lore_cues.dart';
 import 'package:knightlore/src/world/items.dart';
 

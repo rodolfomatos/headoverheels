@@ -1,4 +1,5 @@
 export 'src/assets/assets.dart';
+export 'src/audio/audio_synth.dart';
 export 'src/core/core.dart';
 export 'src/entities/entities.dart';
 export 'src/input/input.dart';

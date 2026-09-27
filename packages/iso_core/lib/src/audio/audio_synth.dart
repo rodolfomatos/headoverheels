@@ -128,9 +128,8 @@ Uint8List encodeWav(Pcm pcm) {
 /// encoder and the assets on disk round trip.
 Pcm decodeWav(Uint8List bytes) {
   final view = ByteData.sublistView(bytes);
-  String ascii(int offset, int length) => String.fromCharCodes(
-        bytes.sublist(offset, offset + length),
-      );
+  String ascii(int offset, int length) =>
+      String.fromCharCodes(bytes.sublist(offset, offset + length));
 
   if (ascii(0, 4) != 'RIFF' || ascii(8, 4) != 'WAVE') {
     throw const FormatException('not a RIFF/WAVE file');
@@ -161,7 +160,7 @@ Pcm decodeWav(Uint8List bytes) {
 /// The building blocks the cues are made of.
 class Synth {
   Synth({this.sampleRate = Pcm.defaultRate, int? seed})
-      : _random = math.Random(seed ?? 7);
+    : _random = math.Random(seed ?? 7);
 
   final int sampleRate;
   final math.Random _random;
@@ -306,14 +305,16 @@ class Synth {
     final length = frames(seconds);
     final cycles = (frequency * seconds).round();
     final tone = cycles / seconds;
-    final tremoloCycles =
-        tremoloRate == 0 ? 0 : (tremoloRate * seconds).round();
+    final tremoloCycles = tremoloRate == 0
+        ? 0
+        : (tremoloRate * seconds).round();
     final samples = Float32List(length);
     for (var index = 0; index < length; index++) {
       var value = ((index * tone / sampleRate) % 1) < duty ? 1.0 : -1.0;
       if (tremoloCycles > 0) {
         final rate = tremoloCycles / seconds;
-        value *= 1 -
+        value *=
+            1 -
             tremolo +
             tremolo *
                 (0.5 + 0.5 * math.sin(2 * math.pi * rate * index / sampleRate));
@@ -326,9 +327,10 @@ class Synth {
 
 /// Scales [samples] so its loudest value is [target], if it is not already.
 Float32List withGain(Float32List samples, double gain) => Float32List.fromList(
-    List.generate(samples.length, (i) => samples[i] * gain));
+  List.generate(samples.length, (i) => samples[i] * gain),
+);
 
 /// Mixes two buffers of equal length.
 Float32List mix(Float32List a, Float32List b) => Float32List.fromList(
-      List.generate(a.length, (index) => a[index] + b[index]),
-    );
+  List.generate(a.length, (index) => a[index] + b[index]),
+);

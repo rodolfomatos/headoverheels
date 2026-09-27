@@ -65,57 +65,64 @@ A **production-ready**, modern Flutter/Dart port of the classic 1987 isometric p
 ### Project Structure
 ```
 headoverheels/
-├── android/                    # Android app configuration
-│   ├── app/
-│   │   ├── build.gradle.kts    # Release signing, ProGuard, R8
-│   │   ├── proguard-rules.pro  # Flutter/Riverpod/Freezed rules
-│   │   └── src/main/           # Manifest, resources, strings
-│   └── key.properties.example  # Keystore template
-├── assets/
-│   ├── audio/
-│   │   ├── music/              # 8 OGG tracks (planets + menu + boss)
-│   │   └── sfx/                # 27 OGG sound effects
-│   ├── levels/
-│   │   ├── rooms/              # 21 TMX files by planet
-│   │   ├── tilesets/           # castle.tsx (64×32 isometric tiles)
-│   │   └── world.json          # World graph (rooms, exits, triggers)
-│   └── sprites/                # Character/item sprite atlases
-├── lib/
-│   ├── core/                   # Isometric coordinates, utilities
-│   ├── entities/               # CharacterState, CharacterComponent
-│   ├── features/
-│   │   ├── audio/              # AudioSystem, AudioSettings
-│   │   ├── gameplay/
-│   │   │   ├── entities/       # 19 puzzle entity classes
-│   │   │   ├── room/           # RoomComponent, RoomGraph, WorldLoader
-│   │   │   ├── state/          # CharacterNotifier, InputSystem, DualCharacterNotifier
-│   │   │   └── systems/        # InteractionSystem (AABB collision)
-│   │   └── ui/                 # Screens, widgets, theme
-│   ├── utils/                  # JSON converters (Vector2/3, Freezed)
-│   └── main.dart               # App entry point
+├── games/
+│   ├── headoverheels/          # The first game: Head over Heels
+│   │   ├── android/ ios/ linux/ macos/ web/ windows/
+│   │   ├── assets/
+│   │   │   ├── levels/         # world.json, 21 TMX rooms, tilesets
+│   │   │   ├── sprites/        # Character and item sprites, manifest.yaml
+│   │   │   └── audio/          # Sound; still to be synthesised (T049)
+│   │   ├── style/              # palette.json, geometry.json, the style guide
+│   │   ├── lib/                # The game itself
+│   │   │   ├── core/           # Isometric coordinates, utilities
+│   │   │   ├── entities/       # CharacterState
+│   │   │   ├── features/
+│   │   │   │   ├── audio/      # AudioSystem, AudioSettings
+│   │   │   │   ├── gameplay/   # entities, room, state, systems
+│   │   │   │   └── ui/         # Screens, widgets, theme
+│   │   │   └── main.dart       # App entry point
+│   │   ├── test/               # Unit and widget tests
+│   │   └── pubspec.yaml
+│   └── knightlore/             # The second game: Knight Lore, on iso_core
+│       ├── lib/src/            # rules, world, renderer, synthesised audio
+│       ├── assets/             # rooms, tiles, sprites, generated WAVs
+│       └── pubspec.yaml
 ├── packages/                   # Reusable builder platform
 │   ├── iso_core/               # 2:1 dimetric runtime, assets, levels, physics
-│   ├── iso_editor/             # Map editor, sprite gallery, asset import
+│   ├── iso_editor/             # Map editor, sprite gallery, world graph
 │   └── iso_builder_cli/        # Project scaffolding and validation
 ├── aes/                        # AES Protocol project management
 │   ├── kanban.md               # Project board
 │   ├── sprints/                # Sprint definitions
-│   └── tickets/                # Ticket specs (T001-T015)
+│   └── tickets/                # Ticket specs
 ├── docs/                       # Documentation
 │   ├── ARCHITECTURE.md
-│   ├── PLAY_STORE_LISTING.md
+│   ├── BUILDER_ARCHITECTURE.md
 │   ├── REQUIREMENTS.md
 │   ├── VISION.md
 │   └── RESEARCH/
-├── scripts/
-│   ├── generate_rooms.dart     # Auto-generates TMX from world.json
-│   ├── analyze-msx.py          # Original game analysis
-│   └── analyze-tzx.py
-├── test/                       # Unit & widget tests
-├── Makefile                    # Build automation
-├── pubspec.yaml
+├── scripts/                    # Generators and validators
+│   ├── generate_knightlore_assets.py   # Draws the Knight Lore art
+│   ├── generate_rooms.dart             # TMX from world.json
+│   ├── validation_pipeline.py          # Sprite pipeline checks
+│   └── validate_sprites.py             # Manifest, palette and naming checks
+├── prompts/                    # AES prompt library
+├── Makefile                    # Build automation for both games
 └── CLAUDE.md                   # Operational contract
 ```
+
+Nothing at the top level is a package. Each game and each library is its own
+Flutter package, and every Makefile target names the directory it runs in:
+
+```
+make setup                  # pub get in both games and both libraries
+make run-headoverheels      # the first game, on :8080
+make run-knightlore         # the second game, on :8081
+make test                   # tests for the first game
+make test-packages          # iso_core, iso_editor, iso_builder_cli, knightlore
+make check                  # format, lint, every test, asset validation
+```
+
 
 ### Key Design Decisions (ADR)
 1. **Flame Engine** — Built-in game loop, TMX support, component system
@@ -140,27 +147,29 @@ headoverheels/
 git clone https://github.com/rodolfomatos/headoverheels.git
 cd headoverheels
 
-# Install dependencies
-flutter pub get
+# Install dependencies in both games and both libraries
+make setup
 
-# Run quality checks (format → analyze → test)
+# Run quality checks (format → analyze → test → asset validation)
 make check
 
-# Run on Android device/emulator (debug)
-make run-android
-# or: flutter run -d android
+# Run a game in the browser
+make run-headoverheels   # :8080
+make run-knightlore      # :8081
 
-# Run on other platforms (experimental)
+# Run on a device, from the game's directory
+cd games/headoverheels
 flutter run -d linux    # Linux
 flutter run -d macos    # macOS
 flutter run -d windows  # Windows
-flutter run -d web      # Web (wasm)
+flutter run -d web      # Web
+flutter run             # Android device or emulator
 ```
 
 ### Build Commands
 ```bash
 # Debug APK
-flutter build apk --debug
+cd games/headoverheels && flutter build apk --debug
 
 # Release APK (obfuscated, split debug info)
 make build-release-apk
@@ -224,11 +233,11 @@ cat aes/tickets/T005-learn.md   # Learnings & hostile audit
 ```bash
 make check
 # Runs:
-# 1. dart format --output=none --set-exit-if-changed lib test packages
-# 2. flutter analyze --no-fatal-infos --no-fatal-warnings
-# 3. flutter test
-# 4. iso_core, iso_editor and iso_builder_cli tests
-# 5. asset validation pipelines
+# 1. dart format --output=none --set-exit-if-changed games packages
+# 2. flutter analyze --no-fatal-infos --no-fatal-warnings, in the first game
+# 3. flutter test, in the first game
+# 4. iso_core, iso_editor, iso_builder_cli and knightlore tests
+# 5. asset validation pipelines, over the first game's sprites
 ```
 
 ### Pre-Commit Checklist

@@ -34,11 +34,11 @@ current_ticket: "T050"
 | T022 | Entity Masters | high | done |
 | T023 | Remaining Themes | medium | done |
 | T024 | Validation Pipeline | medium | done |
-| T025 | Atlas Pipeline | medium | pending |
-| T026 | Flutter Sprite Registry | medium | pending |
-| T027 | Gameplay Integration | medium | pending |
-| T028 | Visual QA | low | pending |
-| T029 | Final Asset Migration | low | pending |
+| T025 | Atlas Pipeline | medium | not needed |
+| T026 | Flutter Sprite Registry | medium | split |
+| T027 | Gameplay Integration | medium | done |
+| T028 | Visual QA | high | pending |
+| T029 | Final Asset Migration | low | done |
 | T030 | Builder architecture & reusable iso_core foundation | high | done |
 | T031 | Editor document, storage, undo/redo & sprite import foundation | high | done |
 | T032 | Builder CLI scaffold and project validation | medium | done |
@@ -122,18 +122,19 @@ current_ticket: "T050"
 | T022 | Entity Masters | done |
 | T023 | Remaining Themes | done |
 | T024 | Validation Pipeline | done |
-| T025 | Atlas Pipeline | pending |
 
 ## Sprint 09 — Integration & Release
 **Goal**: Integration, QA, Release
 
 | ID | Title | Status |
 |----|-------|--------|
-| T025 | Atlas Pipeline | pending |
-| T026 | Flutter Sprite Registry | pending |
-| T027 | Gameplay Integration | pending |
+| T025 | Atlas Pipeline | not needed |
+| T026 | Flutter Sprite Registry | split |
+| T027 | Gameplay Integration | done |
 | T028 | Visual QA | pending |
-| T029 | Final Asset Migration | pending |
+| T029 | Final Asset Migration | done |
+| T053 | The sprite registry should read the manifest, not repeat it | pending |
+| T054 | Gameplay tests: the rules run unverified | pending |
 
 ## Sprint 10 — Builder Platform
 **Goal**: Extract a reusable isometric engine and build editor/CLI foundations
@@ -171,8 +172,31 @@ first game onto the same platform
 ## In Progress
 * T052: The Palette panel squeezes its controls out of reach
 
+## Queued
+* T028: Visual QA: prove what Head over Heels draws, as Knight Lore does
+* T053: The sprite registry should read the manifest, not repeat it
+* T054: Gameplay tests: the rules run unverified
+
 
 ## Notes
+* Audit of the Sprint 09 backlog, checked against the code rather than the
+  board. T025, the atlas: `scripts/pack_atlas.py` is referenced by nothing, the
+  Makefile never runs it, and `assets/sprites/atlases/` is empty. The game loads
+  65 individual sheets through the manifest, which works and is what the editor
+  reads, so the atlas was an optimisation nothing needed. Not needed, and the
+  script goes. T026, the sprite registry: it works and the characters use it,
+  but it hardcodes the animation names and the eight directions in Dart while
+  `assets/sprites/manifest.yaml` is the validated source of truth for the same
+  facts. Two sources can disagree and the validator only knows about one, so
+  that is T053. T027, gameplay integration: the systems are registered and the
+  game runs, but the game's own tests number two, and forty nine of its fifty one
+  are audio. The integration is real and unverified, which is T054. T029, the
+  asset migration: the assets are under `games/headoverheels/assets`, five room
+  themes, world.json, 65 sheets, and the validation pipeline passes 169 checks.
+  Done. T028, visual QA, is the real gap: Knight Lore renders itself to PNGs and
+  the test gates on it, and Head over Heels renders nothing, so a broken
+  renderer there would only be found by playing. That is why T028 went from low
+  to high.
 * T036 scope: the editor could read a TSX and could not write one. Now
   `TsxTileDefinition` and `TsxTilesetDefinition` are values with `copyWith`,
   `withProperty`, `withoutProperty`, `upsertTile` and `removeTile`, a

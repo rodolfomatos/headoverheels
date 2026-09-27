@@ -167,6 +167,9 @@ class RoomSession {
 
   bool get isSplit => curse.isSplit;
 
+  /// The curse is lifted and the game is won.
+  bool get isWon => curse.phase == CursePhase.lifted;
+
   /// Items lying in the current room.
   Map<String, Vector3> get itemsHere =>
       Map.unmodifiable(_items[_roomId] ?? const {});
@@ -326,32 +329,36 @@ class RoomSession {
         curse.demandIngredient(_nextIngredient());
         return InteractOutcome.wizardSpoke;
       case 'chest':
-        return _openChest(target);
+      case 'statue':
+        return _openContainer(target);
       default:
         return InteractOutcome.nothing;
     }
   }
 
-  /// Chests hold one item each and remember whether they were emptied.
-  final Map<String, bool> _openedChests = {};
+  /// Chests and statues hold one item each and remember being emptied.
+  final Map<String, bool> _openedContainers = {};
 
-  bool chestIsOpen(String chestId) => _openedChests[chestId] ?? false;
+  bool containerIsOpen(String id) => _openedContainers[id] ?? false;
 
-  InteractOutcome _openChest(RoomTrigger chest) {
-    final id = chest.id;
-    if (_openedChests[id] ?? false) return InteractOutcome.chestEmpty;
-    _openedChests[id] = true;
-    final properties = chest.properties['properties'];
+  bool chestIsOpen(String chestId) => containerIsOpen(chestId);
+
+  InteractOutcome _openContainer(RoomTrigger container) {
+    final id = container.id;
+    if (_openedContainers[id] ?? false) return InteractOutcome.chestEmpty;
+    final properties = container.properties['properties'];
     final itemId = properties is Map ? properties['itemId'] : null;
     if (itemId is! String || itemId.isEmpty) return InteractOutcome.chestEmpty;
+    _openedContainers[id] = true;
     placeItem(itemId);
     return InteractOutcome.chestOpened;
   }
 
-  /// The chest the party is facing, if any.
+  /// The chest or statue the party is facing, if any.
   String? get chestInFront {
     final target = _facingTrigger();
-    if (target == null || target.type != 'chest') return null;
+    if (target == null) return null;
+    if (target.type != 'chest' && target.type != 'statue') return null;
     return target.id;
   }
 
@@ -379,12 +386,13 @@ class RoomSession {
     return CastOutcome.cast;
   }
 
-  /// The wizard names the next ingredient, and refuses to name one the party
-  /// cannot possibly be carrying.
+  /// The wizard names the next ingredient: the first one the cauldron has not
+  /// taken yet. It never repeats a delivered ingredient, and it never asks for
+  /// something the party is already carrying, so the run always has a goal.
   String _nextIngredient() {
-    final held = inventory.items.whereType<String>().toSet();
     for (final candidate in KlItems.ingredients) {
-      if (!held.contains(candidate)) return candidate;
+      if (curse.delivered.contains(candidate)) continue;
+      return candidate;
     }
     return KlItems.ingredients.last;
   }

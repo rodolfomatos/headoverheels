@@ -43,6 +43,9 @@ class CurseState {
 
   int daysLeft;
   int ingredientsLeft;
+
+  /// What the cauldron has already taken, so the wizard never asks twice.
+  final List<String> delivered = [];
   final Inventory inventory;
   final SpellState spells;
   KnightClass form = KnightClass.sabreman;
@@ -104,6 +107,7 @@ class CurseState {
     if (item != demandedIngredient) return CurseEvent.wizardRefused;
     if (!inventory.remove(item)) return CurseEvent.wizardRefused;
     demandedIngredient = null;
+    delivered.add(item);
     ingredientsLeft -= 1;
     if (ingredientsLeft <= 0) {
       phase = CursePhase.lifted;

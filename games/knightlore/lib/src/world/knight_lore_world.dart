@@ -146,7 +146,7 @@ class KnightLoreWorld {
       exits: [
         exit('east', KlRooms.greatHall, 'west'),
         exit('north', KlRooms.laboratory, 'south'),
-        locked('west', KlRooms.mineEntrance, 'east', 'jewel_key'),
+        locked('west', KlRooms.mineEntrance, 'east', 'golden_key'),
       ],
       triggers: [
         trigger('portcullis_1', 'portcullis', 3, 2),
@@ -245,6 +245,13 @@ class KnightLoreWorld {
           5,
           4,
           properties: {'itemId': 'casket'},
+        ),
+        trigger(
+          'chest_13',
+          'chest',
+          2,
+          5,
+          properties: {'itemId': 'emerald'},
         ),
       ],
     );

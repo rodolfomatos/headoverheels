@@ -148,7 +148,7 @@ void main() {
       );
       expect(session.roomId, KlRooms.corridor);
 
-      session.inventory.pickUp('jewel_key');
+      session.inventory.pickUp('golden_key');
       expect(
         _walkUntilRoomChanges(session, Facing.west),
         MoveOutcome.changedRoom,
@@ -288,11 +288,7 @@ void main() {
       session.leader.facing = Facing.north;
       session.inventory.pickUp('diamond');
       expect(session.interact(), InteractOutcome.wizardSpoke);
-      expect(
-        session.curse.demandedIngredient,
-        'pot_of_gold',
-        reason: 'the wizard asks for the first ingredient still missing',
-      );
+      expect(session.curse.demandedIngredient, 'diamond');
 
       session.nightFalls();
       expect(session.interact(), InteractOutcome.wizardRefused);
@@ -481,7 +477,7 @@ void main() {
       expect(session.roomId, KlRooms.greatHall);
     });
 
-    test('the wizard never asks for something the party already holds', () {
+    test('the wizard asks for each ingredient once, in order', () {
       final curse = CurseState();
       final session = RoomSession(
         world: _world(),
@@ -491,20 +487,28 @@ void main() {
       session.enterRoom(KlRooms.laboratory);
       final wizard = session.room.triggers
           .firstWhere((trigger) => trigger.type == 'wizard');
-      session.leader.position =
-          Vector3(wizard.position.x, wizard.position.y + 1, 0);
-      session.leader.facing = Facing.north;
+      final cauldron = session.room.triggers
+          .firstWhere((trigger) => trigger.type == 'cauldron');
 
-      session.interact();
-      final first = session.curse.demandedIngredient!;
-      expect(curse.inventory.items.whereType<String>(), isNot(contains(first)));
+      void act(RoomTrigger trigger) {
+        session.leader.position =
+            Vector3(trigger.position.x, trigger.position.y + 1, 0);
+        session.leader.facing = Facing.north;
+        session.interact();
+      }
 
-      session.inventory.pickUp(first);
-      session.interact();
-      final second = session.curse.demandedIngredient!;
-      expect(second, isNot(first));
-      expect(
-          curse.inventory.items.whereType<String>(), isNot(contains(second)));
+      final asked = <String>[];
+      for (var trip = 0; trip < KlItems.ingredients.length; trip++) {
+        act(wizard);
+        final wanted = session.curse.demandedIngredient!;
+        asked.add(wanted);
+        curse.inventory.pickUp(wanted);
+        act(cauldron);
+      }
+
+      expect(asked, KlItems.ingredients);
+      expect(curse.delivered, KlItems.ingredients);
+      expect(session.isWon, isTrue);
     });
   });
 }

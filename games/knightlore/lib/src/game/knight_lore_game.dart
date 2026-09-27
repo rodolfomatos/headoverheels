@@ -61,6 +61,9 @@ class KnightLoreGame extends FlameGame {
   /// True while the four knights are the party.
   bool get isSplit => session?.party.length == 4;
 
+  /// True once the six ingredients are in the cauldron.
+  bool get isWon => session?.isWon ?? false;
+
   /// True once the world, the maps and the art are loaded.
   bool get assetsReady => _loaded;
 
@@ -280,8 +283,14 @@ class KnightLoreGame extends FlameGame {
   }
 
   String? _lastChestItem;
+  bool _won = false;
 
   void _applyInteract(InteractOutcome outcome) {
+    final session = this.session;
+    if (session != null && session.isWon && !_won) {
+      _won = true;
+      message = 'The curse is broken. You ride out of the castle a man again.';
+    }
     if (outcome == InteractOutcome.chestOpened) {
       final chest = _facingChest();
       _lastChestItem = chest == null ? null : session?.chestContents(chest);

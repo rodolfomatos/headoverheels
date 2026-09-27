@@ -155,7 +155,7 @@ first game onto the same platform
 | ID | Title | Status |
 |----|-------|--------|
 | T040 | Spell scrolls: find, carry and cast the six spells | done |
-| T041 | Treasures, chests and the six ingredients, with win state | pending |
+| T041 | Treasures, chests and the six ingredients, with win state | done |
 | T042 | Traps and hazards: impalers, ball chains, blocks, demons | pending |
 | T043 | Screens: title, status scroll, pause, victory, defeat | pending |
 | T044 | Procedural audio: effects and one ambient loop | pending |
@@ -209,5 +209,7 @@ first game onto the same platform
 * T037: World graph viewer/editor with topology validation (Graph tab, world.json round trip)
 * T039: Puzzle trigger inspector in the graph tab (targetId and target room editing)
 * T040: Spell scrolls — catalogue, chests that hold one item each, casting with 1-9
+* T041: Treasures and the six ingredients — containers open once, statues hold items, the
+  wizard never repeats a delivered ingredient, and a full playthrough test wins the game
 * T038: Second example game, Knight Lore: rules, world, room maps, generated art, Flame loop,
   HUD, keyboard input and a working web build

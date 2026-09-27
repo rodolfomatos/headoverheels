@@ -25,14 +25,16 @@ class KlItem {
 class KlItems {
   const KlItems._();
 
-  /// The six things the cauldron asks for, in the order it asks for them.
+  /// The six things the cauldron asks for. The golden key is deliberately not
+  /// one of them: a key that is also an ingredient can be spent on a locked
+  /// door and leave the party stuck.
   static const List<String> ingredients = [
     'diamond',
     'pot_of_gold',
     'casket',
     'chalice',
-    'golden_key',
     'jewel',
+    'emerald',
   ];
 
   static const List<KlItem> _catalogue = [
@@ -42,6 +44,7 @@ class KlItems {
     KlItem(id: 'chalice', name: 'Chalice', kind: ItemKind.treasure),
     KlItem(id: 'golden_key', name: 'Golden key', kind: ItemKind.key),
     KlItem(id: 'jewel', name: 'Jewel', kind: ItemKind.treasure),
+    KlItem(id: 'emerald', name: 'Emerald', kind: ItemKind.treasure),
     KlItem(
       id: 'scroll_flip',
       name: 'Flip',

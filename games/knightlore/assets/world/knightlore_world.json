@@ -169,7 +169,7 @@
           "room": "mine_entrance",
           "entrance": "east",
           "isLocked": true,
-          "keyId": "jewel_key",
+          "keyId": "golden_key",
           "oneWay": false
         }
       ],
@@ -488,6 +488,22 @@
           },
           "properties": {
             "itemId": "casket"
+          }
+        },
+        {
+          "id": "chest_13",
+          "type": "chest",
+          "position": {
+            "x": 2.0,
+            "y": 5.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          },
+          "properties": {
+            "itemId": "emerald"
           }
         }
       ]

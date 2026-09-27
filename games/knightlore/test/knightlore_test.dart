@@ -64,7 +64,7 @@ void main() {
       final corridor = graph.getRoom(KlRooms.corridor)!;
       final locked = corridor.exits.firstWhere((exit) => exit.isLocked);
       expect(locked.room, KlRooms.mineEntrance);
-      expect(locked.keyId, 'jewel_key');
+      expect(locked.keyId, 'golden_key');
     });
   });
 

@@ -2,7 +2,7 @@
 project: headoverheels
 created: 2026-09-18
 current_sprint: sprint-11
-current_ticket: "T048"
+current_ticket: "T035"
 ---
 
 # Kanban — headoverheels
@@ -162,19 +162,32 @@ first game onto the same platform
 | T045 | Visual polish: shadows, room transitions, ambience, sundial | done |
 | T046 | Editor reads both games: world and sprite manifest | done |
 | T047 | Visual proof: render the game to images and inspect them | done |
-| T048 | Balance pass: days, spell decay, treasure placement | pending |
+| T048 | Balance pass: days, spell decay, treasure placement | done |
 | T035 | Migrate Head over Heels into games/headoverheels | pending |
 | T036 | TSX authoring: edit tile types/properties and export TSX | pending |
 
 ## In Progress
-* T048: Balance pass: days, spell decay, treasure placement
-
-## Queued (after T048)
 * T035: Migrate Head over Heels into games/headoverheels
+
+## Queued (after T035)
 * T036: TSX authoring (edit tile `type`/properties, write TSX)
 
 
 ## Notes
+* T048 scope: `test/balance_test.dart` measures the game and prints it: 48 room
+  changes for a run that knows the world (2.7 of the 40 days), 20 to walk every
+  room, and the spell lifetimes in days from the data. Two invariants keep the
+  clock meaningful, and the report is in `games/knightlore/README.md`.
+  The measurements found four defects, all fixed:
+  `nightFalls()` set the werewolf phase in both branches, so Magic Armour and
+  Invisibility did nothing and two of the six scrolls were pointless; an instant
+  spell (Flip) stayed in the active set for ever, which was the only thing the
+  dead `SpellState.advance(ticks)` cleaned up, so that method went too and decay
+  now happens at dawn and nowhere else; the emerald and the jewel each existed in
+  two containers, and the casket shared a room with one of them, so the six
+  ingredients are now one per room across five areas; and the rule that every
+  container holds something was right but did not allow a spent container, which
+  is now stated rather than assumed.
 * T046 scope: `EditorProject` (`packages/iso_editor/lib/src/app/editor_project.dart`)
   is a name plus the paths a game keeps its files in, and the two shipped games
   are declared there as data. The shell has a picker that switches between them,

@@ -97,17 +97,43 @@ void main() {
       expect(Spell.fromId('nope'), isNull);
     });
 
-    test('cast spells expire and instant spells do not persist', () {
+    test('a spell lasts whole days, and only decays at dawn', () {
       final state = SpellState();
       state.cast(SpellId.shield);
       expect(state.isActive(SpellId.shield), isTrue);
 
-      state.advance(Spell.fromId('shield')!.duration);
+      // Nothing in the loop decays a spell: a morning cast has to survive the
+      // whole day, and it dies at the first dawn that takes it under zero.
+      final shield = Spell.fromId('shield')!;
+      final fullDays = shield.duration ~/ shield.decayPerDay;
+      for (var day = 0; day < fullDays; day++) {
+        state.advanceDay();
+        expect(
+          state.isActive(SpellId.shield),
+          isTrue,
+          reason: 'the shield died on day ${day + 1} of $fullDays',
+        );
+        expect(
+          state.of(SpellId.shield)!.fraction,
+          inInclusiveRange(0.0, 1.0),
+        );
+      }
+      // The dawn after its last full day is the one that ends it.
+      state.advanceDay();
       expect(state.isActive(SpellId.shield), isFalse);
+      expect(state.of(SpellId.shield), isNull);
+    });
 
+    test('an instant spell does not survive its own cast', () {
+      final state = SpellState();
       state.cast(SpellId.flip);
-      state.advance(1);
+      // Flip is a one step filmation, so it never enters the active set.
       expect(state.isActive(SpellId.flip), isFalse);
+      expect(
+        state.active.any((active) => active.spell == Spell.fromId('flip')),
+        isFalse,
+        reason: 'an instant spell must not linger in the active set',
+      );
     });
 
     test('a day of decay shortens every spell', () {

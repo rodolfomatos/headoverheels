@@ -115,29 +115,26 @@ class SpellState {
   ActiveSpell? of(SpellId id) => _active[id];
 
   /// Casts a spell, replacing any previous cast of the same spell.
+  ///
+  /// An instant spell, such as Flip, is not kept: a filmation is a single step
+  /// and nothing may read it afterwards. Leaving it in the map would need a
+  /// second mechanism to sweep it out, and it would sit in the active list as a
+  /// dead entry.
   void cast(SpellId id) {
     final spell = Spell.fromId(id.id);
     if (spell == null) return;
+    if (spell.isInstant) {
+      _active.remove(id);
+      return;
+    }
     _active[id] = ActiveSpell(spell: spell, remaining: spell.duration);
   }
 
-  /// Advances spell decay. Instant spells (Flip) do not persist.
-  void advance(int ticks) {
-    _active.removeWhere((_, spell) => !spell.isActive);
-    for (final entry in _active.entries.toList()) {
-      if (entry.value.spell.isInstant) {
-        _active.remove(entry.key);
-        continue;
-      }
-      _active[entry.key] = ActiveSpell(
-        spell: entry.value.spell,
-        remaining: entry.value.remaining - ticks,
-      );
-    }
-    _active.removeWhere((_, spell) => !spell.isActive);
-  }
-
   /// Applies one day of decay to every spell.
+  ///
+  /// Decay happens at dawn and nowhere else. A spell cast in the morning has to
+  /// last the whole day, which is what makes the scrolls worth spending at the
+  /// right moment rather than casting one whenever it is convenient.
   void advanceDay() {
     for (final entry in _active.entries.toList()) {
       _active[entry.key] = ActiveSpell(

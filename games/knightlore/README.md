@@ -116,6 +116,25 @@ on disk no longer matches what the synthesiser renders.
 
     dart run tool/generate_audio.dart
 
+## Balance
+
+`test/balance_test.dart` measures the game instead of asserting taste, and prints
+what it finds. With the shipped tuning:
+
+| Measure | Value |
+|---------|-------|
+| Days in the game | 40 |
+| Ingredients to the cauldron | 6, one at a time, the wizard names each |
+| A day holds | 18 room changes (`daySeconds` 24, 6 trap ticks a second, 8 ticks a step) |
+| Knowing the world, six round trips | 48 changes, about 2.7 days |
+| Walking all 15 rooms | 20 changes, about 1.1 days |
+| Spell lifetimes | 2.5 to 3.5 in-game days, decaying at dawn only |
+
+The two invariants that keep the clock honest: a player who knows the world
+finishes in well under half the forty days, and a player who searches every room
+still has time to spare. The forty days are for the search, not the fetch, which
+is why the six ingredients each have one home in five different areas.
+
 ## Look
 
 - `lib/src/render/ambience.dart` is the light of each place: the mine is warm and

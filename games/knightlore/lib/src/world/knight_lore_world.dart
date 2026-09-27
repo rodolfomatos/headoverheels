@@ -136,12 +136,13 @@ class KnightLoreWorld {
           2,
           properties: {'period': 24, 'activeFor': 14, 'phase': 6},
         ),
+        // A statue already emptied, here to say the treasure was moved on.
         trigger(
           'statue_1',
           'statue',
           5,
           4,
-          properties: {'itemId': 'jewel', 'state': 'holding'},
+          properties: {'state': 'empty'},
         ),
         trigger('witch_1', 'witch', 6, 6),
       ],
@@ -238,12 +239,13 @@ class KnightLoreWorld {
       ],
       triggers: [
         trigger('ball_5', 'ball', 4, 2),
+        // A statue already emptied, here to say the treasure was moved on.
         trigger(
           'statue_2',
           'statue',
           2,
           5,
-          properties: {'itemId': 'emerald', 'state': 'empty'},
+          properties: {'state': 'empty'},
         ),
       ],
     );
@@ -259,13 +261,6 @@ class KnightLoreWorld {
           5,
           4,
           properties: {'itemId': 'casket'},
-        ),
-        trigger(
-          'chest_13',
-          'chest',
-          2,
-          5,
-          properties: {'itemId': 'emerald'},
         ),
       ],
     );
@@ -382,7 +377,16 @@ class KnightLoreWorld {
         exit('south', KlRooms.mineVault, 'north'),
         exit('north', KlRooms.towerTop, 'south'),
       ],
-      triggers: [trigger('witch_4', 'witch', 6, 2)],
+      triggers: [
+        trigger('witch_4', 'witch', 6, 2),
+        trigger(
+          'chest_13',
+          'chest',
+          2,
+          5,
+          properties: {'itemId': 'emerald'},
+        ),
+      ],
     );
 
     room(

@@ -68,15 +68,21 @@ class CurseState {
   }
 
   /// Night falls: the sabreman becomes a werewolf unless a spell protects him.
+  ///
+  /// The two defensive scrolls are the only answer to a full moon, and they are
+  /// also the only reason a careful player can afford to be out at night, so
+  /// this is where their value lives. Which night it is does not matter: a
+  /// spell that is still active when the sun sets holds until it decays.
   void nightFalls() {
     if (phase == CursePhase.lifted) return;
-    if (spells.isActive(SpellId.invisibility)) return;
-    if (spells.isActive(SpellId.magicArmour)) {
-      phase = CursePhase.werewolf;
-      return;
-    }
+    if (isProtectedFromTheWolf) return;
     phase = CursePhase.werewolf;
   }
+
+  /// Whether a scroll is holding the wolf off tonight.
+  bool get isProtectedFromTheWolf =>
+      spells.isActive(SpellId.magicArmour) ||
+      spells.isActive(SpellId.invisibility);
 
   void dawnBreaks() {
     if (phase == CursePhase.lifted) return;

@@ -35,19 +35,25 @@ InteractOutcome _actOn(RoomSession session, RoomTrigger trigger) {
 
 void main() {
   group('the game can be finished', () {
-    test('every container in the world holds a catalogue item', () {
+    test('every container holds a catalogue item, or says it is spent', () {
       for (final room in _world().rooms.values) {
         for (final trigger in room.triggers) {
           if (trigger.type != 'chest' && trigger.type != 'statue') continue;
           final properties = trigger.properties['properties'];
           final itemId = properties is Map ? properties['itemId'] : null;
+          if (itemId == null) {
+            // A container may be empty, but only if it says so: an empty
+            // container with nothing to show for it is a promise the world does
+            // not keep.
+            expect(
+              properties is Map ? properties['state'] : null,
+              'empty',
+              reason: '${room.id}/${trigger.id} is empty but does not say so',
+            );
+            continue;
+          }
           expect(
-            itemId,
-            isA<String>(),
-            reason: '${room.id}/${trigger.id} has no itemId',
-          );
-          expect(
-            KlItems.byId(itemId!),
+            KlItems.byId(itemId as String),
             isNotNull,
             reason: '${trigger.id} holds unknown item $itemId',
           );

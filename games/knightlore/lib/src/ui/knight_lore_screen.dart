@@ -126,8 +126,11 @@ class _Hud extends StatelessWidget {
             children: [
               _StatusBar(game: game),
               const SizedBox(height: 8),
-              if (session != null)
+              if (session != null) ...[
                 _InventoryStrip(inventory: session.inventory),
+                if (session.curse.spells.active.isNotEmpty)
+                  _SpellStrip(spells: session.curse.spells),
+              ],
               const Spacer(),
               if (game.error != null)
                 Text(
@@ -151,7 +154,7 @@ class _Hud extends StatelessWidget {
                 ),
               const SizedBox(height: 6),
               const Text(
-                'arrows / wasd walk · space act · f skip to night',
+                'arrows / wasd walk · space act · 1-9 cast · f skip to night',
                 style: TextStyle(color: Color(0xFF7C8494), fontSize: 11),
               ),
             ],
@@ -231,6 +234,41 @@ class _Chip extends StatelessWidget {
   }
 }
 
+/// Shows the decay of every spell currently in effect.
+class _SpellStrip extends StatelessWidget {
+  const _SpellStrip({required this.spells});
+
+  final SpellState spells;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: Wrap(
+        spacing: 6,
+        runSpacing: 4,
+        children: [
+          for (final active in spells.active)
+            SizedBox(
+              width: 96,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    active.spell.name,
+                    style: const TextStyle(fontSize: 10),
+                  ),
+                  LinearProgressIndicator(value: active.fraction),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
 class _InventoryStrip extends StatelessWidget {
   const _InventoryStrip({required this.inventory});
 
@@ -257,9 +295,12 @@ class _InventoryStrip extends StatelessWidget {
                 ),
               ),
               child: slot < inventory.usedSlots
-                  ? Text(
-                      '${slot + 1}',
-                      style: const TextStyle(fontSize: 11),
+                  ? Tooltip(
+                      message: KlItems.nameOf(inventory.items[slot] ?? ''),
+                      child: Text(
+                        '${slot + 1}',
+                        style: const TextStyle(fontSize: 11),
+                      ),
                     )
                   : null,
             ),

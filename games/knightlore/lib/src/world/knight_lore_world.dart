@@ -193,7 +193,7 @@ class KnightLoreWorld {
           'chest',
           2,
           4,
-          properties: {'itemId': 'jinx_clothing'},
+          properties: {'itemId': 'scroll_shield'},
         ),
         trigger('ball_4', 'ball', 6, 6),
       ],
@@ -208,7 +208,8 @@ class KnightLoreWorld {
         exit('south', KlRooms.cauldronEntrance, 'north'),
       ],
       triggers: [
-        trigger('chest_3', 'chest', 3, 5, properties: {'itemId': 'gold'}),
+        trigger('chest_3', 'chest', 3, 5,
+            properties: {'itemId': 'pot_of_gold'}),
         trigger('witch_2', 'witch', 6, 3),
       ],
     );
@@ -297,6 +298,20 @@ class KnightLoreWorld {
       triggers: [
         trigger('ball_7', 'ball', 3, 3),
         trigger('ball_8', 'ball', 5, 5),
+        trigger(
+          'chest_8',
+          'chest',
+          2,
+          2,
+          properties: {'itemId': 'scroll_open_door'},
+        ),
+        trigger(
+          'chest_9',
+          'chest',
+          5,
+          2,
+          properties: {'itemId': 'scroll_telekinesis'},
+        ),
       ],
     );
 

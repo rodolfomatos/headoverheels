@@ -18,3 +18,4 @@ export 'src/assets/knight_lore_manifest.dart';
 export 'src/game/knight_lore_game.dart';
 export 'src/render/room_view.dart';
 export 'src/ui/knight_lore_screen.dart';
+export 'src/world/items.dart';

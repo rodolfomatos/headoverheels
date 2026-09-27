@@ -5,6 +5,7 @@ import '../curse.dart';
 import '../inventory.dart';
 import '../knight.dart';
 import '../spells.dart';
+import '../world/items.dart';
 import '../world/knight_lore_world.dart';
 import 'terrain.dart';
 
@@ -81,10 +82,19 @@ enum InteractOutcome {
   nothing,
   pickedUp,
   dropped,
+  chestOpened,
+  chestEmpty,
   ingredientAccepted,
   ingredientRefused,
   wizardSpoke,
   wizardRefused,
+}
+
+enum CastOutcome {
+  nothing,
+  cast,
+  notAScroll,
+  noSpell,
 }
 
 class Adventurer {
@@ -316,14 +326,68 @@ class RoomSession {
         curse.demandIngredient(_nextIngredient());
         return InteractOutcome.wizardSpoke;
       case 'chest':
-        return InteractOutcome.dropped;
+        return _openChest(target);
       default:
         return InteractOutcome.nothing;
     }
   }
 
-  String _nextIngredient() =>
-      inventory.items.whereType<String>().firstOrNull ?? 'diamond';
+  /// Chests hold one item each and remember whether they were emptied.
+  final Map<String, bool> _openedChests = {};
+
+  bool chestIsOpen(String chestId) => _openedChests[chestId] ?? false;
+
+  InteractOutcome _openChest(RoomTrigger chest) {
+    final id = chest.id;
+    if (_openedChests[id] ?? false) return InteractOutcome.chestEmpty;
+    _openedChests[id] = true;
+    final properties = chest.properties['properties'];
+    final itemId = properties is Map ? properties['itemId'] : null;
+    if (itemId is! String || itemId.isEmpty) return InteractOutcome.chestEmpty;
+    placeItem(itemId);
+    return InteractOutcome.chestOpened;
+  }
+
+  /// The chest the party is facing, if any.
+  String? get chestInFront {
+    final target = _facingTrigger();
+    if (target == null || target.type != 'chest') return null;
+    return target.id;
+  }
+
+  /// Everything the chest would have held, for the status scroll and the HUD.
+  String? chestContents(String chestId) {
+    for (final trigger in room.triggers) {
+      if (trigger.type != 'chest' || trigger.id != chestId) continue;
+      final properties = trigger.properties['properties'];
+      if (properties is Map) return properties['itemId'] as String?;
+    }
+    return null;
+  }
+
+  /// Casts the scroll in [slot]. Scrolls are not consumed: the original keeps
+  /// them usable, and consuming them risks a dead end.
+  CastOutcome castAtSlot(int slot) {
+    if (slot < 0 || slot >= inventory.length) return CastOutcome.nothing;
+    final itemId = inventory.items[slot];
+    if (itemId == null) return CastOutcome.nothing;
+    final item = KlItems.byId(itemId);
+    if (item == null || !item.isScroll) return CastOutcome.notAScroll;
+    final spell = item.spell;
+    if (spell == null) return CastOutcome.noSpell;
+    curse.spells.cast(spell);
+    return CastOutcome.cast;
+  }
+
+  /// The wizard names the next ingredient, and refuses to name one the party
+  /// cannot possibly be carrying.
+  String _nextIngredient() {
+    final held = inventory.items.whereType<String>().toSet();
+    for (final candidate in KlItems.ingredients) {
+      if (!held.contains(candidate)) return candidate;
+    }
+    return KlItems.ingredients.last;
+  }
 
   RoomTrigger? _facingTrigger() {
     final target = Vector2(

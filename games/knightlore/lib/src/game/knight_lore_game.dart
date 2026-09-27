@@ -199,6 +199,11 @@ class KnightLoreGame extends FlameGame {
       _applyStep(current.step(facing));
       return;
     }
+    final slot = _slotFor(key);
+    if (slot != null) {
+      _applyCast(current.castAtSlot(slot));
+      return;
+    }
     switch (key) {
       case ' ':
       case 'enter':
@@ -216,6 +221,12 @@ class KnightLoreGame extends FlameGame {
     }
   }
 
+  String? _facingChest() {
+    final session = this.session;
+    if (session == null) return null;
+    return session.chestInFront;
+  }
+
   Facing? _facingFor(String key) => switch (key) {
         'arrowUp' => Facing.north,
         'arrowRight' => Facing.east,
@@ -231,6 +242,23 @@ class KnightLoreGame extends FlameGame {
         'x' => Facing.northEast,
         _ => null,
       };
+
+  /// Digits one to nine cast the scroll in that inventory slot.
+  int? _slotFor(String key) {
+    if (key.length != 1) return null;
+    final digit = int.tryParse(key);
+    if (digit == null || digit < 1 || digit > 9) return null;
+    return digit - 1;
+  }
+
+  void _applyCast(CastOutcome outcome) {
+    message = switch (outcome) {
+      CastOutcome.cast => 'The spell takes hold.',
+      CastOutcome.notAScroll => 'That is not a scroll.',
+      CastOutcome.noSpell => 'The scroll is blank.',
+      CastOutcome.nothing => '',
+    };
+  }
 
   void _applyStep(MoveOutcome outcome) {
     switch (outcome) {
@@ -251,9 +279,18 @@ class KnightLoreGame extends FlameGame {
     }
   }
 
+  String? _lastChestItem;
+
   void _applyInteract(InteractOutcome outcome) {
+    if (outcome == InteractOutcome.chestOpened) {
+      final chest = _facingChest();
+      _lastChestItem = chest == null ? null : session?.chestContents(chest);
+    }
     message = switch (outcome) {
       InteractOutcome.pickedUp => 'Picked up.',
+      InteractOutcome.chestOpened =>
+        'A chest: ${KlItems.nameOf(_lastChestItem ?? 'something')}.',
+      InteractOutcome.chestEmpty => 'An empty chest.',
       InteractOutcome.ingredientAccepted => 'The cauldron takes it.',
       InteractOutcome.ingredientRefused => 'The cauldron refuses that.',
       InteractOutcome.wizardSpoke => 'Melkhior names what the cauldron wants.',

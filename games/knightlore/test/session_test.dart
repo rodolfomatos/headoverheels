@@ -288,7 +288,11 @@ void main() {
       session.leader.facing = Facing.north;
       session.inventory.pickUp('diamond');
       expect(session.interact(), InteractOutcome.wizardSpoke);
-      expect(session.curse.demandedIngredient, 'diamond');
+      expect(
+        session.curse.demandedIngredient,
+        'pot_of_gold',
+        reason: 'the wizard asks for the first ingredient still missing',
+      );
 
       session.nightFalls();
       expect(session.interact(), InteractOutcome.wizardRefused);
@@ -391,6 +395,116 @@ void main() {
       expect(session.curse.phase, CursePhase.werewolf);
       session.dawnBreaks();
       expect(session.curse.phase, CursePhase.daylight);
+    });
+  });
+
+  group('chests and scrolls', () {
+    test('a chest holds one catalogue item and empties once', () {
+      final session = _session();
+      session.enterRoom(KlRooms.gatehouse);
+      final chest = session.room.triggers
+          .firstWhere((trigger) => trigger.type == 'chest');
+      expect(session.chestContents(chest.id), 'diamond');
+
+      session.leader.position =
+          Vector3(chest.position.x, chest.position.y + 1, 0);
+      session.leader.facing = Facing.north;
+      expect(session.interact(), InteractOutcome.chestOpened);
+      expect(session.itemUnderfoot, contains('diamond'));
+      expect(session.chestIsOpen(chest.id), isTrue);
+
+      session.interact(); // picks the diamond up
+      expect(session.interact(), InteractOutcome.chestEmpty);
+    });
+
+    test('the catalogue has six ingredients and six scrolls', () {
+      expect(KlItems.ingredients, hasLength(6));
+      expect(KlItems.all.where((item) => item.isScroll), hasLength(6));
+      for (final id in KlItems.ingredients) {
+        expect(KlItems.byId(id), isNotNull, reason: id);
+      }
+      for (final spell in SpellId.values) {
+        expect(KlItems.scrollFor(spell), isNotNull, reason: spell.id);
+      }
+    });
+
+    test('casting from a slot uses the scroll in that slot', () {
+      final curse = CurseState();
+      curse.inventory
+        ..pickUp('diamond')
+        ..pickUp('scroll_open_door');
+      final session = RoomSession(
+        world: _world(),
+        terrain: _terrain(),
+        curse: curse,
+      );
+
+      expect(session.castAtSlot(0), CastOutcome.notAScroll);
+      expect(session.castAtSlot(1), CastOutcome.cast);
+      expect(curse.spells.isActive(SpellId.openDoor), isTrue);
+      expect(curse.spells.isActive(SpellId.shield), isFalse);
+      expect(session.castAtSlot(9), CastOutcome.nothing);
+    });
+
+    test('a scroll survives being cast', () {
+      final curse = CurseState()..inventory.pickUp('scroll_shield');
+      RoomSession(world: _world(), terrain: _terrain(), curse: curse);
+      final session = RoomSession(
+        world: _world(),
+        terrain: _terrain(),
+        curse: curse,
+      );
+      expect(session.castAtSlot(0), CastOutcome.cast);
+      expect(curse.inventory.items, contains('scroll_shield'));
+    });
+
+    test('the split knights can leave once a scroll is cast', () {
+      final curse = CurseState()..inventory.pickUp('scroll_open_door');
+      final session = RoomSession(
+        world: _world(),
+        terrain: _terrain(),
+        curse: curse,
+      );
+      session.enterRoom(KlRooms.gatehouse);
+      session.nightFalls();
+      session.splitParty();
+
+      expect(
+        _walkUntilRoomChanges(session, Facing.north),
+        MoveOutcome.refused,
+      );
+      expect(session.castAtSlot(0), CastOutcome.cast);
+      expect(
+        _walkUntilRoomChanges(session, Facing.north),
+        MoveOutcome.changedRoom,
+      );
+      expect(session.roomId, KlRooms.greatHall);
+    });
+
+    test('the wizard never asks for something the party already holds', () {
+      final curse = CurseState();
+      final session = RoomSession(
+        world: _world(),
+        terrain: _terrain(),
+        curse: curse,
+      );
+      session.enterRoom(KlRooms.laboratory);
+      final wizard = session.room.triggers
+          .firstWhere((trigger) => trigger.type == 'wizard');
+      session.leader.position =
+          Vector3(wizard.position.x, wizard.position.y + 1, 0);
+      session.leader.facing = Facing.north;
+
+      session.interact();
+      final first = session.curse.demandedIngredient!;
+      expect(curse.inventory.items.whereType<String>(), isNot(contains(first)));
+
+      session.inventory.pickUp(first);
+      session.interact();
+      final second = session.curse.demandedIngredient!;
+      expect(second, isNot(first));
+      expect(
+          curse.inventory.items.whereType<String>(), isNot(contains(second)));
     });
   });
 }

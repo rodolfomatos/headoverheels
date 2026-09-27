@@ -24,6 +24,7 @@ void main() {
     }
 
     expect(find.textContaining('arrows / wasd walk'), findsOneWidget);
+    expect(find.textContaining('1-9 cast'), findsOneWidget);
     expect(find.text('day'), findsOneWidget);
     expect(find.byType(LinearProgressIndicator), findsOneWidget);
 

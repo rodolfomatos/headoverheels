@@ -1,8 +1,8 @@
 ---
 project: headoverheels
 created: 2026-09-18
-current_sprint: sprint-10
-current_ticket: "T037"
+current_sprint: sprint-11
+current_ticket: "T040"
 ---
 
 # Kanban — headoverheels
@@ -148,9 +148,28 @@ current_ticket: "T037"
 | T036 | TSX authoring: edit tile types/properties and export TSX | pending |
 | T035 | Migrate Head over Heels into games/headoverheels | pending |
 
+## Sprint 11 — Knight Lore Completion
+**Goal**: turn the second example game into a finished product, then migrate the
+first game onto the same platform
+
+| ID | Title | Status |
+|----|-------|--------|
+| T040 | Spell scrolls: find, carry and cast the six spells | done |
+| T041 | Treasures, chests and the six ingredients, with win state | pending |
+| T042 | Traps and hazards: impalers, ball chains, blocks, demons | pending |
+| T043 | Screens: title, status scroll, pause, victory, defeat | pending |
+| T044 | Procedural audio: effects and one ambient loop | pending |
+| T045 | Visual polish: shadows, room transitions, ambience, sundial | pending |
+| T046 | Editor reads both games: world and sprite manifest | pending |
+| T047 | Visual proof: render the game to images and inspect them | pending |
+| T048 | Balance pass: days, spell decay, treasure placement | pending |
+| T035 | Migrate Head over Heels into games/headoverheels | pending |
+| T036 | TSX authoring: edit tile types/properties and export TSX | pending |
+
 ## In Progress
 * T035: Migrate Head over Heels into games/headoverheels
 * T036: TSX authoring (edit tile `type`/properties, write TSX)
+
 
 ## Notes
 * T033 scope: TMX/TSX import, pan/zoom dimetric canvas with tileset image preview, paint/place/erase
@@ -189,5 +208,6 @@ current_ticket: "T037"
 * T034: Sprite browser/animator and asset management UI (manifest editor, frame import, delete)
 * T037: World graph viewer/editor with topology validation (Graph tab, world.json round trip)
 * T039: Puzzle trigger inspector in the graph tab (targetId and target room editing)
+* T040: Spell scrolls — catalogue, chests that hold one item each, casting with 1-9
 * T038: Second example game, Knight Lore: rules, world, room maps, generated art, Flame loop,
   HUD, keyboard input and a working web build

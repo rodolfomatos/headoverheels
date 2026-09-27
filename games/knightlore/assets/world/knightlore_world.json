@@ -304,7 +304,7 @@
             "height": 1.0
           },
           "properties": {
-            "itemId": "jinx_clothing"
+            "itemId": "scroll_shield"
           }
         },
         {
@@ -370,7 +370,7 @@
             "height": 1.0
           },
           "properties": {
-            "itemId": "gold"
+            "itemId": "pot_of_gold"
           }
         },
         {
@@ -688,6 +688,38 @@
           "size": {
             "width": 1.0,
             "height": 1.0
+          }
+        },
+        {
+          "id": "chest_8",
+          "type": "chest",
+          "position": {
+            "x": 2.0,
+            "y": 2.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          },
+          "properties": {
+            "itemId": "scroll_open_door"
+          }
+        },
+        {
+          "id": "chest_9",
+          "type": "chest",
+          "position": {
+            "x": 5.0,
+            "y": 2.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          },
+          "properties": {
+            "itemId": "scroll_telekinesis"
           }
         }
       ]

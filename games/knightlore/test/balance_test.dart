@@ -173,7 +173,8 @@ void main() {
         final spell = Spell.fromId(id.id)!;
         if (spell.isInstant) {
           // A one step filmation costs nothing and lasts nothing.
-          expect(spell.duration, 0, reason: '$id is instant but has a duration');
+          expect(spell.duration, 0,
+              reason: '$id is instant but has a duration');
           expect(spell.decayPerDay, 0, reason: '$id is instant but decays');
           continue;
         }
@@ -198,11 +199,13 @@ void main() {
       final curse = CurseState();
       curse.spells.cast(SpellId.magicArmour);
       curse.nightFalls();
-      expect(curse.phase == CursePhase.werewolf, isFalse, reason: 'magic armour should hold');
+      expect(curse.phase == CursePhase.werewolf, isFalse,
+          reason: 'magic armour should hold');
 
       final other = CurseState()..spells.cast(SpellId.invisibility);
       other.nightFalls();
-      expect(other.phase == CursePhase.werewolf, isFalse, reason: 'invisibility should hold');
+      expect(other.phase == CursePhase.werewolf, isFalse,
+          reason: 'invisibility should hold');
 
       // With nothing cast, the wolf comes.
       final bare = CurseState();
@@ -215,7 +218,8 @@ void main() {
         faded.spells.advanceDay();
       }
       faded.nightFalls();
-      expect(faded.phase == CursePhase.werewolf, isTrue, reason: 'a dead scroll must not help');
+      expect(faded.phase == CursePhase.werewolf, isTrue,
+          reason: 'a dead scroll must not help');
     });
   });
 
@@ -301,7 +305,12 @@ void main() {
       // cheaper in one room than another.
       final session = newKnightLoreSession();
       expect(session.ticksPerStep, 8);
-      final facing = <Facing>[Facing.north, Facing.east, Facing.south, Facing.west];
+      final facing = <Facing>[
+        Facing.north,
+        Facing.east,
+        Facing.south,
+        Facing.west
+      ];
       for (final face in facing) {
         final before = session.tick;
         session.step(face);

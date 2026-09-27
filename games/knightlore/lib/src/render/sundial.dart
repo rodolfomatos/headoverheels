@@ -65,9 +65,7 @@ class SundialPainter extends CustomPainter {
 
     // The night half, so the dial says which half of the day it is.
     final nightColour = Paint()
-      ..color = isNight
-          ? const Color(0x554A6BC8)
-          : const Color(0x33202830)
+      ..color = isNight ? const Color(0x554A6BC8) : const Color(0x33202830)
       ..style = PaintingStyle.fill;
     canvas.drawArc(
       Rect.fromCircle(center: centre, radius: radius - 1),
@@ -126,13 +124,13 @@ class Sundial extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => CustomPaint(
-    size: const Size(92, 92),
-    painter: SundialPainter(
-      geometry: SundialGeometry(
-        days: totalDays - daysLeft + 1,
-        totalDays: totalDays,
-      ),
-      isNight: isNight,
-    ),
-  );
+        size: const Size(92, 92),
+        painter: SundialPainter(
+          geometry: SundialGeometry(
+            days: totalDays - daysLeft + 1,
+            totalDays: totalDays,
+          ),
+          isNight: isNight,
+        ),
+      );
 }

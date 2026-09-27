@@ -13,8 +13,12 @@ from PIL import Image
 import numpy as np
 
 # Configuration
-ASSETS_DIR = Path(__file__).parent.parent / "assets" / "sprites"
-STYLE_DIR = Path(__file__).parent.parent / "style"
+#
+# The game is a package under games/, not the repository root, so the directory
+# is an argument. The Makefile passes it; running the script by hand still works.
+GAME_ROOT = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("games/headoverheels")
+ASSETS_DIR = GAME_ROOT / "assets" / "sprites"
+STYLE_DIR = GAME_ROOT / "style"
 
 # Load style configurations
 with open(STYLE_DIR / "palette.json") as f:
@@ -65,7 +69,7 @@ class ValidationPipeline:
     def check_tiles(self):
         result = ValidationResult("tiles")
         
-        for img_file in Path("assets/sprites/tiles").rglob("*.png"):
+        for img_file in (ASSETS_DIR / "tiles").rglob("*.png"):
             try:
                 img = Image.open(img_file)
                 if img.mode != "RGBA":
@@ -73,11 +77,11 @@ class ValidationPipeline:
                 
                 if img_file.name.endswith("_masters.png") or img_file.name in ["castle_masters.png", "egyptus.png", "penitentiary.png", "safari.png", "bookworld.png", "moonbase.png"]:
                     if img.size != (1024, 512):
-                        result.add_error(f"{img_file.relative_to(Path('assets/sprites'))}: Master tileset wrong size {img.size}, expected 1024x512")
+                        result.add_error(f"{img_file.relative_to(ASSETS_DIR)}: Master tileset wrong size {img.size}, expected 1024x512")
                     else:
                         result.add_pass()
                 elif img.size != (64, 32):
-                    result.add_error(f"{img_file.relative_to(Path('assets/sprites'))}: Wrong tile size {img.size}, expected 64x32")
+                    result.add_error(f"{img_file.relative_to(ASSETS_DIR)}: Wrong tile size {img.size}, expected 64x32")
                 else:
                     result.add_pass()
                 
@@ -123,7 +127,7 @@ class ValidationPipeline:
     def check_palette(self):
         result = ValidationResult("palette")
         
-        for img_file in Path("assets/sprites").rglob("*.png"):
+        for img_file in ASSETS_DIR.rglob("*.png"):
             try:
                 img = Image.open(img_file)
                 if img.mode != "RGBA":
@@ -185,14 +189,14 @@ class ValidationPipeline:
             "ui_": (32, 32),
         }
         
-        for img_file in Path("assets/sprites").rglob("*.png"):
+        for img_file in ASSETS_DIR.rglob("*.png"):
             try:
                 img = Image.open(img_file)
                 matched = False
                 for prefix, (ew, eh) in expected_dims.items():
                     if img_file.name.startswith(prefix):
                         if img.size != (ew, eh):
-                            result.add_error(f"{img_file.relative_to(Path('assets/sprites'))}: {img.size} != expected {ew}x{eh}")
+                            result.add_error(f"{img_file.relative_to(ASSETS_DIR)}: {img.size} != expected {ew}x{eh}")
                         result.add_pass()
                         matched = True
                         break
@@ -212,7 +216,7 @@ class ValidationPipeline:
         result = ValidationResult("naming")
         pattern = re.compile(r'^[a-z]+_[a-z0-9_]+(?:_[a-z]+)?(?:_[nsew]{1,2})?_\d{2}\.png$')
         
-        for img_file in Path("assets/sprites").rglob("*.png"):
+        for img_file in ASSETS_DIR.rglob("*.png"):
             if img_file.name in ["manifest.json"] or img_file.name.startswith("tileset_") or \
                img_file.name.startswith("atlas_") or img_file.name.endswith("_master.png") or \
                img_file.name.endswith("_masters.png") or img_file.name.endswith("_idle_front.png") or \
@@ -222,7 +226,7 @@ class ValidationPipeline:
                 continue
             
             if not re.match(r'^[a-z]+_[a-z0-9_]+(?:_[a-z]+)?(?:_[nsew]{1,2})?_\d{2}\.png$', img_file.name):
-                result.add_error(f"Invalid naming: {img_file.relative_to(Path('assets/sprites'))}")
+                result.add_error(f"Invalid naming: {img_file.relative_to(ASSETS_DIR)}")
             else:
                 result.add_pass()
         
@@ -232,7 +236,7 @@ class ValidationPipeline:
     def check_alpha(self):
         result = ValidationResult("alpha")
         
-        for img_file in Path("assets/sprites").rglob("*.png"):
+        for img_file in ASSETS_DIR.rglob("*.png"):
             try:
                 img = Image.open(img_file)
                 if img.mode != "RGBA":
@@ -246,7 +250,7 @@ class ValidationPipeline:
                     # Allow higher threshold for master sprites (intentional semi-transparency for effects)
                     threshold = 5000 if img_file.name.endswith("_master.png") or img_file.name.endswith("_masters.png") else 1000
                     if count > threshold:
-                        result.add_error(f"{img_file.relative_to(Path('assets/sprites').parent)}: {count} semi-transparent pixels")
+                        result.add_error(f"{img_file.relative_to(ASSETS_DIR.parent)}: {count} semi-transparent pixels")
                     else:
                         result.add_pass()
                 else:
@@ -306,7 +310,7 @@ class ValidationPipeline:
 
 
 def main():
-    pipeline = ValidationPipeline("assets/sprites")
+    pipeline = ValidationPipeline(str(ASSETS_DIR))
     results = pipeline.run_all()
     pipeline.print_summary()
     return 0 if sum(r.failed for r in pipeline.results.values()) == 0 else 1

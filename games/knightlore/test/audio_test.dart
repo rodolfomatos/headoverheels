@@ -53,7 +53,8 @@ void main() {
   test('every scroll item in the game has a cue', () {
     // A scroll without a sound would cast in silence, so the item catalogue and
     // the cue table have to stay in step.
-    final scrolls = KlItems.all.where((item) => item.isScroll).map((item) => item.id);
+    final scrolls =
+        KlItems.all.where((item) => item.isScroll).map((item) => item.id);
     for (final scroll in scrolls) {
       expect(
         cueForSpellItem(scroll),
@@ -65,7 +66,9 @@ void main() {
   });
 
   test('no two cues sound the same', () {
-    final hashes = {for (final cue in AudioCue.values) cue: renderCue(cue).hash};
+    final hashes = {
+      for (final cue in AudioCue.values) cue: renderCue(cue).hash
+    };
     final collisions = <AudioCue>[];
     final seen = <int, AudioCue>{};
     for (final entry in hashes.entries) {
@@ -122,7 +125,9 @@ void main() {
     }
 
     test('each area has its own loop', () {
-      final hashes = {for (final area in AudioArea.values) area: renderAmbient(area).hash};
+      final hashes = {
+        for (final area in AudioArea.values) area: renderAmbient(area).hash
+      };
       expect(hashes.values.toSet().length, AudioArea.values.length);
     });
   });
@@ -152,13 +157,15 @@ void main() {
         expect(
           file.readAsBytesSync(),
           renderCue(cue).normalised().toWav(),
-          reason: '${cue.name}.wav is stale: run `dart run tool/generate_audio.dart`',
+          reason:
+              '${cue.name}.wav is stale: run `dart run tool/generate_audio.dart`',
         );
         checked++;
       }
       for (final area in AudioArea.values) {
         final file = File('assets/audio/${area.asset}.wav');
-        expect(file.existsSync(), isTrue, reason: '${area.asset}.wav is missing');
+        expect(file.existsSync(), isTrue,
+            reason: '${area.asset}.wav is missing');
         expect(
           file.readAsBytesSync(),
           renderAmbient(area).normalised().toWav(),

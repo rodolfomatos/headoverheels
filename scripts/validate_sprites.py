@@ -8,8 +8,12 @@ import numpy as np
 import yaml
 from PIL import Image
 
+# The game is a package under games/, so the sprite directory is an argument and
+# the style files sit next to it. The Makefile passes both in.
 PROJECT_ROOT = Path(__file__).parent.parent
-STYLE_DIR = PROJECT_ROOT / "style"
+GAME_ROOT = Path(sys.argv[1]) if len(sys.argv) > 1 else PROJECT_ROOT / "games" / "headoverheels"
+DEFAULT_ASSETS_DIR = GAME_ROOT / "assets" / "sprites"
+STYLE_DIR = GAME_ROOT / "style"
 MANIFEST_NAME = "manifest.yaml"
 SOURCE_TYPES = {"master", "source"}
 FRAME_NAME = re.compile(r"^[a-z][a-z0-9_]*_\d{2,3}\.png$")
@@ -229,7 +233,7 @@ def validate_animations(assets: list[dict]) -> list[str]:
 
 
 def main() -> int:
-    assets_dir = Path(sys.argv[1]) if len(sys.argv) > 1 else PROJECT_ROOT / "assets" / "sprites"
+    assets_dir = DEFAULT_ASSETS_DIR
     if not assets_dir.exists():
         print(f"Assets directory not found: {assets_dir}")
         return 1

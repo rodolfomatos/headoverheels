@@ -124,7 +124,8 @@ Pcm renderCue(AudioCue cue, {Synth? synth}) {
             List.generate(s.frames(0.4), (index) {
               final on = (index ~/ (s.sampleRate * 0.02)).isEven;
               return on
-                  ? (s.pulse(760, 0.02, duty: 0.5)[index % s.frames(0.02)] * 0.6)
+                  ? (s.pulse(760, 0.02, duty: 0.5)[index % s.frames(0.02)] *
+                      0.6)
                   : 0.0;
             }),
           ),
@@ -143,7 +144,8 @@ Pcm renderCue(AudioCue cue, {Synth? synth}) {
       return Pcm(
         mix(
           s.take(s.decay(s.noise(0.3), tail: 5), 0.3, gain: 0.5),
-          s.take(s.decay(s.glide(400, 90, 0.3, duty: 0.3), tail: 4), 0.3, gain: 0.6),
+          s.take(s.decay(s.glide(400, 90, 0.3, duty: 0.3), tail: 4), 0.3,
+              gain: 0.6),
         ),
       );
     case AudioCue.trap:
@@ -158,7 +160,10 @@ Pcm renderCue(AudioCue cue, {Synth? synth}) {
       return Pcm(
         s.sequence([
           (samples: s.decay(s.pulse(330, 0.16, duty: 0.5), tail: 3), gain: 0.6),
-          (samples: s.decay(s.pulse(220, 0.26, duty: 0.25), tail: 3), gain: 0.6),
+          (
+            samples: s.decay(s.pulse(220, 0.26, duty: 0.25), tail: 3),
+            gain: 0.6
+          ),
         ]),
       );
     case AudioCue.dawn:
@@ -170,9 +175,11 @@ Pcm renderCue(AudioCue cue, {Synth? synth}) {
       );
     case AudioCue.dayTick:
       // The sundial moving on: one quiet pulse, easy to miss.
-      return Pcm(s.decay(s.pulse(1046, 0.05, duty: 0.25), tail: 8)).normalised(0.22);
+      return Pcm(s.decay(s.pulse(1046, 0.05, duty: 0.25), tail: 8))
+          .normalised(0.22);
     case AudioCue.menuMove:
-      return Pcm(s.decay(s.pulse(880, 0.05, duty: 0.25), tail: 8)).normalised(0.3);
+      return Pcm(s.decay(s.pulse(880, 0.05, duty: 0.25), tail: 8))
+          .normalised(0.3);
     case AudioCue.menuSelect:
       return Pcm(
         s.sequence([
@@ -233,9 +240,19 @@ Pcm renderAmbient(AudioArea area, {Synth? synth}) {
   const seconds = 2.0;
   return Pcm(
     s.layer([
-      (samples: s.drone(seconds: seconds, frequency: area.root, duty: 0.5), gain: 0.35),
-      (samples: s.drone(seconds: seconds, frequency: area.root * 1.5, duty: 0.25), gain: 0.2),
-      (samples: s.drone(seconds: seconds, frequency: area.root * 2, duty: 0.5), gain: 0.12),
+      (
+        samples: s.drone(seconds: seconds, frequency: area.root, duty: 0.5),
+        gain: 0.35
+      ),
+      (
+        samples:
+            s.drone(seconds: seconds, frequency: area.root * 1.5, duty: 0.25),
+        gain: 0.2
+      ),
+      (
+        samples: s.drone(seconds: seconds, frequency: area.root * 2, duty: 0.5),
+        gain: 0.12
+      ),
       (
         samples: s.drone(
           seconds: seconds,

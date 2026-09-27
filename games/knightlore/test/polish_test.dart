@@ -20,7 +20,8 @@ Future<ByteData> renderRoom(RoomView view, {required bool shadows}) async {
 }
 
 /// Which pixels of [after] differ from [before], and in which direction.
-({Rect changed, int darker, int lighter}) compareFrames(ByteData before, ByteData after) {
+({Rect changed, int darker, int lighter}) compareFrames(
+    ByteData before, ByteData after) {
   var minX = 1024, minY = 640, maxX = -1, maxY = -1;
   var darker = 0, lighter = 0;
   for (var y = 0; y < 640; y++) {
@@ -43,7 +44,8 @@ Future<ByteData> renderRoom(RoomView view, {required bool shadows}) async {
   return (
     changed: maxX < 0
         ? Rect.zero
-        : Rect.fromLTRB(minX.toDouble(), minY.toDouble(), maxX.toDouble(), maxY.toDouble()),
+        : Rect.fromLTRB(
+            minX.toDouble(), minY.toDouble(), maxX.toDouble(), maxY.toDouble()),
     darker: darker,
     lighter: lighter,
   );
@@ -150,7 +152,8 @@ void main() {
         reason: 'the shadow is not under any figure: ${diff.changed}',
       );
       // The room still has to be a room, not a black square.
-      expect((await readFrame(await renderFrame(game))).colours, greaterThan(20));
+      expect(
+          (await readFrame(await renderFrame(game))).colours, greaterThan(20));
     });
   });
 
@@ -298,7 +301,8 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('the hud shows the sundial once the game starts', (tester) async {
+    testWidgets('the hud shows the sundial once the game starts',
+        (tester) async {
       tester.view.physicalSize = const Size(1280, 800);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
@@ -306,7 +310,8 @@ void main() {
       late KnightLoreGame game;
       await tester.runAsync(() async {
         game = KnightLoreGame(
-          config: const KnightLoreGameConfig(daySeconds: 1000, autoCycle: false),
+          config:
+              const KnightLoreGameConfig(daySeconds: 1000, autoCycle: false),
           bundle: TestAssetBundle(),
         );
         await game.onLoad();
@@ -321,12 +326,14 @@ void main() {
       await tester.pump(const Duration(milliseconds: 50));
 
       expect(find.byType(Sundial), findsOneWidget);
-      final painter = tester.widget<CustomPaint>(
-        find.descendant(
-          of: find.byType(Sundial),
-          matching: find.byType(CustomPaint),
-        ),
-      ).painter! as SundialPainter;
+      final painter = tester
+          .widget<CustomPaint>(
+            find.descendant(
+              of: find.byType(Sundial),
+              matching: find.byType(CustomPaint),
+            ),
+          )
+          .painter! as SundialPainter;
       expect(painter.geometry.totalDays, 40);
     });
   });

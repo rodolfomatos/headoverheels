@@ -418,7 +418,10 @@ class KnightLoreGame extends FlameGame {
 
   /// Where [Sundial] reads the day from: the dial counts the days that have
   /// passed, the HUD counts the ones that are left.
-  int get daysOn => CurseState.totalDays - (session?.curse.daysLeft ?? CurseState.totalDays) + 1;
+  int get daysOn =>
+      CurseState.totalDays -
+      (session?.curse.daysLeft ?? CurseState.totalDays) +
+      1;
 
   /// Queues a sound. Deliberately not awaited: a cue must never delay a move.
   void _cue(AudioCue cue) {

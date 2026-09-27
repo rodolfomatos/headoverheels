@@ -71,9 +71,7 @@ void main() {
     // Nothing in slot three: either nothing happens, or the curse complains.
     expect(
       game.audio.played.every(
-        (cue) =>
-            cue == AudioCue.blockedCurse ||
-            cue == AudioCue.step,
+        (cue) => cue == AudioCue.blockedCurse || cue == AudioCue.step,
       ),
       isTrue,
       reason: 'casting nothing played ${game.audio.played}',
@@ -112,7 +110,9 @@ void main() {
       orElse: () => throw StateError('the world has no hazard at all'),
     );
     session.enterRoom(trapped.id);
-    for (var tick = 0; tick < 60 && session.lastHazardOutcome != HazardOutcome.hurt; tick++) {
+    for (var tick = 0;
+        tick < 60 && session.lastHazardOutcome != HazardOutcome.hurt;
+        tick++) {
       game.update(0.2);
     }
     if (session.lastHazardOutcome == HazardOutcome.hurt) {
@@ -163,6 +163,7 @@ void main() {
     for (final area in AudioArea.values) {
       expect(area.asset, 'ambient_${area.name}');
     }
-    expect(AudioArea.values.map((area) => area.name).toSet(), KlAreas.all.toSet());
+    expect(
+        AudioArea.values.map((area) => area.name).toSet(), KlAreas.all.toSet());
   });
 }

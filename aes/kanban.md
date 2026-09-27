@@ -2,7 +2,7 @@
 project: headoverheels
 created: 2026-09-18
 current_sprint: sprint-11
-current_ticket: "T035"
+current_ticket: "T036"
 ---
 
 # Kanban — headoverheels
@@ -44,7 +44,7 @@ current_ticket: "T035"
 | T032 | Builder CLI scaffold and project validation | medium | done |
 | T033 | Visual isometric map editor | high | done |
 | T034 | Sprite browser/animator and asset management UI | high | done |
-| T035 | Migrate Head over Heels into games/headoverheels | high | pending |
+| T035 | Migrate Head over Heels into games/headoverheels | high | done |
 | T036 | TSX authoring: edit tile types/properties and export TSX | medium | pending |
 | T037 | World graph viewer/editor with topology validation | high | done |
 | T038 | Second example game (Knight Lore) on iso_core | medium | done |
@@ -146,7 +146,7 @@ current_ticket: "T035"
 | T033 | Visual isometric map editor | done |
 | T034 | Sprite browser/animator and asset management UI | done |
 | T036 | TSX authoring: edit tile types/properties and export TSX | pending |
-| T035 | Migrate Head over Heels into games/headoverheels | pending |
+| T035 | Migrate Head over Heels into games/headoverheels | done |
 | T049 | Replace the untracked HoH audio with synthesised cues | pending |
 
 ## Sprint 11 — Knight Lore Completion
@@ -164,17 +164,32 @@ first game onto the same platform
 | T046 | Editor reads both games: world and sprite manifest | done |
 | T047 | Visual proof: render the game to images and inspect them | done |
 | T048 | Balance pass: days, spell decay, treasure placement | done |
-| T035 | Migrate Head over Heels into games/headoverheels | pending |
 | T036 | TSX authoring: edit tile types/properties and export TSX | pending |
 
 ## In Progress
-* T035: Migrate Head over Heels into games/headoverheels
+* T036: TSX authoring: edit a tile's type and properties, write the TSX
 
-## Queued (after T035)
-* T036: TSX authoring (edit tile `type`/properties, write TSX)
+## Queued (after T036)
+* T049: Replace the untracked HoH audio with synthesised cues
 
 
 ## Notes
+* T035 scope: the root package is now `games/headoverheels`. `lib`, `assets`,
+  `style`, `test`, the five platform directories, `analysis_options.yaml`,
+  `.metadata` and the pubspec moved with `git mv`, so the history follows the
+  files. Nothing at the top level is a package any more, so the Makefile names
+  where each command runs: `setup` loops over both games and both libraries,
+  `test`, `lint` and `build` run in `games/headoverheels`, `format-check` covers
+  `games packages`, and `assets-check` passes the game directory to both Python
+  validators. `run-headoverheels` and `build-headoverheels` join the Knight Lore
+  equivalents. `EditorProject.headoverheels` now points inside `games/`, and its
+  test proves every key of both projects stays inside its own game directory.
+  Two things the move exposed: `format-check` had never covered `games/`, so ten
+  Knight Lore files had drifted from the formatter and are now formatted; and the
+  T046 test asserted the two projects differ only by the game directory, which
+  stopped being true once both live under `games/`, so the invariant is now the
+  stronger one: the sprite paths are parallel and no project can read the other
+  game's files.
 * T049 scope: `assets/audio/music/*.ogg` (8) and `assets/audio/sfx/*.ogg` (22)
   exist on this machine, untracked, and `lib/features/audio/audio_system.dart`
   plus the `assets/audio/` entry in the pubspec both depend on them, so the game

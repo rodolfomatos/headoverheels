@@ -81,21 +81,46 @@ void main() {
     expect(validation.errors, isEmpty);
   });
 
-  test('both projects differ only by the game directory', () {
-    // The whole point of T046: the editor is not told anything about a game
-    // except where its files are.
-    const prefix = 'games/knightlore/';
-    expect(
-      EditorProject.knightLore.worldKey,
-      '${prefix}assets/world/knightlore_world.json',
-    );
+  test('both projects name their files the same way', () {
+    // The point of T046 is that the editor is told nothing about a game except
+    // where its files are. The sprite side of the two projects is therefore
+    // exactly parallel: same sub-paths, only the game directory changes.
+    const prefix = 'games/';
     expect(
       EditorProject.knightLore.manifestKey,
       EditorProject.headoverheels.manifestKey.replaceFirst(
-        'assets/',
-        '${prefix}assets/',
+        '$prefix'
+            'headoverheels/',
+        '$prefix'
+            'knightlore/',
       ),
     );
+    expect(
+      EditorProject.knightLore.assetsBasePath,
+      EditorProject.headoverheels.assetsBasePath.replaceFirst(
+        '$prefix'
+            'headoverheels/',
+        '$prefix'
+            'knightlore/',
+      ),
+    );
+    // Every key sits inside its own game directory, so one project can never
+    // read the other game's files by accident.
+    for (final project in EditorProject.shipped) {
+      for (final key in [
+        project.worldKey,
+        project.manifestKey,
+        project.assetsBasePath,
+        project.roomsBasePath,
+        project.tilesetImageBasePath,
+      ]) {
+        expect(
+          key,
+          startsWith('$prefix${project.id}/'),
+          reason: '${project.id} points outside its own directory: $key',
+        );
+      }
+    }
   });
 
   test('the Knight Lore sprite manifest is the shared format', () async {

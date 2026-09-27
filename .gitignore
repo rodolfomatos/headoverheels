@@ -3,8 +3,8 @@ build/
 .dart_tool/
 .flutter-plugins-dependencies
 packages/*/pubspec.lock
-android/.kotlin/
-assets/sprites_normalized/
+**/android/.kotlin/
+**/assets/sprites_normalized/
 *.iml
 
 # IDE

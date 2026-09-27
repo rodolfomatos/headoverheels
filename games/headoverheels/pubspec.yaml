@@ -1,5 +1,5 @@
 name: headoverheels
-description: "A modern Android port of the classic 1987 isometric puzzle-platformer 'Head over Heels'. Features dual-character mechanics, 5 planets, 21 rooms, and touch-optimized controls."
+description: "Head over Heels, the first game on the reusable isometric core: dual character mechanics, five planets and a world graph the editor can read."
 publish_to: 'none'
 
 version: 1.0.0+1
@@ -38,7 +38,7 @@ dependencies:
 
   # Reusable isometric engine core
   iso_core:
-    path: packages/iso_core
+    path: ../../packages/iso_core
 
 
 dev_dependencies:

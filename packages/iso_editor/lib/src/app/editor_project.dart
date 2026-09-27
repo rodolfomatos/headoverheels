@@ -49,13 +49,15 @@ class EditorProject {
     tilesetImageBasePath: tilesetImageBasePath,
   );
 
-  /// The first game on the platform.
+  /// The first game on the platform, in its own package under games/.
   static const EditorProject headoverheels = EditorProject(
     id: 'headoverheels',
     label: 'Head over Heels',
-    worldKey: 'assets/levels/world.json',
-    roomsBasePath: 'assets/levels/rooms',
-    tilesetImageBasePath: 'assets/tilesets',
+    worldKey: 'games/headoverheels/assets/levels/world.json',
+    manifestKey: 'games/headoverheels/assets/sprites/manifest.yaml',
+    assetsBasePath: 'games/headoverheels/assets/sprites',
+    roomsBasePath: 'games/headoverheels/assets/levels/rooms',
+    tilesetImageBasePath: 'games/headoverheels/assets/levels/tilesets',
   );
 
   /// The second game, the one that proves the editor is not tailored to one.

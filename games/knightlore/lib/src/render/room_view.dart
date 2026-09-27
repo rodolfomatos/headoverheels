@@ -2,7 +2,8 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flame/components.dart';
-import 'package:flutter/material.dart' show Color, FilterQuality, Offset, Rect, Size;
+import 'package:flutter/material.dart'
+    show Color, FilterQuality, Offset, Rect, Size;
 import 'package:iso_core/iso_core.dart';
 import 'package:knightlore/knightlore.dart';
 
@@ -117,8 +118,7 @@ class RoomView extends Component {
   Offset _previewOffset = Offset.zero;
 
   /// Where [point], a position in room coordinates, lands on the canvas.
-  Offset canvasOf(Offset point) =>
-      _previewOffset + point * _previewScale;
+  Offset canvasOf(Offset point) => _previewOffset + point * _previewScale;
 
   /// The room fills the canvas, but never more than [maximumScale] so a small
   /// window does not turn a floor tile into a wall of pixels.

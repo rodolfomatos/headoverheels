@@ -62,10 +62,10 @@ class ShadowShape {
   double get flatten => 0.5;
 
   Rect get bounds => Rect.fromCenter(
-    center: centre.translate(0, radius * flatten * 0.35),
-    width: radius * 2,
-    height: radius * flatten * 2,
-  );
+        center: centre.translate(0, radius * flatten * 0.35),
+        width: radius * 2,
+        height: radius * flatten * 2,
+      );
 
   /// The paint for this shadow, fading at the edges.
   ///
@@ -76,5 +76,9 @@ class ShadowShape {
       const Color(0x66000000),
       const Color(0x33000000),
       const Color(0x00000000),
-    ], const [0.0, 0.55, 1.0]);
+    ], const [
+      0.0,
+      0.55,
+      1.0
+    ]);
 }

@@ -2,7 +2,7 @@
 project: headoverheels
 created: 2026-09-18
 current_sprint: sprint-11
-current_ticket: "T040"
+current_ticket: "T044"
 ---
 
 # Kanban — headoverheels
@@ -161,17 +161,30 @@ first game onto the same platform
 | T044 | Procedural audio: effects and one ambient loop | pending |
 | T045 | Visual polish: shadows, room transitions, ambience, sundial | pending |
 | T046 | Editor reads both games: world and sprite manifest | pending |
-| T047 | Visual proof: render the game to images and inspect them | pending |
+| T047 | Visual proof: render the game to images and inspect them | done |
 | T048 | Balance pass: days, spell decay, treasure placement | pending |
 | T035 | Migrate Head over Heels into games/headoverheels | pending |
 | T036 | TSX authoring: edit tile types/properties and export TSX | pending |
 
 ## In Progress
+* T044: Procedural audio: effects and one ambient loop
+
+## Queued (after T044)
+* T045: Visual polish: shadows, room transitions, ambience, sundial
+* T046: Editor reads both games: world and sprite manifest
+* T048: Balance pass: days, spell decay, treasure placement
 * T035: Migrate Head over Heels into games/headoverheels
 * T036: TSX authoring (edit tile `type`/properties, write TSX)
 
 
 ## Notes
+* T047 scope: `KnightLoreGame.createView()` + `RoomView.renderInto()` render a
+  room off-screen; `test/visual_preview_test.dart` writes `build/preview/*.png`
+  and gates on colour count, an FNV-1a frame hash per area and the bounding box
+  of drawn pixels, so a cropped or blank room fails the build. The evidence found
+  three real defects: the room was cropped, the tileset mixed 32 and 48 tall
+  sprites (walls floated 16px above their tile), and the floor tile's inner
+  diamond was drawn off centre, shearing the grid. All three are fixed.
 * T033 scope: TMX/TSX import, pan/zoom dimetric canvas with tileset image preview, paint/place/erase
   tools, layer visibility, object inspector, document save/load, TMX export, TSX palette browser and
   file-picker gateways. Known gap: no per-layer tile selection.

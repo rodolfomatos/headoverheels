@@ -150,15 +150,27 @@ class KnightLoreGame extends FlameGame {
     return frame.image;
   }
 
-  /// Adds the room view once the world and the art are ready.
-  void attachView() {
+  /// Builds a room view for the current room without attaching it, which is
+  /// what the visual preview test renders.
+  RoomView? createView() {
     final current = session;
-    if (current == null || roomView != null) return;
+    if (current == null) return null;
     final view = RoomView(
       session: current,
       tileset: _tilesets[current.room.theme],
       sprites: _normalisedSprites(),
     );
+    final map = _maps[current.roomId];
+    if (map != null) view.setRoom(map, _tilesets[map.room.theme]!);
+    return view;
+  }
+
+  /// Adds the room view once the world and the art are ready.
+  void attachView() {
+    final current = session;
+    if (current == null || roomView != null) return;
+    final view = createView();
+    if (view == null) return;
     roomView = view;
     world.add(view);
     _syncRoom();

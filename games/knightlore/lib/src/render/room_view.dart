@@ -1,7 +1,8 @@
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flame/components.dart';
-import 'package:flutter/material.dart' show Color, FilterQuality, Offset, Rect;
+import 'package:flutter/material.dart' show Color, FilterQuality, Offset, Rect, Size;
 import 'package:iso_core/iso_core.dart';
 import 'package:knightlore/knightlore.dart';
 
@@ -20,15 +21,38 @@ class RoomView extends Component {
   final Map<String, ui.Image> sprites;
 
   RoomMap? _map;
-  String? _area;
   int _animationTick = 0;
 
-  Offset origin() {
+  /// How far a wall block's face hangs below its tile, in pixels. The same
+  /// number the tileset generator extrudes faces by.
+  static const double blockHeight = 16;
+
+  /// The pixel bounds of the room, taken from the tiles themselves so nothing
+  /// is cropped: half a tile on each side, plus the wall blocks.
+  Rect? get bounds {
     final map = _map;
-    if (map == null) return Offset.zero;
-    final centre = gridToScreen(Vector3(map.width / 2, map.height / 2, 0));
-    return Offset(
-        centre.x + map.width * kTileWidth / 4, centre.y + kTileHeight / 2);
+    if (map == null) return null;
+    var minX = double.infinity;
+    var minY = double.infinity;
+    var maxX = -double.infinity;
+    var maxY = -double.infinity;
+    for (var y = 0; y < map.height; y++) {
+      for (var x = 0; x < map.width; x++) {
+        final point = gridToScreen(Vector3(x.toDouble(), y.toDouble(), 0));
+        minX = math.min(minX, point.x - kTileWidth / 2);
+        maxX = math.max(maxX, point.x + kTileWidth / 2);
+        minY = math.min(minY, point.y - kTileHeight / 2);
+        maxY = math.max(maxY, point.y + kTileHeight / 2 + blockHeight);
+      }
+    }
+    return Rect.fromLTRB(minX, minY, maxX, maxY);
+  }
+
+  /// The offset that turns a projected point into a canvas point.
+  Offset origin() {
+    final rect = bounds;
+    if (rect == null) return Offset.zero;
+    return Offset(-rect.left, -rect.top);
   }
 
   Offset screenOf(Vector3 grid) {
@@ -37,13 +61,39 @@ class RoomView extends Component {
     return Offset(base.dx + point.x, base.dy + point.y);
   }
 
-  Future<void> setRoom(RoomMap map, ui.Image tilesetImage) async {
+  void setRoom(RoomMap map, ui.Image tilesetImage) {
     _map = map;
     tileset = tilesetImage;
-    if (_area != map.room.theme) {
-      _area = map.room.theme;
-    }
   }
+
+  RoomMap? get map => _map;
+
+  /// Draws the room centred in a canvas of [size], scaled up to fill it.
+  void renderInto(ui.Canvas canvas, Size size) {
+    final previous = canvas.getSaveCount();
+    final scale = _scaleFor(size);
+    final room = roomSize;
+    canvas.translate(
+      (size.width - room.width * scale) / 2,
+      (size.height - room.height * scale) / 2,
+    );
+    canvas.scale(scale);
+    render(canvas);
+    canvas.restoreToCount(previous);
+  }
+
+  /// The room fills the canvas, but never more than [maximumScale] so a small
+  /// window does not turn a floor tile into a wall of pixels.
+  double _scaleFor(Size size) {
+    final room = roomSize;
+    if (room.width <= 0 || room.height <= 0) return 1;
+    final byWidth = size.width / room.width;
+    final byHeight = size.height / room.height;
+    return math.min(math.min(byWidth, byHeight), maximumScale);
+  }
+
+  /// A small window should not turn one floor tile into a wall of pixels.
+  static const double maximumScale = 2.4;
 
   void tick() => _animationTick++;
 
@@ -175,12 +225,9 @@ class RoomView extends Component {
     );
   }
 
-  Vector2 get roomSize {
-    final map = _map;
-    if (map == null) return Vector2.zero();
-    return Vector2(
-      (map.width + map.height) * kTileWidth / 2,
-      (map.width + map.height) * kTileHeight / 2 + 24,
-    );
+  Size get roomSize {
+    final rect = bounds;
+    if (rect == null) return Size.zero;
+    return rect.size;
   }
 }

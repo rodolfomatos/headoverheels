@@ -20,6 +20,11 @@ from PIL import Image, ImageDraw
 TILE_W = 64
 TILE_H = 32
 BLOCK_H = 16
+# Every tile sprite is this tall, with the diamond at a fixed y, so the three
+# tiles of a sheet line up exactly when the renderer draws them.
+TILE_SPRITE_H = TILE_H + BLOCK_H * 2
+# The top of the diamond inside a sprite.
+D_TOP = BLOCK_H
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT_TILES = os.path.join(ROOT, "games", "knightlore", "assets", "world", "tiles")
@@ -40,48 +45,48 @@ class AreaPalette:
 AREAS = [
     AreaPalette(
         "castle",
-        (74, 70, 66),
-        (44, 41, 38),
-        (96, 92, 88),
-        (58, 54, 50),
-        (40, 37, 34),
-        (198, 168, 96),
+        (122, 114, 104),
+        (74, 68, 62),
+        (168, 158, 142),
+        (96, 88, 80),
+        (62, 57, 52),
+        (236, 198, 112),
     ),
     AreaPalette(
         "jungle",
-        (58, 92, 52),
-        (32, 58, 30),
-        (78, 118, 66),
-        (44, 72, 40),
-        (30, 52, 28),
-        (150, 210, 90),
+        (92, 142, 78),
+        (54, 92, 48),
+        (126, 180, 100),
+        (74, 118, 62),
+        (48, 78, 42),
+        (186, 236, 118),
     ),
     AreaPalette(
         "cauldron",
-        (72, 58, 78),
-        (42, 34, 48),
-        (96, 78, 102),
-        (56, 44, 60),
-        (38, 30, 42),
-        (198, 120, 220),
+        (108, 86, 120),
+        (66, 52, 74),
+        (152, 124, 166),
+        (88, 68, 96),
+        (58, 45, 64),
+        (224, 150, 244),
     ),
     AreaPalette(
         "mine",
-        (66, 62, 58),
-        (38, 35, 32),
-        (88, 82, 76),
-        (50, 46, 42),
-        (34, 31, 28),
-        (232, 168, 72),
+        (104, 98, 92),
+        (62, 58, 54),
+        (142, 132, 120),
+        (82, 76, 70),
+        (54, 50, 46),
+        (248, 186, 96),
     ),
     AreaPalette(
         "tower",
-        (60, 58, 76),
-        (34, 32, 46),
-        (84, 80, 104),
-        (48, 45, 62),
-        (32, 30, 40),
-        (170, 150, 240),
+        (94, 90, 118),
+        (56, 53, 74),
+        (132, 126, 162),
+        (76, 72, 100),
+        (50, 47, 64),
+        (198, 178, 255),
     ),
 ]
 
@@ -115,65 +120,119 @@ def diamond_polygon(width: int, height: int, top: int = 0):
 
 
 def floor_tile(palette: AreaPalette) -> Image.Image:
-    tile = Image.new("RGBA", (TILE_W, TILE_H), (0, 0, 0, 0))
+    tile = Image.new("RGBA", (TILE_W, TILE_SPRITE_H), (0, 0, 0, 0))
     draw = ImageDraw.Draw(tile)
-    draw.polygon(diamond_polygon(TILE_W, TILE_H), fill=palette.floor_top + (255,))
-    # A darker lower band gives the floor some depth without a second sprite.
     draw.polygon(
-        diamond_polygon(TILE_W, TILE_H, top=6),
-        outline=palette.floor_side + (255,),
+        diamond_polygon(TILE_W, TILE_H, top=D_TOP),
+        fill=palette.floor_top + (255,),
     )
-    for offset in (10, 20, 30):
-        draw.point([(TILE_W // 2 + offset, TILE_H // 2)], fill=palette.floor_side)
+
+    # An inner diamond reads as a tile edge, so the floor is not a flat sheet.
+    # It has to stay centred, or the whole room ends up sheared.
+    inner_w, inner_h = TILE_W - 12, TILE_H - 6
+    inner = [
+        (x + (TILE_W - inner_w) // 2, y + (TILE_H - inner_h) // 2 + D_TOP)
+        for x, y in diamond_polygon(inner_w, inner_h)
+    ]
+    draw.polygon(inner, fill=shade(palette.floor_top, 1.1) + (255,))
+    outline = diamond_polygon(TILE_W, TILE_H, top=D_TOP)
+    draw.line(outline + [outline[0]], fill=palette.floor_side + (255,))
+    # Two quiet marks so a large floor still has texture without moire.
+    for dx in (-8, 9):
+        draw.point(
+            [(TILE_W // 2 + dx, D_TOP + TILE_H // 2)],
+            fill=palette.floor_side + (255,),
+        )
     return tile
 
 
 def wall_tile(palette: AreaPalette) -> Image.Image:
-    """A solid block: a lit diamond on top of two visible sides."""
-    tile = Image.new("RGBA", (TILE_W, TILE_H + BLOCK_H), (0, 0, 0, 0))
+    """A solid block: a lit diamond on top of two faces extruded downwards.
+
+    Extruding down, not up, is what keeps the block sitting on its own tile: a
+    raised top face would leave the block floating over the floor.
+    """
+    tile = Image.new("RGBA", (TILE_W, TILE_SPRITE_H), (0, 0, 0, 0))
     draw = ImageDraw.Draw(tile)
-    top = BLOCK_H
-    left = [(0, TILE_H // 2), (TILE_W // 2, TILE_H - 1), (TILE_W // 2, top + TILE_H // 2 - 1)]
+    middle = D_TOP + TILE_H // 2
+    bottom = D_TOP + TILE_H - 1
+    foot = TILE_SPRITE_H - 1
+    left = [(0, middle), (TILE_W // 2, bottom), (TILE_W // 2, foot), (0, foot - TILE_H // 2)]
     right = [
-        (TILE_W - 1, TILE_H // 2),
-        (TILE_W // 2, TILE_H - 1),
-        (TILE_W // 2, top + TILE_H // 2 - 1),
+        (TILE_W - 1, middle),
+        (TILE_W // 2, bottom),
+        (TILE_W // 2, foot),
+        (TILE_W - 1, foot - TILE_H // 2),
     ]
     draw.polygon(left, fill=palette.wall_left + (255,))
     draw.polygon(right, fill=palette.wall_side + (255,))
     draw.polygon(
-        diamond_polygon(TILE_W, TILE_H, top=top),
+        diamond_polygon(TILE_W, TILE_H, top=D_TOP),
         fill=palette.wall_top + (255,),
     )
+    outline = diamond_polygon(TILE_W, TILE_H, top=D_TOP)
+    draw.line(outline + [outline[0]], fill=shade(palette.wall_top, 1.3) + (255,), width=2)
+
+    # Masonry joints: one course line and two uprights per face.
+    for face, tint in ((left, 0.72), (right, 0.55)):
+        draw.line(
+            [(face[0][0], middle + 8), (TILE_W // 2, bottom + 8)],
+            fill=shade(palette.wall_side, tint) + (255,),
+        )
+        draw.line(
+            [(face[3][0] + (TILE_W // 2 - face[3][0]) // 2, face[3][1] + TILE_H // 4),
+             (TILE_W // 2, bottom + 8 + TILE_H // 4)],
+            fill=shade(palette.wall_side, tint) + (255,),
+        )
+    # The corner between the two faces, and a shadow where the block meets the
+    # floor.
     draw.line(
-        diamond_polygon(TILE_W, TILE_H, top=top) + [diamond_polygon(TILE_W, TILE_H, top=top)[0]],
-        fill=shade(palette.wall_top, 1.25) + (255,),
-        width=1,
+        [(TILE_W // 2, bottom), (TILE_W // 2, foot)],
+        fill=shade(palette.wall_side, 0.45) + (255,),
     )
-    return tile.crop((0, 0, TILE_W, TILE_H + BLOCK_H))
-
-
-def wall_top_tile(palette: AreaPalette) -> Image.Image:
-    tile = Image.new("RGBA", (TILE_W, TILE_H), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(tile)
-    draw.polygon(diamond_polygon(TILE_W, TILE_H), fill=palette.wall_top + (255,))
-    draw.polygon(
-        diamond_polygon(TILE_W, TILE_H, top=5),
-        outline=shade(palette.wall_top, 0.8) + (255,),
+    draw.line(
+        [(0, foot - TILE_H // 2), (TILE_W // 2, foot), (TILE_W - 1, foot - TILE_H // 2)],
+        fill=shade(palette.wall_side, 0.5) + (200,),
     )
     return tile
 
 
+def wall_top_tile(palette: AreaPalette) -> Image.Image:
+    """The far wall of a room: a lit top face and the top of its front face."""
+    tile = Image.new("RGBA", (TILE_W, TILE_SPRITE_H), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(tile)
+    middle = D_TOP + TILE_H // 2
+    bottom = D_TOP + TILE_H - 1
+    draw.polygon(
+        [(0, middle), (TILE_W // 2, bottom), (TILE_W - 1, middle), (TILE_W // 2, middle - TILE_H // 2)],
+        fill=shade(palette.wall_side, 0.8) + (255,),
+    )
+    draw.polygon(
+        diamond_polygon(TILE_W, TILE_H, top=D_TOP),
+        fill=palette.wall_top + (255,),
+    )
+    draw.polygon(
+        [
+            (x + (TILE_W - 50) // 2, y + (TILE_H - 25) // 2 + D_TOP)
+            for x, y in diamond_polygon(50, 25)
+        ],
+        fill=shade(palette.wall_top, 1.12) + (255,),
+    )
+    outline = diamond_polygon(TILE_W, TILE_H, top=D_TOP)
+    draw.line(outline + [outline[0]], fill=shade(palette.wall_top, 1.35) + (255,), width=2)
+    return tile
+
+
 def build_tileset(palette: AreaPalette) -> Image.Image:
-    sheet = Image.new("RGBA", (TILE_W * 3, TILE_H + BLOCK_H), (0, 0, 0, 0))
+    sheet = Image.new("RGBA", (TILE_W * 3, TILE_SPRITE_H), (0, 0, 0, 0))
     floor = floor_tile(palette)
     wall = wall_tile(palette)
     top = wall_top_tile(palette)
     for index, tile in enumerate([floor, wall, top]):
-        # Floor and wall top are 32 tall, the block is 48; align them on the
-        # lower half so a room reads as a flat plane with blocks on it.
-        offset = (TILE_H + BLOCK_H) - tile.height
-        sheet.paste(tile, (index * TILE_W, offset), tile)
+        # All three sprites are the same height with the diamond at the same
+        # y, so the renderer can centre them on the tile and line them up.
+        assert tile.height == TILE_SPRITE_H, tile.height
+        sheet.paste(tile, (index * TILE_W, 0), tile)
     return sheet
 
 

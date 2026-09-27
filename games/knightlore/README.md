@@ -116,6 +116,16 @@ on disk no longer matches what the synthesiser renders.
 
     dart run tool/generate_audio.dart
 
+## Look
+
+- `lib/src/render/ambience.dart` is the light of each place: the mine is warm and
+  dark, the tower cold and blue, the jungle green. The room view washes the
+  finished room with it, and every figure casts a soft shadow on the floor.
+- A room change fades over about a fifth of a second, with the wash easing back
+  in behind the fade.
+- The HUD carries the sundial of the original: forty ticks, a marker for the day
+  and a lit half for the night.
+
 ## Not implemented yet
 
 - A menu.

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flame/game.dart';
@@ -54,6 +55,17 @@ class KnightLoreGame extends FlameGame {
   String? error;
 
   bool _loaded = false;
+
+  /// How much of the screen is still black from the last room change, 1 to 0.
+  ///
+  /// The original cuts between rooms. A short fade is the polish, and it also
+  /// hides the moment when the new room is drawn before the party is placed.
+  double transition = 0;
+
+  /// How long a room change takes to fade, in seconds.
+  static const double transitionSeconds = 0.22;
+
+  bool get isTransitioning => transition > 0;
 
   /// Trap cycles per second.
   static const double trapTicksPerSecond = 6;
@@ -209,6 +221,8 @@ class KnightLoreGame extends FlameGame {
     roomView?.tick();
     // The traps keep their own time so a party standing still still gets
     // caught, and so the renderer can draw a spike that is currently out.
+    _stepTransition(dt);
+
     final session = this.session;
     if (session != null && _loaded) {
       _trapAccumulator += dt * trapTicksPerSecond;
@@ -370,6 +384,42 @@ class KnightLoreGame extends FlameGame {
   }
 
   /// The game ends when the curse is broken or the days run out.
+  /// Fades the room change out. A party that changes rooms twice in one frame
+  /// restarts the fade instead of stacking it.
+  void _stepTransition(double dt) {
+    if (transition > 0) {
+      transition = math.max(0, transition - dt / transitionSeconds);
+    }
+    final view = roomView;
+    if (view == null) return;
+    view.fade = transition;
+    // The wash comes back as the fade clears. Driving both from the same value
+    // is what stops a room staying unlit forever after a change.
+    view.ambienceStrength = 1 - transition;
+    // The canvas size is only known once the game is on screen. Reading it
+    // before layout asserts, and the game does update before the widget puts it
+    // on the display.
+    if (transition > 0 && hasLayout) {
+      final canvas = camera.viewport.size;
+      view.canvasSize = ui.Size(canvas.x, canvas.y);
+    }
+  }
+
+  /// Starts the fade for a room change. Public because a screen that swaps
+  /// rooms itself has to start the same fade.
+  void beginTransition() {
+    transition = 1;
+    final view = roomView;
+    if (view != null) {
+      view.ambienceStrength = 0;
+      view.fade = 1;
+    }
+  }
+
+  /// Where [Sundial] reads the day from: the dial counts the days that have
+  /// passed, the HUD counts the ones that are left.
+  int get daysOn => CurseState.totalDays - (session?.curse.daysLeft ?? CurseState.totalDays) + 1;
+
   /// Queues a sound. Deliberately not awaited: a cue must never delay a move.
   void _cue(AudioCue cue) {
     audio.play(cue);
@@ -453,6 +503,7 @@ class KnightLoreGame extends FlameGame {
         message = '';
         _syncRoom();
         if (outcome == MoveOutcome.changedRoom) {
+          beginTransition();
           _cue(AudioCue.door);
           final current = session;
           if (current != null) audio.startAmbient(current.room.theme);

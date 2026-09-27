@@ -227,6 +227,12 @@ class _StatusBar extends StatelessWidget {
                 '${CurseState.totalIngredients - curse.ingredientsLeft}'
                 '/${CurseState.totalIngredients}',
           ),
+        if (curse != null)
+          Sundial(
+            daysLeft: curse.daysLeft,
+            totalDays: CurseState.totalDays,
+            isNight: game.isNight,
+          ),
         _Chip(
           label: game.isNight ? 'night' : 'day',
           colour:

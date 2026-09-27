@@ -14,11 +14,15 @@ class RoomView extends Component {
     required this.session,
     required this.tileset,
     required this.sprites,
+    this.isNight = false,
   });
 
   final RoomSession session;
   ui.Image? tileset;
   final Map<String, ui.Image> sprites;
+
+  /// Whether the room is drawn at night, which changes the wash.
+  bool isNight;
 
   RoomMap? _map;
   int _animationTick = 0;
@@ -27,9 +31,12 @@ class RoomView extends Component {
   /// number the tileset generator extrudes faces by.
   static const double blockHeight = 16;
 
-  /// The pixel bounds of the room, taken from the tiles themselves so nothing
-  /// is cropped: half a tile on each side, plus the wall blocks.
-  Rect? get bounds {
+  /// The pixel bounds of the room in projection space, taken from the tiles
+  /// themselves so nothing is cropped: half a tile on each side, plus the wall
+  /// blocks hanging below the near edge.
+  ///
+  /// This is *not* where the room is drawn: [origin] moves it to the top left.
+  Rect? get projection {
     final map = _map;
     if (map == null) return null;
     var minX = double.infinity;
@@ -50,9 +57,22 @@ class RoomView extends Component {
 
   /// The offset that turns a projected point into a canvas point.
   Offset origin() {
-    final rect = bounds;
+    final rect = projection;
     if (rect == null) return Offset.zero;
     return Offset(-rect.left, -rect.top);
+  }
+
+  /// The room where it is actually drawn, which is [projection] moved by
+  /// [origin].
+  ///
+  /// Anything drawn over the whole room, such as the ambience wash, has to use
+  /// this one: mixing the two spaces shifts the overlay by the origin and paints
+  /// it over the wrong half of the screen.
+  Rect? get bounds {
+    final rect = projection;
+    if (rect == null) return null;
+    final offset = origin();
+    return rect.shift(offset);
   }
 
   Offset screenOf(Vector3 grid) {
@@ -70,17 +90,35 @@ class RoomView extends Component {
 
   /// Draws the room centred in a canvas of [size], scaled up to fill it.
   void renderInto(ui.Canvas canvas, Size size) {
+    canvasSize = size;
     final previous = canvas.getSaveCount();
     final scale = _scaleFor(size);
     final room = roomSize;
-    canvas.translate(
+    final offset = Offset(
       (size.width - room.width * scale) / 2,
       (size.height - room.height * scale) / 2,
     );
+    canvas.translate(offset.dx, offset.dy);
     canvas.scale(scale);
     render(canvas);
     canvas.restoreToCount(previous);
+    _previewScale = scale;
+    _previewOffset = offset;
   }
+
+  /// The scale and offset of the last [renderInto] call.
+  ///
+  /// The game draws with no extra transform, so this is one for a running game.
+  /// It exists so a test, or anything else that renders off screen, can turn a
+  /// room position into a canvas position instead of guessing the transform.
+  double get previewScale => _previewScale;
+  Offset get previewOffset => _previewOffset;
+  double _previewScale = 1;
+  Offset _previewOffset = Offset.zero;
+
+  /// Where [point], a position in room coordinates, lands on the canvas.
+  Offset canvasOf(Offset point) =>
+      _previewOffset + point * _previewScale;
 
   /// The room fills the canvas, but never more than [maximumScale] so a small
   /// window does not turn a floor tile into a wall of pixels.
@@ -132,6 +170,18 @@ class RoomView extends Component {
       }
     }
 
+    // Shadows go under everything that stands up, so a prop or a knight sits
+    // on the floor instead of floating over it.
+    if (drawShadows) {
+      for (final object in map.objects) {
+        final shape = ShadowShape(
+          centre: screenOf(object.position),
+          radius: 9,
+        );
+        canvas.drawOval(shape.bounds, shape.paint);
+      }
+    }
+
     for (final object in map.objects) {
       final sprite = sprites[object.type];
       final centre = screenOf(object.position);
@@ -153,7 +203,52 @@ class RoomView extends Component {
     }
 
     _renderParty(canvas, frame);
+
+    // The wash of the area, painted over the finished room. It is the last
+    // thing drawn so it tints the tiles, the props and the party together.
+    final room = bounds;
+    final ambience = Ambience.of(map.room.theme);
+    // The area decides how strong its own light is; the game scales that, so a
+    // room that is fading in does not arrive fully lit.
+    final alpha = (ambience.strength * ambienceStrength).clamp(0.0, 1.0);
+    if (room != null && alpha > 0) {
+      canvas.drawRect(
+        room.inflate(2),
+        ui.Paint()..color = ambience.colour.withValues(alpha: alpha),
+      );
+    }
+
+    // The room change fade goes over the wash, over everything.
+    if (fade > 0) {
+      final area = canvasSize;
+      if (area.width > 0 && area.height > 0) {
+        canvas.drawRect(
+          Offset.zero & area,
+          ui.Paint()..color = const Color(0xFF000000).withValues(alpha: fade),
+        );
+      }
+    }
   }
+
+  /// The canvas the fade covers. The game sets it from its own size, and
+  /// [renderInto] sets it for an off-screen render.
+  Size canvasSize = Size.zero;
+
+  /// Whether figures cast a shadow. Off gives a flat, wireframe look, which is
+  /// also how a test can tell what the shadow itself is doing.
+  bool drawShadows = true;
+
+  /// How much of the area's colour to lay over the room, 0 to 1. The game
+  /// lowers it while a room transition is fading.
+  double ambienceStrength = 1;
+
+  /// How black the screen is right now, 0 to 1. The game drives this on a room
+  /// change.
+  ///
+  /// The fade lives here rather than in the widget tree because the value
+  /// changes every frame: a widget would rebuild the whole overlay sixty times
+  /// a second to change one number.
+  double fade = 0;
 
   int _tileIndexFor(int tile) {
     // 1 = floor, 2 = wall block, 3 = wall top
@@ -179,6 +274,11 @@ class RoomView extends Component {
       }
       _drawFrame(canvas, sprite, anchor, frame, spread: 0);
       return;
+    }
+
+    if (drawShadows) {
+      final shape = ShadowShape(centre: anchor, radius: 10);
+      canvas.drawOval(shape.bounds, shape.paint);
     }
 
     // The four knights stand shoulder to shoulder, as one creature.
@@ -226,7 +326,7 @@ class RoomView extends Component {
   }
 
   Size get roomSize {
-    final rect = bounds;
+    final rect = projection;
     if (rect == null) return Size.zero;
     return rect.size;
   }

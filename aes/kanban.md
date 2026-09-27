@@ -2,7 +2,7 @@
 project: headoverheels
 created: 2026-09-18
 current_sprint: sprint-11
-current_ticket: "T045"
+current_ticket: "T046"
 ---
 
 # Kanban — headoverheels
@@ -159,7 +159,7 @@ first game onto the same platform
 | T042 | Traps and hazards: impalers, ball chains, blocks, demons | done |
 | T043 | Screens: title, status scroll, pause, victory, defeat | done |
 | T044 | Procedural audio: effects and one ambient loop | done |
-| T045 | Visual polish: shadows, room transitions, ambience, sundial | pending |
+| T045 | Visual polish: shadows, room transitions, ambience, sundial | done |
 | T046 | Editor reads both games: world and sprite manifest | pending |
 | T047 | Visual proof: render the game to images and inspect them | done |
 | T048 | Balance pass: days, spell decay, treasure placement | pending |
@@ -167,16 +167,29 @@ first game onto the same platform
 | T036 | TSX authoring: edit tile types/properties and export TSX | pending |
 
 ## In Progress
-* T045: Visual polish: shadows, room transitions, ambience, sundial
-
-## Queued (after T045)
 * T046: Editor reads both games: world and sprite manifest
+
+## Queued (after T046)
 * T048: Balance pass: days, spell decay, treasure placement
 * T035: Migrate Head over Heels into games/headoverheels
 * T036: TSX authoring (edit tile `type`/properties, write TSX)
 
 
 ## Notes
+* T045 scope: four things, all data or geometry rather than new state.
+  `lib/src/render/ambience.dart` holds the light of each area and the shape of a
+  shadow; the room view draws a shadow under every figure and washes the finished
+  room with the area's colour; `sundial.dart` draws the forty day dial on the HUD
+  from a pure geometry class, so a test checks the marker really travels instead
+  of trusting a picture; and a room change now fades over `transitionSeconds`
+  (0.22s) with the wash easing back in behind it.
+  The tests found four defects, all fixed: the fade read the camera size, which
+  asserts before the game is laid out and would have crashed the first frame; the
+  ambience never came back after a room change, leaving the room unlit forever;
+  `RoomView.bounds` was in projection space while everything is drawn in
+  `screenOf` space, so the wash was offset by the origin and painted over half
+  the screen; and the wash used the view's strength as the alpha, which starts
+  at 1, so it was fully opaque instead of the area's own 0.35 to 0.45.
 * T044 scope: the audio is synthesised, not sampled. `lib/src/audio/audio_synth.dart`
   is pure Dart (pulse, triangle, noise, glide, envelopes), `knight_lore_cues.dart`
   holds 22 cues and five seamless ambient loops, and `tool/generate_audio.dart`

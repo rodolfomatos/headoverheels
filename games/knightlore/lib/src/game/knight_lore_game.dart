@@ -37,10 +37,16 @@ class KnightLoreGame extends FlameGame {
   KnightLoreGame({
     this.config = const KnightLoreGameConfig(),
     AssetBundle? bundle,
-  }) : bundle = bundle ?? rootBundle;
+    KnightLoreAudio? audio,
+  })  : bundle = bundle ?? rootBundle,
+        audio = audio ?? KnightLoreAudio();
 
   final KnightLoreGameConfig config;
   final AssetBundle bundle;
+
+  /// The sounds. Silent unless a sink is given, so tests and the off-screen
+  /// preview never touch an audio device.
+  final KnightLoreAudio audio;
 
   RoomSession? session;
   RoomView? roomView;
@@ -221,6 +227,7 @@ class KnightLoreGame extends FlameGame {
         _nightHandled = true;
         current.nightFalls();
         current.splitParty();
+        _cue(AudioCue.night);
         message = isSplit
             ? 'The curse splits: four knights, one creature.'
             : 'Night falls. The sabreman turns into a wolf.';
@@ -229,6 +236,8 @@ class KnightLoreGame extends FlameGame {
         _nightHandled = false;
         current.dawnBreaks();
         final event = current.advanceDay();
+        _cue(AudioCue.dawn);
+        _cue(AudioCue.dayTick);
         message = switch (event) {
           CurseEvent.outOfTime => 'The forty days are over.',
           null => 'Dawn. ${current.curse.daysLeft} days left.',
@@ -252,6 +261,8 @@ class KnightLoreGame extends FlameGame {
     }
     final slot = _slotFor(key);
     if (slot != null) {
+      final items = current.inventory.items;
+      _lastCastItem = slot < items.length ? items[slot] : null;
       _applyCast(current.castAtSlot(slot));
       return;
     }
@@ -359,17 +370,26 @@ class KnightLoreGame extends FlameGame {
   }
 
   /// The game ends when the curse is broken or the days run out.
+  /// Queues a sound. Deliberately not awaited: a cue must never delay a move.
+  void _cue(AudioCue cue) {
+    audio.play(cue);
+  }
+
   void _checkEnd() {
     final current = session;
     if (current == null) return;
     if (isWon && screen != GameScreen.victory) {
       screen = GameScreen.victory;
       message = 'The curse is broken. You ride out of the castle a man again.';
+      _cue(AudioCue.victory);
+      audio.stopAmbient();
       return;
     }
     if (isOutOfTime && screen != GameScreen.defeat) {
       screen = GameScreen.defeat;
       message = 'The forty days are over and the wolf keeps you.';
+      _cue(AudioCue.defeat);
+      audio.stopAmbient();
     }
   }
 
@@ -380,6 +400,14 @@ class KnightLoreGame extends FlameGame {
       CastOutcome.noSpell => 'The scroll is blank.',
       CastOutcome.nothing => '',
     };
+    if (outcome == CastOutcome.cast) {
+      // The scroll that was cast decides the sound, so casting the same spell
+      // twice sounds the same twice.
+      final cue = cueForSpellItem(_lastCastItem);
+      if (cue != null) _cue(cue);
+    } else if (outcome == CastOutcome.noSpell) {
+      _cue(AudioCue.blockedCurse);
+    }
   }
 
   /// A trap that caught the party costs a day; say so.
@@ -389,6 +417,7 @@ class KnightLoreGame extends FlameGame {
       return;
     }
     final hazard = session.hazards.byId(session.lastHazardId ?? '');
+    _cue(hazard?.kind == HazardKind.ball ? AudioCue.trap : AudioCue.hurt);
     message = switch (hazard?.kind) {
       HazardKind.spikes => 'The spikes catch you. A day is gone.',
       HazardKind.demon => 'The demon surfaces on you. A day is gone.',
@@ -406,22 +435,32 @@ class KnightLoreGame extends FlameGame {
     switch (outcome) {
       case MoveOutcome.moved:
         message = '';
+        _cue(AudioCue.step);
       case MoveOutcome.blocked:
         message =
             session?.lastHazardId != null ? 'A ball is in the way.' : 'A wall.';
+        _cue(AudioCue.blocked);
       case MoveOutcome.noExit:
         message = 'No way out that way.';
+        _cue(AudioCue.blocked);
       case MoveOutcome.refused:
         message = isWerewolf
             ? 'The wolf cannot use a doorway.'
             : 'That door is locked.';
+        _cue(AudioCue.blockedCurse);
       case MoveOutcome.changedRoom:
       case MoveOutcome.flipped:
         message = '';
         _syncRoom();
+        if (outcome == MoveOutcome.changedRoom) {
+          _cue(AudioCue.door);
+          final current = session;
+          if (current != null) audio.startAmbient(current.room.theme);
+        }
     }
   }
 
+  String? _lastCastItem;
   String? _lastChestItem;
   bool _won = false;
 
@@ -447,6 +486,14 @@ class KnightLoreGame extends FlameGame {
       InteractOutcome.dropped => 'An empty chest.',
       InteractOutcome.nothing => '',
     };
+    _cue(switch (outcome) {
+      InteractOutcome.pickedUp => AudioCue.pickup,
+      InteractOutcome.chestOpened => AudioCue.chest,
+      InteractOutcome.ingredientAccepted => AudioCue.chest,
+      InteractOutcome.ingredientRefused => AudioCue.blockedCurse,
+      InteractOutcome.dropped => AudioCue.drop,
+      _ => AudioCue.menuMove,
+    });
     // The end of the game has the last word on the message.
     _checkEnd();
   }

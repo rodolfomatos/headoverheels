@@ -28,7 +28,13 @@ class _KnightLoreScreenState extends State<KnightLoreScreen> {
   @override
   void initState() {
     super.initState();
-    _game = widget.game ?? KnightLoreGame(config: widget.config);
+    // The screen is the only place that knows a real device is there, so it is
+    // the only place that gets a real audio sink. Tests inject their own game.
+    _game = widget.game ??
+        KnightLoreGame(
+          config: widget.config,
+          audio: KnightLoreAudio(sink: FlameAudioSink()),
+        );
     _ownsGame = widget.game == null;
     // The game widget can take the focus, so ask for it on the first frame
     // instead of relying on autofocus alone.

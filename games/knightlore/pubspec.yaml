@@ -8,6 +8,7 @@ environment:
 
 dependencies:
   flame: ^1.38.2
+  flame_audio: ^2.0.0
   flutter:
     sdk: flutter
   iso_core:
@@ -27,3 +28,4 @@ flutter:
     - assets/world/tiles/
     - assets/world/rooms/
     - assets/sprites/
+    - assets/audio/

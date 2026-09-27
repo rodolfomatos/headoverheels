@@ -2,7 +2,7 @@
 project: headoverheels
 created: 2026-09-18
 current_sprint: sprint-11
-current_ticket: "T044"
+current_ticket: "T045"
 ---
 
 # Kanban — headoverheels
@@ -158,7 +158,7 @@ first game onto the same platform
 | T041 | Treasures, chests and the six ingredients, with win state | done |
 | T042 | Traps and hazards: impalers, ball chains, blocks, demons | done |
 | T043 | Screens: title, status scroll, pause, victory, defeat | done |
-| T044 | Procedural audio: effects and one ambient loop | pending |
+| T044 | Procedural audio: effects and one ambient loop | done |
 | T045 | Visual polish: shadows, room transitions, ambience, sundial | pending |
 | T046 | Editor reads both games: world and sprite manifest | pending |
 | T047 | Visual proof: render the game to images and inspect them | done |
@@ -167,10 +167,9 @@ first game onto the same platform
 | T036 | TSX authoring: edit tile types/properties and export TSX | pending |
 
 ## In Progress
-* T044: Procedural audio: effects and one ambient loop
-
-## Queued (after T044)
 * T045: Visual polish: shadows, room transitions, ambience, sundial
+
+## Queued (after T045)
 * T046: Editor reads both games: world and sprite manifest
 * T048: Balance pass: days, spell decay, treasure placement
 * T035: Migrate Head over Heels into games/headoverheels
@@ -178,6 +177,18 @@ first game onto the same platform
 
 
 ## Notes
+* T044 scope: the audio is synthesised, not sampled. `lib/src/audio/audio_synth.dart`
+  is pure Dart (pulse, triangle, noise, glide, envelopes), `knight_lore_cues.dart`
+  holds 22 cues and five seamless ambient loops, and `tool/generate_audio.dart`
+  writes `assets/audio/*.wav` from that same code. `test/audio_test.dart` proves
+  each cue is audible, brief, unclipped, distinct and that the committed files
+  match a fresh render, so a cue cannot drift from its file.
+  `test/audio_wiring_test.dart` proves the rules actually reach the sounds: a
+  step, a bump, a door, a pickup, a trap, a spell per scroll, night and dawn.
+  The failures the tests found: the WAV header was not in the pubspec asset list,
+  so a release build shipped no audio at all; the frame hash rounded float samples
+  to zero and made every sound look identical; and the loop seam test compared
+  the wrong samples, which proves nothing for a square wave.
 * T047 scope: `KnightLoreGame.createView()` + `RoomView.renderInto()` render a
   room off-screen; `test/visual_preview_test.dart` writes `build/preview/*.png`
   and gates on colour count, an FNV-1a frame hash per area and the bounding box

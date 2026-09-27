@@ -6,6 +6,9 @@
 /// assets, rendering helpers) lives in `iso_core`.
 library;
 
+export 'src/audio/audio_synth.dart';
+export 'src/audio/knight_lore_cues.dart';
+export 'src/audio/knight_lore_audio.dart';
 export 'src/curse.dart';
 export 'src/inventory.dart';
 export 'src/knight.dart';

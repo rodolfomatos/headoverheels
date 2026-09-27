@@ -2,7 +2,7 @@
 project: headoverheels
 created: 2026-09-18
 current_sprint: sprint-11
-current_ticket: "T036"
+current_ticket: "T050"
 ---
 
 # Kanban — headoverheels
@@ -45,7 +45,7 @@ current_ticket: "T036"
 | T033 | Visual isometric map editor | high | done |
 | T034 | Sprite browser/animator and asset management UI | high | done |
 | T035 | Migrate Head over Heels into games/headoverheels | high | done |
-| T036 | TSX authoring: edit tile types/properties and export TSX | medium | pending |
+| T036 | TSX authoring: edit tile types/properties and export TSX | medium | done |
 | T037 | World graph viewer/editor with topology validation | high | done |
 | T038 | Second example game (Knight Lore) on iso_core | medium | done |
 | T039 | Puzzle trigger inspector (switch/target links) in the graph tab | medium | done |
@@ -145,11 +145,11 @@ current_ticket: "T036"
 | T032 | Builder CLI scaffold and project validation | done |
 | T033 | Visual isometric map editor | done |
 | T034 | Sprite browser/animator and asset management UI | done |
-| T036 | TSX authoring: edit tile types/properties and export TSX | pending |
 | T035 | Migrate Head over Heels into games/headoverheels | done |
 | T049 | Replace the untracked HoH audio with synthesised cues | done |
 | T051 | Publish nested assets: a pubspec entry ships only its own files | done |
 | T050 | Clear the 34 analyzer warnings in the HoH code | pending |
+| T052 | The Palette panel squeezes its controls out of reach | pending |
 
 ## Sprint 11 — Knight Lore Completion
 **Goal**: turn the second example game into a finished product, then migrate the
@@ -166,16 +166,38 @@ first game onto the same platform
 | T046 | Editor reads both games: world and sprite manifest | done |
 | T047 | Visual proof: render the game to images and inspect them | done |
 | T048 | Balance pass: days, spell decay, treasure placement | done |
-| T036 | TSX authoring: edit tile types/properties and export TSX | pending |
+| T036 | TSX authoring: edit tile types/properties and export TSX | done |
 
 ## In Progress
-* T036: TSX authoring: edit a tile's type and properties, write the TSX
-
-## Queued (after T036)
 * T050: Clear the analyzer warnings in the migrated code
+
+## Queued (after T050)
+* T052: The Palette panel squeezes its controls out of reach
 
 
 ## Notes
+* T036 scope: the editor could read a TSX and could not write one. Now
+  `TsxTileDefinition` and `TsxTilesetDefinition` are values with `copyWith`,
+  `withProperty`, `withoutProperty`, `upsertTile` and `removeTile`, a
+  `TsxTilesetDefinition.create` that sizes a new tileset from its sheet, a
+  `toXmlString` that writes what Tiled reads, and a `TsxValidation` in the same
+  shape as the world graph's. The Palette tab grew a tile inspector: edit the
+  type, edit the class, add and remove properties, delete the tile, save the
+  file, and author a new tileset from a sheet already in the project, whose size
+  is measured from the image rather than typed. A property keeps its declared type
+  when it is edited, so a number does not quietly become text.
+  `test/tsx_authoring_test.dart` (18) covers the model: round trip through
+  parse and write, property types, validation, and the catalog. Two layout bugs
+  were fixed on the way, both real: the inspector's scroll view handed its fields
+  an unbounded width, so a row of `Expanded` grew to 100 000 pixels, and
+  `TsxBrowser` overflowed by 10 pixels whenever its panel was short, which the
+  existing shell test caught as soon as the inspector took part of the height.
+* T052 scope: with the inspector sharing the Palette panel, the save and delete
+  controls sit in a 320 pixel column below a browser that wants the space. The
+  inspector scrolls, the browser drops its search box under 130 pixels, and the
+  buttons are inside the inspector, but driving them from a widget test is a
+  fight with hit testing rather than with the code. The panel wants a proper
+  layout pass: a tab of its own, or a resizable split.
 * T051 scope: a pubspec entry ending in `/` ships the files directly inside that
   directory and nothing below it, so `assets/sprites/` shipped the manifest and
   none of the sprites. Both games were broken in the browser and neither build

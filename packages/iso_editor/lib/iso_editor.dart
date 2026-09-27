@@ -12,6 +12,7 @@ export 'src/views/map_editor_view.dart';
 export 'src/views/sprite_animator.dart';
 export 'src/views/sprite_gallery.dart';
 export 'src/views/sprite_manager.dart';
+export 'src/views/tsx_authoring.dart';
 export 'src/views/tsx_browser.dart';
 export 'src/views/world_graph_panel.dart';
 export 'src/views/world_graph_view.dart';

@@ -34,66 +34,76 @@ class _TsxBrowserState extends State<TsxBrowser> {
     final index = _tilesetIndex.clamp(0, widget.catalog.tilesets.length - 1);
     final tileset = widget.catalog.tilesets[index];
     final tiles = _filteredTiles(tileset);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        if (widget.catalog.tilesets.length > 1)
-          DropdownButton<int>(
-            value: index,
-            isDense: true,
-            onChanged: (value) => setState(() => _tilesetIndex = value ?? 0),
-            items: [
-              for (var i = 0; i < widget.catalog.tilesets.length; i++)
-                DropdownMenuItem(
-                  value: i,
-                  child: Text(widget.catalog.tilesets[i].name),
-                ),
-            ],
-          ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: TextField(
-            decoration: const InputDecoration(
-              isDense: true,
-              prefixIcon: Icon(Icons.search, size: 18),
-              hintText: 'tile id or type',
-              border: OutlineInputBorder(),
-            ),
-            onChanged: (value) =>
-                setState(() => _query = value.trim().toLowerCase()),
-          ),
-        ),
-        Text(
-          '${tileset.name}: ${tileset.tileCount} tiles, '
-          '${tileset.tileWidth}x${tileset.tileHeight}',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-        const SizedBox(height: 4),
-        Expanded(
-          child: tiles.isEmpty
-              ? const Center(child: Text('No tiles match'))
-              : SingleChildScrollView(
-                  child: Wrap(
-                    spacing: 4,
-                    runSpacing: 4,
-                    children: [
-                      for (final tile in tiles)
-                        _TileCell(
-                          tile: tile,
-                          tileset: tileset,
-                          selected: widget.selectedTileId == tile.id,
-                          imagePath: widget.resolveImagePath?.call(
-                            tileset.imageSource,
-                          ),
-                          onTap: widget.onTileSelected == null
-                              ? null
-                              : () => widget.onTileSelected!(tile),
-                        ),
-                    ],
+    // The panel can be short, and a fixed header plus a grid does not fit in a
+    // box of nothing. Below this the search box goes rather than the layout
+    // overflowing.
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final roomy = constraints.maxHeight >= 130;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (widget.catalog.tilesets.length > 1)
+              DropdownButton<int>(
+                value: index,
+                isDense: true,
+                onChanged: (value) =>
+                    setState(() => _tilesetIndex = value ?? 0),
+                items: [
+                  for (var i = 0; i < widget.catalog.tilesets.length; i++)
+                    DropdownMenuItem(
+                      value: i,
+                      child: Text(widget.catalog.tilesets[i].name),
+                    ),
+                ],
+              ),
+            if (roomy)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: TextField(
+                  decoration: const InputDecoration(
+                    isDense: true,
+                    prefixIcon: Icon(Icons.search, size: 18),
+                    hintText: 'tile id or type',
+                    border: OutlineInputBorder(),
                   ),
+                  onChanged: (value) =>
+                      setState(() => _query = value.trim().toLowerCase()),
                 ),
-        ),
-      ],
+              ),
+            Text(
+              '${tileset.name}: ${tileset.tileCount} tiles, '
+              '${tileset.tileWidth}x${tileset.tileHeight}',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            const SizedBox(height: 4),
+            Expanded(
+              child: tiles.isEmpty
+                  ? const Center(child: Text('No tiles match'))
+                  : SingleChildScrollView(
+                      child: Wrap(
+                        spacing: 4,
+                        runSpacing: 4,
+                        children: [
+                          for (final tile in tiles)
+                            _TileCell(
+                              tile: tile,
+                              tileset: tileset,
+                              selected: widget.selectedTileId == tile.id,
+                              imagePath: widget.resolveImagePath?.call(
+                                tileset.imageSource,
+                              ),
+                              onTap: widget.onTileSelected == null
+                                  ? null
+                                  : () => widget.onTileSelected!(tile),
+                            ),
+                        ],
+                      ),
+                    ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -168,6 +178,9 @@ class _TileCell extends StatelessWidget {
           'id ${tile.id}'
           '${tile.type.isEmpty ? '' : ' · ${tile.type}'}',
       child: InkWell(
+        // Keyed by id, so a tile can be pointed at: from a test, or from the
+        // inspector when it picks one up again after a reload.
+        key: Key('tile-${tile.id}'),
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.all(2),

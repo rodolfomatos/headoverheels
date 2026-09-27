@@ -16,6 +16,7 @@ import '../tmx/tmx_codec.dart';
 import '../tmx/tsx_catalog.dart';
 import '../views/map_editor_view.dart';
 import '../views/sprite_manager.dart';
+import '../views/tsx_authoring.dart';
 import '../views/tsx_browser.dart';
 import '../views/world_graph_panel.dart';
 
@@ -99,7 +100,7 @@ class _IsoEditorAppState extends State<IsoEditorApp> {
       home: EditorShell(
         controller: _controller,
         manifest: _manifest,
-        assetsBasePath: _project.assetsBasePath,
+        assetsBasePath: widget.project.assetsBasePath,
         tilesets: _tilesets,
         tilesetImageBasePath: _project.tilesetImageBasePath,
         fileGateway: widget.fileGateway ?? const FileSelectorEditorGateway(),
@@ -315,6 +316,11 @@ class _EditorShellState extends State<EditorShell> {
                   selectedTileId: _tileId,
                   onTileSelected: _selectPaletteTile,
                   onLoadTileset: _loadTilesetFromFile,
+                  onNewTileset: _authorTileset,
+                  onTileEdited: _editTile,
+                  onTileDeleted: _deleteTile,
+                  onSaveTileset: _saveTileset,
+                  selectedTile: _selectedTile,
                   onImportSprite: _importSprite,
                   worldKey: widget.worldKey,
                   storage: _controller.storage,
@@ -443,6 +449,77 @@ class _EditorShellState extends State<EditorShell> {
       if (tile.type.isNotEmpty) _objectType = tile.type;
     });
     _controller.setTool(EditorTool.tile);
+  }
+
+  /// The tile the inspector is editing, taken from the open tileset.
+  TsxTileDefinition? get _selectedTile {
+    final tileset = _tileset;
+    if (tileset == null) return null;
+    return tileset.tileOrNew(_tileId);
+  }
+
+  /// Puts an edited tile back into its tileset, as a new value.
+  void _editTile(TsxTileDefinition tile) {
+    final tileset = _tileset;
+    if (tileset == null) return;
+    setState(() {
+      _tilesets = (_tilesets ?? TsxCatalog(const [])).upsert(
+        tileset.upsertTile(tile),
+      );
+      _tileset = tileset.upsertTile(tile);
+    });
+  }
+
+  void _deleteTile(int id) {
+    final tileset = _tileset;
+    if (tileset == null) return;
+    setState(() {
+      _tilesets = (_tilesets ?? TsxCatalog(const [])).upsert(
+        tileset.removeTile(id),
+      );
+      _tileset = tileset.removeTile(id);
+    });
+  }
+
+  /// Writes the open tileset back out as TSX.
+  Future<void> _saveTileset() async {
+    final tileset = _tileset;
+    if (tileset == null) return;
+    final validation = TsxValidation.of([tileset]);
+    if (!validation.isValid) {
+      _notify('Cannot save: ${validation.errors.first}');
+      return;
+    }
+    final gateway = _fileGateway;
+    if (gateway == null) {
+      _notify('Configure a file gateway to save TSX tilesets');
+      return;
+    }
+    final path = await gateway.saveText(
+      suggestedName: '${tileset.name}.tsx',
+      contents: tileset.toXmlString(),
+      label: 'Tiled tileset',
+      extensions: const ['tsx'],
+    );
+    if (path == null) return;
+    _notify('Saved ${tileset.name}.tsx');
+  }
+
+  /// Authors a tileset from a sheet that is already in the project.
+  Future<void> _authorTileset() async {
+    final created = await showDialog<TsxTilesetDefinition>(
+      context: context,
+      builder: (context) => NewTilesetDialog(
+        storage: _controller.storage,
+        assetsBasePath: widget.project.assetsBasePath,
+      ),
+    );
+    if (created == null) return;
+    setState(() {
+      _tilesets = (_tilesets ?? TsxCatalog(const [])).upsert(created);
+      _tileset = created;
+    });
+    _notify('Authored ${created.name}: ${created.tileCount} tiles');
   }
 
   Future<void> _loadTilesetFromFile() async {
@@ -742,6 +819,11 @@ class _InspectorPanel extends StatelessWidget {
     required this.selectedTileId,
     required this.onTileSelected,
     required this.onLoadTileset,
+    required this.onNewTileset,
+    required this.onTileEdited,
+    required this.onTileDeleted,
+    required this.onSaveTileset,
+    required this.selectedTile,
     required this.onImportSprite,
     required this.worldKey,
     required this.storage,
@@ -762,6 +844,13 @@ class _InspectorPanel extends StatelessWidget {
   final int selectedTileId;
   final ValueChanged<TsxTileDefinition> onTileSelected;
   final VoidCallback onLoadTileset;
+  final VoidCallback onNewTileset;
+  final ValueChanged<TsxTileDefinition> onTileEdited;
+  final ValueChanged<int> onTileDeleted;
+  final VoidCallback? onSaveTileset;
+
+  /// The tile the inspector is editing.
+  final TsxTileDefinition? selectedTile;
   final VoidCallback onImportSprite;
   final String worldKey;
   final EditorStorage storage;
@@ -851,14 +940,59 @@ class _InspectorPanel extends StatelessWidget {
                                 icon: const Icon(Icons.upload_file),
                                 label: const Text('Load TSX'),
                               ),
+                              const SizedBox(height: 6),
+                              FilledButton.tonalIcon(
+                                key: const Key('new-tsx-button'),
+                                onPressed: onNewTileset,
+                                icon: const Icon(Icons.add),
+                                label: const Text('New TSX'),
+                              ),
                             ],
                           ),
                         )
-                      : TsxBrowser(
-                          key: const Key('tsx-browser'),
-                          catalog: tilesets!,
-                          selectedTileId: selectedTileId,
-                          onTileSelected: onTileSelected,
+                      : Column(
+                          children: [
+                            TsxProblems(validation: tilesets!.validation),
+                            Expanded(
+                              child: TsxBrowser(
+                                key: const Key('tsx-browser'),
+                                catalog: tilesets!,
+                                selectedTileId: selectedTileId,
+                                onTileSelected: onTileSelected,
+                              ),
+                            ),
+                            const Divider(height: 1),
+                            if (selectedTile != null)
+                              TsxTileInspector(
+                                key: ValueKey(
+                                  'tsx-inspector:${selectedTile!.id}',
+                                ),
+                                tile: selectedTile!,
+                                onChanged: onTileEdited,
+                                onDeleted: () =>
+                                    onTileDeleted(selectedTile!.id),
+                              ),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                FilledButton.tonalIcon(
+                                  key: const Key('save-tsx-button'),
+                                  onPressed: onSaveTileset == null
+                                      ? null
+                                      : () => onSaveTileset!(),
+                                  icon: const Icon(Icons.save_outlined),
+                                  label: const Text('Save TSX'),
+                                ),
+                                const SizedBox(width: 8),
+                                TextButton.icon(
+                                  key: const Key('new-tsx-button'),
+                                  onPressed: onNewTileset,
+                                  icon: const Icon(Icons.add, size: 16),
+                                  label: const Text('New'),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                 ),
                 Column(

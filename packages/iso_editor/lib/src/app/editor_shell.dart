@@ -16,6 +16,7 @@ import '../tmx/tsx_catalog.dart';
 import '../views/map_editor_view.dart';
 import '../views/sprite_manager.dart';
 import '../views/tsx_browser.dart';
+import '../views/world_graph_panel.dart';
 
 class IsoEditorApp extends StatefulWidget {
   const IsoEditorApp({
@@ -26,6 +27,7 @@ class IsoEditorApp extends StatefulWidget {
     this.tilesets,
     this.tilesetImageBasePath = 'assets/tilesets',
     this.fileGateway,
+    this.worldKey = 'assets/levels/world.json',
     super.key,
   });
 
@@ -36,6 +38,7 @@ class IsoEditorApp extends StatefulWidget {
   final TsxCatalog? tilesets;
   final String tilesetImageBasePath;
   final EditorFileGateway? fileGateway;
+  final String worldKey;
 
   @override
   State<IsoEditorApp> createState() => _IsoEditorAppState();
@@ -73,6 +76,7 @@ class _IsoEditorAppState extends State<IsoEditorApp> {
         tilesets: _tilesets,
         tilesetImageBasePath: widget.tilesetImageBasePath,
         fileGateway: widget.fileGateway ?? const FileSelectorEditorGateway(),
+        worldKey: widget.worldKey,
       ),
     );
   }
@@ -86,6 +90,7 @@ class EditorShell extends StatefulWidget {
     this.tilesets,
     this.tilesetImageBasePath = 'assets/tilesets',
     this.fileGateway,
+    this.worldKey = 'assets/levels/world.json',
     super.key,
   });
 
@@ -95,6 +100,7 @@ class EditorShell extends StatefulWidget {
   final TsxCatalog? tilesets;
   final String tilesetImageBasePath;
   final EditorFileGateway? fileGateway;
+  final String worldKey;
 
   @override
   State<EditorShell> createState() => _EditorShellState();
@@ -206,6 +212,8 @@ class _EditorShellState extends State<EditorShell> {
                   onTileSelected: _selectPaletteTile,
                   onLoadTileset: _loadTilesetFromFile,
                   onImportSprite: _importSprite,
+                  worldKey: widget.worldKey,
+                  storage: _controller.storage,
                   onSaveAsset: _saveAsset,
                   onDeleteAsset: _deleteAsset,
                   onAddFrames: _addFrames,
@@ -630,6 +638,8 @@ class _InspectorPanel extends StatelessWidget {
     required this.onTileSelected,
     required this.onLoadTileset,
     required this.onImportSprite,
+    required this.worldKey,
+    required this.storage,
     required this.onSaveAsset,
     required this.onDeleteAsset,
     required this.onAddFrames,
@@ -643,6 +653,8 @@ class _InspectorPanel extends StatelessWidget {
   final ValueChanged<TsxTileDefinition> onTileSelected;
   final VoidCallback onLoadTileset;
   final VoidCallback onImportSprite;
+  final String worldKey;
+  final EditorStorage storage;
   final Future<void> Function(AssetEntry entry) onSaveAsset;
   final Future<void> Function(AssetEntry entry) onDeleteAsset;
   final Future<void> Function(AssetEntry entry) onAddFrames;
@@ -650,7 +662,7 @@ class _InspectorPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Column(
         children: [
           const TabBar(
@@ -658,6 +670,7 @@ class _InspectorPanel extends StatelessWidget {
               Tab(text: 'Project'),
               Tab(text: 'Palette'),
               Tab(text: 'Sprites'),
+              Tab(text: 'Graph'),
             ],
           ),
           Expanded(
@@ -776,6 +789,14 @@ class _InspectorPanel extends StatelessWidget {
                             ),
                     ),
                   ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: WorldGraphPanel(
+                    key: const Key('world-graph-panel'),
+                    source: () => storage.readText(worldKey),
+                    onSave: (json) => storage.writeText(worldKey, json),
+                  ),
                 ),
               ],
             ),

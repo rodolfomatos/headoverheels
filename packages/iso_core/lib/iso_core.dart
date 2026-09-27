@@ -4,5 +4,6 @@ export 'src/entities/entities.dart';
 export 'src/input/input.dart';
 export 'src/isometric/isometric.dart';
 export 'src/levels/levels.dart';
+export 'src/levels/world_validation.dart';
 export 'src/physics/physics.dart';
 export 'src/rendering/rendering.dart';

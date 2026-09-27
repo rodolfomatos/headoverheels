@@ -124,6 +124,265 @@ assets:
       expect(graph.getRoomsByTheme('castle'), hasLength(1));
       expect(graph.groups.single.name, 'Castle');
     });
+
+    test('round trips a world graph through json', () {
+      final graph = WorldGraph.fromJson({
+        'startRoom': 'start',
+        'rooms': {
+          'start': {
+            'file': 'start.tmx',
+            'theme': 'castle',
+            'spawnPoint': {'x': 1, 'y': 2, 'z': 0},
+            'exits': [
+              {
+                'direction': 'east',
+                'room': 'next',
+                'entrance': 'west',
+                'isLocked': true,
+                'keyId': 'brass',
+                'oneWay': true,
+              },
+            ],
+            'triggers': [
+              {
+                'id': 'switch_1',
+                'type': 'switch',
+                'position': {'x': 3, 'y': 4, 'z': 0},
+                'size': {'width': 1, 'height': 1},
+                'room': 'next',
+              },
+            ],
+          },
+        },
+        'planets': [
+          {'id': 'castle', 'name': 'Castle'},
+        ],
+      });
+
+      final decoded = WorldGraph.fromJson(
+        jsonDecode(graph.toJsonString()) as Map<String, dynamic>,
+      );
+
+      expect(decoded.startRoom, 'start');
+      expect(decoded.getRoom('start')?.spawnPosition, Vector3(1, 2, 0));
+      final exit = decoded.getRoom('start')!.exits.single;
+      expect(exit.room, 'next');
+      expect(exit.isLocked, isTrue);
+      expect(exit.keyId, 'brass');
+      expect(exit.oneWay, isTrue);
+      final trigger = decoded.getRoom('start')!.triggers.single;
+      expect(trigger.type, 'switch');
+      expect(trigger.position, Vector3(3, 4, 0));
+      expect(trigger.properties['room'], 'next');
+      expect(decoded.groups.single.id, 'castle');
+    });
+
+    test('edits rooms and exits without losing triggers', () {
+      final graph = WorldGraph.fromJson({
+        'startRoom': 'start',
+        'rooms': {
+          'start': {
+            'file': 'start.tmx',
+            'theme': 'castle',
+            'exits': [
+              {'direction': 'east', 'room': 'next', 'entrance': 'west'},
+            ],
+            'triggers': [
+              {
+                'id': 'door_1',
+                'type': 'door',
+                'position': {'x': 3, 'y': 4, 'z': 0},
+                'size': {'width': 1, 'height': 1},
+              },
+            ],
+          },
+        },
+      });
+
+      final room = graph.getRoom('start')!;
+      final edited = graph.upsertRoom(
+        room.copyWith(
+          exits: [room.exits.single.copyWith(isLocked: true, keyId: 'gold')],
+        ),
+      );
+
+      expect(edited.getRoom('start')!.exits.single.isLocked, isTrue);
+      expect(edited.getRoom('start')!.exits.single.keyId, 'gold');
+      expect(edited.getRoom('start')!.triggers, hasLength(1));
+
+      final without = edited.removeRoom('start');
+      expect(without.rooms, isEmpty);
+    });
+  });
+
+  group('world validation', () {
+    WorldGraph graphWith(Map<String, dynamic> rooms, {String start = 'a'}) =>
+        WorldGraph.fromJson({'startRoom': start, 'rooms': rooms});
+
+    test('accepts a symmetric graph', () {
+      final validation = validateWorld(
+        graphWith({
+          'a': {
+            'file': 'a.tmx',
+            'theme': 'castle',
+            'exits': [
+              {'direction': 'east', 'room': 'b', 'entrance': 'west'},
+            ],
+          },
+          'b': {
+            'file': 'b.tmx',
+            'theme': 'castle',
+            'exits': [
+              {'direction': 'west', 'room': 'a', 'entrance': 'east'},
+            ],
+          },
+        }),
+      );
+
+      expect(validation.isValid, isTrue);
+      expect(validation.issues, isEmpty);
+    });
+
+    test('reports unknown targets, duplicates and unreachable rooms', () {
+      final validation = validateWorld(
+        graphWith({
+          'a': {
+            'file': 'a.tmx',
+            'theme': 'castle',
+            'exits': [
+              {'direction': 'east', 'room': 'ghost', 'entrance': 'west'},
+              {'direction': 'east', 'room': 'c', 'entrance': 'west'},
+            ],
+          },
+          'c': {
+            'file': 'c.tmx',
+            'theme': 'castle',
+            'exits': [
+              {'direction': 'west', 'room': 'a', 'entrance': 'east'},
+            ],
+          },
+          'island': {'file': 'island.tmx', 'theme': 'castle'},
+        }),
+      );
+
+      expect(
+        validation.issues.where((i) => i.kind == WorldIssueKind.unknownTarget),
+        hasLength(1),
+      );
+      expect(
+        validation.issues.where(
+          (i) => i.kind == WorldIssueKind.duplicateDirection,
+        ),
+        hasLength(1),
+      );
+      expect(
+        validation.issues.where((i) => i.kind == WorldIssueKind.unreachable),
+        hasLength(1),
+      );
+      expect(validation.isValid, isFalse);
+    });
+
+    test('reports a missing start room, missing file and dead ends', () {
+      final validation = validateWorld(
+        graphWith({
+          'a': {
+            'file': '',
+            'theme': '',
+            'exits': [
+              {'direction': 'east', 'room': 'a', 'entrance': 'west'},
+            ],
+          },
+        }, start: 'nowhere'),
+      );
+
+      expect(
+        validation.issues.where(
+          (i) => i.kind == WorldIssueKind.missingStartRoom,
+        ),
+        hasLength(1),
+      );
+      expect(
+        validation.issues.where((i) => i.kind == WorldIssueKind.missingFile),
+        hasLength(1),
+      );
+      expect(
+        validation.issues.where((i) => i.kind == WorldIssueKind.emptyTheme),
+        hasLength(1),
+      );
+      expect(
+        validation.issues.where((i) => i.kind == WorldIssueKind.selfLoop),
+        hasLength(1),
+      );
+    });
+
+    test('flags one-way and asymmetric exits', () {
+      final validation = validateWorld(
+        graphWith({
+          'a': {
+            'file': 'a.tmx',
+            'theme': 'castle',
+            'exits': [
+              {
+                'direction': 'east',
+                'room': 'b',
+                'entrance': 'west',
+                'oneWay': true,
+              },
+            ],
+          },
+          'b': {'file': 'b.tmx', 'theme': 'castle'},
+        }),
+      );
+
+      expect(
+        validation.issues.where((i) => i.kind == WorldIssueKind.asymmetricExit),
+        isEmpty,
+      );
+      expect(
+        validation.issues.where((i) => i.kind == WorldIssueKind.deadEnd),
+        hasLength(1),
+      );
+    });
+
+    test('flags trigger targets and empty graphs', () {
+      final validation = validateWorld(
+        graphWith({
+          'a': {
+            'file': 'a.tmx',
+            'theme': 'castle',
+            'triggers': [
+              {
+                'id': 'switch_1',
+                'type': 'switch',
+                'position': {'x': 1, 'y': 1, 'z': 0},
+                'size': {'width': 1, 'height': 1},
+                'room': 'nowhere',
+              },
+              {
+                'id': 'door_1',
+                'type': 'door',
+                'position': {'x': 2, 'y': 1, 'z': 0},
+                'size': {'width': 1, 'height': 1},
+              },
+            ],
+          },
+        }),
+      );
+
+      expect(
+        validation.issues.where(
+          (i) => i.kind == WorldIssueKind.triggerUnknownRoom,
+        ),
+        hasLength(1),
+      );
+      expect(
+        validation.issues.where(
+          (i) => i.kind == WorldIssueKind.triggerWithoutRoom,
+        ),
+        hasLength(1),
+      );
+      expect(validateWorld(WorldGraph.fromJson({})).isValid, isFalse);
+    });
   });
 
   group('entities', () {

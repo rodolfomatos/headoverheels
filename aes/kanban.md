@@ -46,6 +46,8 @@ current_ticket: "T035"
 | T034 | Sprite browser/animator and asset management UI | high | done |
 | T035 | Migrate Head over Heels into games/headoverheels | high | pending |
 | T036 | TSX authoring: edit tile types/properties and export TSX | medium | pending |
+| T037 | World graph viewer/editor with topology validation | high | done |
+| T038 | Second example game (Knight Lore) on iso_core | medium | pending |
 
 ## Sprint 01 — Foundation & Research
 **Goal**: Understand original game, establish core architecture, prove isometric rendering
@@ -148,6 +150,7 @@ current_ticket: "T035"
 ## In Progress
 * T035: Migrate Head over Heels into games/headoverheels
 * T036: TSX authoring (edit tile `type`/properties, write TSX)
+* T038: Knight Lore as the second example game
 
 ## Notes
 * T033 scope: TMX/TSX import, pan/zoom dimetric canvas with tileset image preview, paint/place/erase
@@ -184,3 +187,4 @@ current_ticket: "T035"
 * T032: Builder CLI scaffold and project validation
 * T033: Visual isometric map editor (palette/TSX browser, file gateways, canvas preview)
 * T034: Sprite browser/animator and asset management UI (manifest editor, frame import, delete)
+* T037: World graph viewer/editor with topology validation (Graph tab, world.json round trip)

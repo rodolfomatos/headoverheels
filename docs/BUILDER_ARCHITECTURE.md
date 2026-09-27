@@ -68,6 +68,21 @@ EditorController
 4. Write the binary and upsert the manifest atomically.
 5. Validate before marking the asset available to the runtime.
 
+### World graph
+
+- The room topology lives in one `world.json`, not in code: rooms, files, themes, spawn points,
+  exits (`direction`, `room`, `entrance`, `isLocked`, `keyId`, `oneWay`) and triggers.
+- `iso_core` owns the generic model (`WorldGraph`, `RoomInfo`, `RoomExit`, `RoomTrigger`,
+  `WorldGroup`) with `toJson`/`fromJson`, so the editor and the runtime read the same file.
+- `validateWorld` reports missing start room, exits to unknown rooms, duplicate directions, self
+  loops, unreachable rooms, dead ends, missing TMX files, empty themes, asymmetric exits and
+  trigger targets that do not exist. Errors block; warnings and info do not.
+- The editor's **Graph** tab draws rooms as nodes grouped in theme columns, draws exits as
+  direction arrows (locked exits are marked), and allows editing direction, target and lock state,
+  adding and removing exits, then writes `world.json` back through `EditorStorage`.
+- Puzzle semantics (what a switch powers, how a guardian reacts) stay in the game package. The
+  graph stores identity and topology; the game binds behaviour to it.
+
 ## Storage
 
 The common editor uses abstractions so the same code compiles on web and desktop:

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
@@ -840,6 +841,183 @@ void main() {
       ),
       hasLength(2),
     );
+  });
+
+  test('world graph layout places rooms in theme columns', () {
+    final graph = WorldGraph.fromJson({
+      'startRoom': 'a',
+      'rooms': {
+        'a': {'file': 'a.tmx', 'theme': 'castle'},
+        'b': {'file': 'b.tmx', 'theme': 'castle'},
+        'c': {'file': 'c.tmx', 'theme': 'moonbase'},
+      },
+    });
+
+    final layout = layoutWorldGraph(graph);
+    expect(layout.positions.keys, hasLength(3));
+    expect(layout.positionOf('a')!.dx, layout.positionOf('b')!.dx);
+    expect(layout.positionOf('c')!.dx, greaterThan(layout.positionOf('a')!.dx));
+    expect(layout.positionOf('a')!.dy, lessThan(layout.positionOf('b')!.dy));
+  });
+
+  testWidgets('graph panel lists rooms, edits exits and validates', (
+    tester,
+  ) async {
+    final storage = MemoryEditorStorage();
+    await storage.writeText(
+      'assets/levels/world.json',
+      jsonEncode({
+        'startRoom': 'a',
+        'rooms': {
+          'a': {
+            'file': 'a.tmx',
+            'theme': 'castle',
+            'exits': [
+              {'direction': 'east', 'room': 'ghost', 'entrance': 'west'},
+            ],
+          },
+          'b': {'file': 'b.tmx', 'theme': 'castle'},
+        },
+      }),
+    );
+
+    tester.view.physicalSize = const Size(1400, 1200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: WorldGraphPanel(
+          source: () => storage.readText('assets/levels/world.json'),
+          onSave: (json) => storage.writeText('assets/levels/world.json', json),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('world-graph-view')), findsOneWidget);
+    expect(find.text('2 rooms · 1 exits'), findsOneWidget);
+    expect(find.text('1 error(s) · 1 warning(s)'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('world-issue-unknownTarget')));
+    await tester.pumpAndSettle();
+    expect(find.text('a.tmx · castle'), findsOneWidget);
+    expect(find.byKey(const Key('exit-target')), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('exit-target')).last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('b').last);
+    await tester.pumpAndSettle();
+
+    expect(find.text('0 error(s) · 1 warning(s)'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('world-save-button')));
+    await tester.pumpAndSettle();
+
+    final saved = WorldGraph.fromJson(
+      jsonDecode(await storage.readText('assets/levels/world.json'))
+          as Map<String, dynamic>,
+    );
+    expect(saved.getRoom('a')!.exits.single.room, 'b');
+  });
+
+  testWidgets('graph panel removes and adds exits', (tester) async {
+    final storage = MemoryEditorStorage();
+    await storage.writeText(
+      'assets/levels/world.json',
+      jsonEncode({
+        'startRoom': 'a',
+        'rooms': {
+          'a': {
+            'file': 'a.tmx',
+            'theme': 'castle',
+            'exits': [
+              {'direction': 'east', 'room': 'b', 'entrance': 'west'},
+            ],
+          },
+          'b': {'file': 'b.tmx', 'theme': 'castle'},
+        },
+      }),
+    );
+
+    tester.view.physicalSize = const Size(1400, 1200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: WorldGraphPanel(
+          source: () => storage.readText('assets/levels/world.json'),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tapAt(const Offset(105, 53));
+    await tester.pumpAndSettle();
+    expect(find.text('a.tmx · castle'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('exit-remove')));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('0 exits'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('world-add-exit-button')));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('1 exits'), findsOneWidget);
+  });
+
+  testWidgets('graph panel reports an unreadable world file', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: WorldGraphPanel(source: () => throw StateError('no world.json')),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('World could not be read'), findsOneWidget);
+    expect(find.byKey(const Key('world-reload-button')), findsOneWidget);
+  });
+
+  testWidgets('editor shell shows the world graph tab', (tester) async {
+    final storage = MemoryEditorStorage();
+    await storage.writeText(
+      'assets/levels/world.json',
+      jsonEncode({
+        'startRoom': 'a',
+        'rooms': {
+          'a': {
+            'file': 'a.tmx',
+            'theme': 'castle',
+            'exits': [
+              {'direction': 'east', 'room': 'b', 'entrance': 'west'},
+            ],
+          },
+          'b': {
+            'file': 'b.tmx',
+            'theme': 'castle',
+            'exits': [
+              {'direction': 'west', 'room': 'a', 'entrance': 'east'},
+            ],
+          },
+        },
+      }),
+    );
+    final controller = EditorController(storage: storage);
+    addTearDown(controller.dispose);
+
+    tester.view.physicalSize = const Size(1600, 1200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      MaterialApp(home: EditorShell(controller: controller)),
+    );
+
+    await tester.tap(find.text('Graph'));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('world-graph-panel')), findsOneWidget);
+    expect(find.text('2 rooms · 2 exits'), findsOneWidget);
+    expect(find.text('0 error(s) · 0 warning(s)'), findsOneWidget);
   });
 
   testWidgets('shell deletes an asset after confirmation', (tester) async {

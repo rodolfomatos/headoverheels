@@ -77,6 +77,40 @@ class WorldGraph {
   List<RoomInfo> getRoomsByTheme(String theme) {
     return rooms.values.where((room) => room.theme == theme).toList();
   }
+
+  WorldGraph copyWith({
+    Map<String, RoomInfo>? rooms,
+    String? startRoom,
+    List<WorldGroup>? groups,
+  }) {
+    return WorldGraph(
+      rooms: rooms ?? this.rooms,
+      startRoom: startRoom ?? this.startRoom,
+      groups: groups ?? this.groups,
+    );
+  }
+
+  WorldGraph upsertRoom(RoomInfo room) {
+    return copyWith(rooms: {...rooms, room.id: room});
+  }
+
+  WorldGraph removeRoom(String roomId) {
+    return copyWith(rooms: {...rooms}..remove(roomId));
+  }
+
+  Map<String, dynamic> toJson() => {
+    'startRoom': startRoom,
+    'rooms': {
+      for (final entry in rooms.entries) entry.key: entry.value.toJson(),
+    },
+    if (groups.isNotEmpty)
+      'planets': [for (final group in groups) group.toJson()],
+  };
+
+  String toJsonString({bool pretty = true}) {
+    const encoder = JsonEncoder.withIndent('  ');
+    return '${encoder.convert(toJson())}\n';
+  }
 }
 
 class RoomInfo {
@@ -119,6 +153,35 @@ class RoomInfo {
   final Vector3 spawnPosition;
   final List<RoomExit> exits;
   final List<RoomTrigger> triggers;
+
+  RoomInfo copyWith({
+    String? file,
+    String? theme,
+    Vector3? spawnPosition,
+    List<RoomExit>? exits,
+    List<RoomTrigger>? triggers,
+  }) {
+    return RoomInfo(
+      id: id,
+      file: file ?? this.file,
+      theme: theme ?? this.theme,
+      spawnPosition: spawnPosition ?? this.spawnPosition,
+      exits: exits ?? this.exits,
+      triggers: triggers ?? this.triggers,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'file': file,
+    'theme': theme,
+    'spawnPoint': {
+      'x': spawnPosition.x,
+      'y': spawnPosition.y,
+      'z': spawnPosition.z,
+    },
+    'exits': [for (final exit in exits) exit.toJson()],
+    'triggers': [for (final trigger in triggers) trigger.toJson()],
+  };
 }
 
 class RoomExit {
@@ -148,6 +211,34 @@ class RoomExit {
   final bool isLocked;
   final String? keyId;
   final bool oneWay;
+
+  RoomExit copyWith({
+    String? direction,
+    String? room,
+    String? entrance,
+    bool? isLocked,
+    String? keyId,
+    bool clearKeyId = false,
+    bool? oneWay,
+  }) {
+    return RoomExit(
+      direction: direction ?? this.direction,
+      room: room ?? this.room,
+      entrance: entrance ?? this.entrance,
+      isLocked: isLocked ?? this.isLocked,
+      keyId: clearKeyId ? null : (keyId ?? this.keyId),
+      oneWay: oneWay ?? this.oneWay,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'direction': direction,
+    'room': room,
+    'entrance': entrance,
+    'isLocked': isLocked,
+    'keyId': keyId,
+    'oneWay': oneWay,
+  };
 }
 
 class RoomTrigger {
@@ -190,6 +281,36 @@ class RoomTrigger {
   final Vector3 position;
   final Vector2 size;
   final Map<String, dynamic> properties;
+
+  RoomTrigger copyWith({
+    String? type,
+    Vector3? position,
+    Vector2? size,
+    Map<String, dynamic>? properties,
+  }) {
+    return RoomTrigger(
+      id: id,
+      type: type ?? this.type,
+      position: position ?? this.position,
+      size: size ?? this.size,
+      properties: properties ?? this.properties,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final json = Map<String, dynamic>.from(properties)
+      ..remove('id')
+      ..remove('type')
+      ..remove('position')
+      ..remove('size');
+    return {
+      'id': id,
+      'type': type,
+      'position': {'x': position.x, 'y': position.y, 'z': position.z},
+      'size': {'width': size.x, 'height': size.y},
+      ...json,
+    };
+  }
 }
 
 class WorldGroup {
@@ -210,6 +331,8 @@ class WorldGroup {
   final String id;
   final String name;
   final Map<String, dynamic> properties;
+
+  Map<String, dynamic> toJson() => {'id': id, 'name': name, ...properties};
 }
 
 class RoomObject {

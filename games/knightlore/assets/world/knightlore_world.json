@@ -85,9 +85,9 @@
           "oneWay": false
         },
         {
-          "direction": "down",
+          "direction": "north",
           "room": "castle_underground",
-          "entrance": "up",
+          "entrance": "south",
           "isLocked": false,
           "keyId": null,
           "oneWay": false
@@ -282,9 +282,9 @@
       },
       "exits": [
         {
-          "direction": "up",
+          "direction": "south",
           "room": "castle_great_hall",
-          "entrance": "down",
+          "entrance": "north",
           "isLocked": false,
           "keyId": null,
           "oneWay": false
@@ -348,9 +348,9 @@
           "oneWay": false
         },
         {
-          "direction": "down",
+          "direction": "south",
           "room": "cauldron_entrance",
-          "entrance": "up",
+          "entrance": "north",
           "isLocked": false,
           "keyId": null,
           "oneWay": false
@@ -414,9 +414,9 @@
           "oneWay": false
         },
         {
-          "direction": "down",
+          "direction": "west",
           "room": "mine_entrance",
-          "entrance": "up",
+          "entrance": "east",
           "isLocked": false,
           "keyId": null,
           "oneWay": false
@@ -502,17 +502,17 @@
       },
       "exits": [
         {
-          "direction": "up",
+          "direction": "north",
           "room": "jungle_entrance",
-          "entrance": "down",
+          "entrance": "south",
           "isLocked": false,
           "keyId": null,
           "oneWay": false
         },
         {
-          "direction": "north",
+          "direction": "east",
           "room": "cauldron_cave",
-          "entrance": "south",
+          "entrance": "west",
           "isLocked": false,
           "keyId": null,
           "oneWay": false
@@ -544,9 +544,9 @@
       },
       "exits": [
         {
-          "direction": "south",
+          "direction": "west",
           "room": "cauldron_entrance",
-          "entrance": "north",
+          "entrance": "east",
           "isLocked": false,
           "keyId": null,
           "oneWay": false
@@ -602,9 +602,9 @@
           "oneWay": false
         },
         {
-          "direction": "up",
+          "direction": "west",
           "room": "jungle_track",
-          "entrance": "down",
+          "entrance": "east",
           "isLocked": false,
           "keyId": null,
           "oneWay": false

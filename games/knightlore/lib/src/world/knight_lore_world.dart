@@ -35,6 +35,9 @@ class KlRooms {
   static const String towerEntrance = 'tower_entrance';
   static const String towerTop = 'tower_top';
 
+  /// The engine is two dimensional, so "down to the crypt" and "down to the
+  /// mine" are ordinary doorways on another edge; the ids carry the flavour.
+  ///
   /// Melkhior's laboratory, where the cauldron lives.
   static const String wizardRoom = laboratory;
 }
@@ -122,7 +125,7 @@ class KnightLoreWorld {
       exits: [
         exit('south', KlRooms.gatehouse, 'north'),
         exit('west', KlRooms.corridor, 'east'),
-        exit('down', KlRooms.underground, 'up'),
+        exit('north', KlRooms.underground, 'south'),
       ],
       triggers: [
         trigger('ball_2', 'ball', 3, 4),
@@ -183,7 +186,7 @@ class KnightLoreWorld {
     room(
       KlRooms.underground,
       KlAreas.castle,
-      exits: [exit('up', KlRooms.greatHall, 'down')],
+      exits: [exit('south', KlRooms.greatHall, 'north')],
       triggers: [
         trigger(
           'chest_2',
@@ -202,7 +205,7 @@ class KnightLoreWorld {
       exits: [
         exit('west', KlRooms.gatehouse, 'east'),
         exit('north', KlRooms.jungleTrack, 'south'),
-        exit('down', KlRooms.cauldronEntrance, 'up'),
+        exit('south', KlRooms.cauldronEntrance, 'north'),
       ],
       triggers: [
         trigger('chest_3', 'chest', 3, 5, properties: {'itemId': 'gold'}),
@@ -216,7 +219,7 @@ class KnightLoreWorld {
       exits: [
         exit('south', KlRooms.jungleEntrance, 'north'),
         exit('east', KlRooms.jungleRuins, 'west'),
-        exit('down', KlRooms.mineEntrance, 'up'),
+        exit('west', KlRooms.mineEntrance, 'east'),
       ],
       triggers: [
         trigger('ball_5', 'ball', 4, 2),
@@ -249,8 +252,8 @@ class KnightLoreWorld {
       KlRooms.cauldronEntrance,
       KlAreas.cauldron,
       exits: [
-        exit('up', KlRooms.jungleEntrance, 'down'),
-        exit('north', KlRooms.cauldronCave, 'south'),
+        exit('north', KlRooms.jungleEntrance, 'south'),
+        exit('east', KlRooms.cauldronCave, 'west'),
       ],
       triggers: [trigger('ball_6', 'ball', 4, 5)],
     );
@@ -258,7 +261,7 @@ class KnightLoreWorld {
     room(
       KlRooms.cauldronCave,
       KlAreas.cauldron,
-      exits: [exit('south', KlRooms.cauldronEntrance, 'north')],
+      exits: [exit('west', KlRooms.cauldronEntrance, 'east')],
       triggers: [
         trigger(
           'cauldron_3',
@@ -276,7 +279,7 @@ class KnightLoreWorld {
       KlAreas.mine,
       exits: [
         exit('east', KlRooms.corridor, 'west'),
-        exit('up', KlRooms.jungleTrack, 'down'),
+        exit('west', KlRooms.jungleTrack, 'east'),
         exit('north', KlRooms.mineShaft, 'south'),
       ],
       triggers: [

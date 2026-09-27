@@ -11,3 +11,5 @@ export 'src/inventory.dart';
 export 'src/knight.dart';
 export 'src/spells.dart';
 export 'src/world/knight_lore_world.dart';
+export 'src/game/room_session.dart';
+export 'src/game/terrain.dart';

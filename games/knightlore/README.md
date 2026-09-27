@@ -43,10 +43,29 @@ lib/src/knight.dart     the sabreman and the four knights
 lib/src/spells.dart     the six spells, as data, with decay
 lib/src/inventory.dart  the sixteen slot inventory
 lib/src/curse.dart      curse, day/night, split, ingredients, filmation rule
+lib/src/game/           the playable session: terrain, movement, interaction
 lib/src/world/          the world definition in the generic iso_core format
 assets/world/           the generated world.json
-test/                   rules tests plus the world export
+test/                   rules tests, session tests and the world export
 ```
+
+## The session
+
+`RoomSession` is the playable core and it holds no rendering: it walks the party
+one tile at a time, reads walls from a `RoomTerrain`, follows exits (locked exits
+need their key, a werewolf cannot use a doorway, the split knights need Open Door
+or Telekinesis), picks items up, answers the wizard and the cauldron, advances
+the sundial and splits or rejoins the party. A test walks the whole 15 room world
+to prove every room is reachable on foot, not just in the graph.
+
+Two decisions worth knowing:
+
+- Exits are stored per room edge, so the engine never has two doorways on the same
+  edge. The "down to the crypt" and "down to the mine" flavour is carried by the
+  room ids (`castle_crypt`, `mine_shaft`, `cauldron_cave`) because the engine is
+  two dimensional.
+- The party shares one inventory. The curse state owns it, so an item the sabreman
+  picks up is the same item the cauldron can be given.
 
 ## World data
 
@@ -61,6 +80,7 @@ loader and the game rules all read one file in one format.
 
 ## Not implemented yet
 
-- Room TMX files (the world references `rooms/<area>/<room>.tmx`).
+- Room TMX files (the world references `rooms/<area>/<room>.tmx`). The session
+  runs on open floors until the maps exist.
 - A runnable game loop, input mapping and rendering.
 - Sprite and tileset assets for the five areas.

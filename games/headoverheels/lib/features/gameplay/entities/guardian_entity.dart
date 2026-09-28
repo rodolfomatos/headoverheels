@@ -6,14 +6,24 @@ import 'package:headoverheels/core/isometric.dart';
 import 'package:headoverheels/features/gameplay/entities/character_component.dart';
 import 'package:headoverheels/features/gameplay/entities/monster_entity.dart';
 
-/// Guardian entity - blocks throne room, immune to doughnuts, defeated by 4 crowns.
+/// Guardian entity - blocks throne room, immune to doughnuts, defeated by 4
+/// crowns of its own planet.
+///
+/// The crowns have to be the throne room's own. Counting every crown the party
+/// had picked up let a player who never set foot on the planet beat its
+/// guardian, and one who had four of that planet's could not.
 class GuardianEntity extends MonsterEntity {
+  /// What a throne room asks for.
   static const int requiredCrowns = 4;
+
+  /// The planet whose throne room this guardian guards.
+  final String planetId;
 
   GuardianEntity({
     required super.id,
     required super.triggerZone,
     required super.patrolPoints,
+    required this.planetId,
   });
 
   @override
@@ -43,7 +53,7 @@ class GuardianEntity extends MonsterEntity {
     // Check if player has required crowns
     final game = this.game;
 
-    final crownCount = game.crownsCollected;
+    final crownCount = game.crownsFor(planetId);
     if (crownCount >= requiredCrowns) {
       _defeatGuardian();
     } else {

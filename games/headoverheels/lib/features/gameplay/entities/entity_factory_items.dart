@@ -80,10 +80,20 @@ class EntityFactoryItems {
 
   static PuzzleEntity _createGuardian(TriggerZone trigger, RoomId roomId) {
     final patrolPoints = _parsePatrolPoints(trigger.properties);
+    // A guardian without a planet would count every crown in the game, so the
+    // data has to say which throne room it guards.
+    final planetId = trigger.properties?['planetId'] as String?;
+    if (planetId == null || planetId.isEmpty) {
+      throw StateError(
+        'The guardian ${trigger.id} in $roomId does not say which planet it '
+        'guards: its trigger needs a planetId.',
+      );
+    }
     return GuardianEntity(
       id: trigger.id,
       triggerZone: trigger,
       patrolPoints: patrolPoints,
+      planetId: planetId,
     );
   }
 

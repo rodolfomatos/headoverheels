@@ -89,7 +89,7 @@
           "type": "guardian",
           "position": { "x": 14, "y": 3, "z": 0 },
           "size": { "width": 1, "height": 1 },
-          "properties": { "patrolPoints": [[16,2,0]] }
+          "properties": {"planetId": "castle", "patrolPoints": [[16, 2, 0]]}
         },
         {
           "id": "teleport_1",
@@ -321,7 +321,7 @@
           "type": "guardian",
           "position": { "x": 5, "y": 5, "z": 0 },
           "size": { "width": 1, "height": 1 },
-          "properties": { "patrolPoints": [[5,5,0],[11,5,0],[11,11,0],[5,11,0]] }
+          "properties": {"planetId": "castle", "patrolPoints": [[5, 5, 0], [11, 5, 0], [11, 11, 0], [5, 11, 0]]}
         },
         {
           "id": "crown_teleport",
@@ -544,7 +544,7 @@
           "type": "guardian",
           "position": { "x": 5, "y": 5, "z": 0 },
           "size": { "width": 1, "height": 1 },
-          "properties": { "patrolPoints": [[5,5,0],[11,5,0],[11,11,0],[5,11,0]] }
+          "properties": {"planetId": "egyptus", "patrolPoints": [[5, 5, 0], [11, 5, 0], [11, 11, 0], [5, 11, 0]]}
         },
         {
           "id": "spring_tomb",
@@ -703,7 +703,7 @@
           "type": "guardian",
           "position": { "x": 4, "y": 4, "z": 0 },
           "size": { "width": 1, "height": 1 },
-          "properties": { "patrolPoints": [[4,4,0],[12,4,0],[12,12,0],[4,12,0]] }
+          "properties": {"planetId": "penitentiary", "patrolPoints": [[4, 4, 0], [12, 4, 0], [12, 12, 0], [4, 12, 0]]}
         },
         {
           "id": "spring_pit",
@@ -871,7 +871,7 @@
           "type": "guardian",
           "position": { "x": 5, "y": 5, "z": 0 },
           "size": { "width": 1, "height": 1 },
-          "properties": { "patrolPoints": [[5,5,0],[11,5,0],[11,11,0],[5,11,0]] }
+          "properties": {"planetId": "safari", "patrolPoints": [[5, 5, 0], [11, 5, 0], [11, 11, 0], [5, 11, 0]]}
         },
         {
           "id": "spring_fort",
@@ -1037,7 +1037,7 @@
           "type": "guardian",
           "position": { "x": 5, "y": 5, "z": 0 },
           "size": { "width": 1, "height": 1 },
-          "properties": { "patrolPoints": [[5,5,0],[11,5,0],[11,11,0],[5,11,0]] }
+          "properties": {"planetId": "bookworld", "patrolPoints": [[5, 5, 0], [11, 5, 0], [11, 11, 0], [5, 11, 0]]}
         },
         {
           "id": "spring_library2",
@@ -1135,7 +1135,7 @@
           "type": "guardian",
           "position": { "x": 8, "y": 8, "z": 0 },
           "size": { "width": 2, "height": 2 },
-          "properties": { "patrolPoints": [[6,6,0],[10,6,0],[10,10,0],[6,10,0]] }
+          "properties": {"planetId": "castle", "patrolPoints": [[6, 6, 0], [10, 6, 0], [10, 10, 0], [6, 10, 0]]}
         },
         {
           "id": "monster_throne",

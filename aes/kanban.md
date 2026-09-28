@@ -136,7 +136,7 @@ current_ticket: "T050"
 | T053 | The sprite registry should read the manifest, not repeat it | pending |
 | T055 | Show the game on the game screen: it is a placeholder | done |
 | T056 | The bag is carried but does nothing yet | pending |
-| T057 | The guardian trigger does not say which planet it guards | pending |
+| T057 | The guardian trigger does not say which planet it guards | done |
 | T058 | Four of the five planets have no tileset | pending |
 | T059 | The pixel-level visual proof of the HoH renderer | pending |
 
@@ -183,7 +183,6 @@ first game onto the same platform
 * T053: The sprite registry should read the manifest, not repeat it
 * T054: Gameplay tests: the rules are barely covered
 * T056: The bag is carried but does nothing yet
-* T057: The guardian trigger does not say which planet it guards
 * T058: Four of the five planets have no tileset
 * T059: The pixel-level visual proof of the HoH renderer
 
@@ -246,6 +245,23 @@ first game onto the same platform
   audible, that the cue list is complete. Not one of them asked for the path the
   loader is given. Each game now has that test, and the two old assertions that
   encoded the doubled prefix as a requirement are corrected.
+* T057, the crown economy, which was wrong in three places at once. A throne
+  room opens for the crowns of its own planet, and none of the three parts
+  agreed on that. The world's guardian triggers carried no `planetId`, so
+  `GuardianEntity` counted every crown the party had ever collected: four crowns
+  from one planet opened all five, and the four a throne room actually asked
+  for were never the ones being checked. The game had both a per-planet count
+  and a global one, and the guardian read the global one. The HUD had no count
+  at all: `const int crownsCollected = 2` of `const int totalCrowns = 5`, a
+  number written into a widget that never moved, over a total the game does not
+  use. A player picking up their fourth crown was still told `2/5`.
+  The seven guardian triggers now carry the `planetId` of the room they sit in,
+  the factory refuses to build a guardian that does not say which throne room it
+  guards, the guardian asks `crownsFor(planetId)`, the global total is gone, and
+  one notifier, `crownsProvider`, is the truth the guardian and the HUD both
+  read. Five tests: two on the data, because a trigger that loses its `planetId`
+  in an edit is this bug coming back, and three on the rule: the wrong planet
+  does not open a throne room, the right one does, and three crowns do not.
 * Audit of the Sprint 09 backlog, checked against the code rather than the
   board. T025, the atlas: `scripts/pack_atlas.py` is referenced by nothing, the
   Makefile never runs it, and `assets/sprites/atlases/` is empty. The game loads

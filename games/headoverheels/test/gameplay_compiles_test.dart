@@ -1,12 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vector_math/vector_math.dart' show Vector3;
+import 'package:vector_math/vector_math.dart' show Vector2, Vector3;
 import 'package:headoverheels/entities/character_state.dart';
 import 'package:headoverheels/features/gameplay/entities/character_component.dart';
 import 'package:headoverheels/features/gameplay/game.dart';
 import 'package:headoverheels/features/gameplay/room/room_graph.dart';
 import 'package:headoverheels/features/gameplay/room/world_loader.dart';
 import 'package:headoverheels/features/gameplay/state/character_notifier.dart';
+import 'package:headoverheels/features/gameplay/entities/guardian_entity.dart';
+import 'package:headoverheels/features/gameplay/entities/entity_factory.dart';
 
 /// Compiles the gameplay layer and checks the notifications the puzzle
 /// entities send.
@@ -34,6 +36,56 @@ void main() {
     expect(graph.roomsById, isNotEmpty);
   });
 
+  test('every guardian says which planet it guards', () async {
+    // The throne room of a planet opens for the crowns of that planet. A guardian
+    // whose trigger does not say which planet it is would have to count every
+    // crown in the game, and that is how it was: four crowns from one planet
+    // opened all five.
+    final graph = await loadWorldGraph();
+    final guardians = <TriggerZone>[];
+    for (final room in graph.rooms.values) {
+      for (final trigger in room.triggers) {
+        if (trigger.type == TriggerType.guardian) guardians.add(trigger);
+      }
+    }
+
+    expect(guardians, isNotEmpty, reason: 'the world has no guardians at all');
+    for (final guardian in guardians) {
+      expect(
+        guardian.properties?['planetId'],
+        isNotNull,
+        reason: '${guardian.id} does not say which planet it guards',
+      );
+    }
+  });
+
+  test('a guardian guards the planet its room is on', () async {
+    // The planet of a room is its theme, and the crowns in it agree: a throne
+    // room asking for crowns of another planet is not a throne room.
+    final graph = await loadWorldGraph();
+    for (final room in graph.rooms.values) {
+      final crownPlanets = room.triggers
+          .where((trigger) => trigger.type == TriggerType.crown)
+          .map((trigger) => trigger.properties?['planetId'])
+          .whereType<String>()
+          .toSet();
+      for (final trigger in room.triggers) {
+        if (trigger.type != TriggerType.guardian) continue;
+        final planet = trigger.properties?['planetId'];
+        expect(
+          planet,
+          room.theme,
+          reason: '${trigger.id} in ${room.id} guards another planet',
+        );
+        if (crownPlanets.isNotEmpty) {
+          expect(crownPlanets, {
+            planet,
+          }, reason: 'the crowns in ${room.id} are not of its planet');
+        }
+      }
+    }
+  });
+
   group('the notifications the puzzle entities send', () {
     late ProviderContainer container;
     late HeadOverHeelsGame game;
@@ -44,8 +96,12 @@ void main() {
       game = HeadOverHeelsGame(container.read(_refProvider), _emptyGraph());
     });
 
-    test('a crown is counted, per planet and in total', () {
-      expect(game.crownsCollected, 0);
+    test('a crown is counted against its own planet only', () {
+      // There is no total on purpose. A guardian asks for the crowns of the
+      // planet whose throne room it guards, and a total let a party beat a
+      // guardian it had never earned: four crowns from anywhere opened every
+      // throne room, and the four a throne room asked for went uncounted
+      // anywhere else.
       game.collectCrown('egyptus');
       game.collectCrown('egyptus');
       game.collectCrown('safari');
@@ -53,7 +109,46 @@ void main() {
       expect(game.crownsFor('egyptus'), 2);
       expect(game.crownsFor('safari'), 1);
       expect(game.crownsFor('bookworld'), 0, reason: 'a planet with no crowns');
-      expect(game.crownsCollected, 3);
+    });
+
+    test('a guardian counts only the crowns of its own planet', () async {
+      // Four crowns of the wrong planet used to be enough: the guardian added
+      // up everything the party had ever collected.
+      for (var count = 0; count < GuardianEntity.requiredCrowns; count++) {
+        game.collectCrown('safari');
+      }
+      final wrongPlanet = await _guardian(game, container, planetId: 'egyptus');
+      wrongPlanet.onInteract(_character(container));
+
+      expect(
+        game.guardianDefeated,
+        isFalse,
+        reason: 'four crowns from another planet opened this throne room',
+      );
+    });
+
+    test('a guardian opens for the crowns of its planet', () async {
+      for (var count = 0; count < GuardianEntity.requiredCrowns; count++) {
+        game.collectCrown('egyptus');
+      }
+      final guardian = await _guardian(game, container, planetId: 'egyptus');
+      guardian.onInteract(_character(container));
+
+      expect(game.guardianDefeated, isTrue);
+    });
+
+    test('a guardian with three crowns of its planet still blocks', () async {
+      for (var count = 0; count < GuardianEntity.requiredCrowns - 1; count++) {
+        game.collectCrown('egyptus');
+      }
+      final guardian = await _guardian(game, container, planetId: 'egyptus');
+      guardian.onInteract(_character(container));
+
+      expect(
+        game.guardianDefeated,
+        isFalse,
+        reason: 'three crowns are not four',
+      );
     });
 
     test('the guardian reports itself beaten', () {
@@ -120,6 +215,34 @@ void main() {
 
 /// A way to get hold of a [Ref] without a widget: the game wants one.
 final _refProvider = Provider<Ref>((ref) => ref);
+
+/// A guardian built the way the factory builds one, so the test goes through the
+/// data rather than around it, and attached to the game: an entity that is not
+/// in the tree cannot find the game it asks about the crowns.
+Future<GuardianEntity> _guardian(
+  HeadOverHeelsGame game,
+  ProviderContainer container, {
+  required String planetId,
+}) async {
+  final trigger = TriggerZone(
+    id: 'guardian_test',
+    type: TriggerType.guardian,
+    position: Vector3(1, 1, 0),
+    size: Vector2(1, 1),
+    properties: {'planetId': planetId, 'patrolPoints': ''},
+  );
+  final guardian =
+      EntityFactory.create(trigger, const RoomId('test_room'))!
+          as GuardianEntity;
+  await game.add(guardian);
+  return guardian;
+}
+
+CharacterComponent _character(ProviderContainer container) =>
+    CharacterComponent(
+      type: CharacterType.head,
+      ref: container.read(_refProvider),
+    );
 
 /// The notifications never read the world, so the tests hand the game a graph
 /// with one empty room rather than loading a thousand.

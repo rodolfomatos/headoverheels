@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:headoverheels/features/ui/theme/app_theme.dart';
 import 'package:headoverheels/entities/character_state.dart';
 import 'package:headoverheels/features/gameplay/state/dual_character_notifier.dart';
+import 'package:headoverheels/features/gameplay/state/crowns_notifier.dart';
+import 'package:headoverheels/features/gameplay/entities/guardian_entity.dart';
 
 /// Heads-up display showing lives, crowns, character, doughnuts, and bag item.
 class HUD extends ConsumerWidget {
@@ -28,9 +30,15 @@ class HUD extends ConsumerWidget {
     final doughnutCount = headState.doughnutCount;
     final carriedItem = heelsState.carriedItem; // Heels carries items
 
-    // Count crowns collected (mock for now - would come from game progress)
-    const int crownsCollected = 2;
-    const int totalCrowns = 5;
+    // The crowns of the planet the party is standing on, which is the number the
+    // guardian of that planet's throne room asks for. This was a `2/5` written
+    // into the widget: a number that never moved, for a total the game does not
+    // use.
+    final crowns = ref.watch(crownsProvider);
+    final crownsCollected = crowns.planet == null
+        ? 0
+        : crowns.byPlanet[crowns.planet] ?? 0;
+    const int totalCrowns = GuardianEntity.requiredCrowns;
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -51,7 +59,9 @@ class HUD extends ConsumerWidget {
               const SizedBox(width: AppSpacing.md),
               _buildStatIcon(
                 Icons.emoji_events_rounded,
-                '$crownsCollected/$totalCrowns',
+                crowns.planet == null
+                    ? '--/$totalCrowns'
+                    : '$crownsCollected/$totalCrowns',
                 AppColors.crownColor,
               ),
             ],

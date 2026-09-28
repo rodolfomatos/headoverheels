@@ -4,6 +4,7 @@ import '../../core/audio/hoh_cues.dart';
 import 'package:flame/game.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:headoverheels/features/gameplay/state/input_system.dart';
+import 'package:headoverheels/features/gameplay/state/crowns_notifier.dart';
 import 'package:headoverheels/features/gameplay/systems/interaction_system.dart';
 import 'package:headoverheels/features/gameplay/entities/character_component.dart';
 import 'package:headoverheels/features/gameplay/room/room_component.dart';
@@ -25,9 +26,6 @@ class HeadOverHeelsGame extends FlameGame
         ItemPicker,
         GuardianDefeatedNotifier {
   final Ref ref;
-
-  /// Crowns collected, per planet. The throne room wants four of them.
-  final Map<String, int> crownsByPlanet = {};
 
   /// Set once the guardian is beaten, which is what opens the throne room.
   bool guardianDefeated = false;
@@ -97,6 +95,7 @@ class HeadOverHeelsGame extends FlameGame
     await add(room);
     _currentRoom = room;
     _currentRoomId = roomId;
+    ref.read(crownsProvider.notifier).arriveOn(definition.theme);
 
     // Play music for the room's planet/theme
     _playRoomMusic(definition.theme);
@@ -197,7 +196,7 @@ class HeadOverHeelsGame extends FlameGame
 
   @override
   void collectCrown(String planetId) {
-    crownsByPlanet.update(planetId, (count) => count + 1, ifAbsent: () => 1);
+    ref.read(crownsProvider.notifier).collect(planetId);
   }
 
   @override
@@ -205,16 +204,9 @@ class HeadOverHeelsGame extends FlameGame
     _notifierFor(character)?.pickUp(item);
   }
 
-  /// How many crowns a planet has collected.
-  int crownsFor(String planetId) => crownsByPlanet[planetId] ?? 0;
-
-  /// Every crown collected so far. The world's guardian trigger does not say
-  /// which planet its throne room belongs to, so the guardian counts them all:
-  /// see T057 for the data that would fix it properly.
-
-  /// Every crown collected, across the planets.
-  int get crownsCollected =>
-      crownsByPlanet.values.fold(0, (total, count) => total + count);
+  /// How many crowns a planet has collected: its own, and no other's.
+  int crownsFor(String planetId) =>
+      ref.read(crownsProvider).byPlanet[planetId] ?? 0;
 
   @override
   void onGuardianDefeated() {

@@ -19,6 +19,27 @@ Future<Pcm> _readPcm(String asset) async =>
     decodeWav(Uint8List.fromList(_asset(asset).readAsBytesSync()));
 
 void main() {
+  test('every cue resolves to a file the audio layer can load', () {
+    // The cue table names files from the bundle root and the audio layer
+    // prefixes `assets/audio/` itself. Asking for `assets/audio/assets/audio/...`
+    // returns silence, and every other test here would still pass: the files
+    // exist, the WAVs decode, the cue list is complete. Only the path the
+    // loader is handed says whether a player hears anything.
+    for (final cue in HohCue.values) {
+      final path = AudioSystem.relativeAsset(assetFor(cue));
+      expect(
+        path,
+        isNot(startsWith('assets/')),
+        reason: 'FlameAudio adds the assets/ prefix; $cue already has it',
+      );
+      expect(
+        File('${AudioSystem.audioRoot}$path').existsSync(),
+        isTrue,
+        reason: 'nothing to play for $cue: $path',
+      );
+    }
+  });
+
   group('the game only asks for sounds that exist', () {
     test('every cue has a file on disk', () {
       for (final cue in HohCue.values) {
@@ -58,10 +79,14 @@ void main() {
       for (final asset in AudioSystem.allAssets) {
         expect(
           asset,
-          isNot(startsWith('assets/')),
-          reason: 'FlameAudio wants a path relative to the bundle',
+          isNot(startsWith(AudioSystem.audioRoot)),
+          reason: 'FlameAudio prefixes the audio root itself: $asset',
         );
-        expect(_asset('assets/$asset').existsSync(), isTrue, reason: asset);
+        expect(
+          _asset('${AudioSystem.audioRoot}$asset').existsSync(),
+          isTrue,
+          reason: asset,
+        );
       }
     });
 

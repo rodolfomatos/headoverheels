@@ -19,8 +19,20 @@ class FlameAudioSink implements AudioSink {
 
   @override
   Future<void> play(String asset, {double volume = 1}) async {
-    await FlameAudio.play(asset, volume: volume);
+    await FlameAudio.play(audioLayerPath(asset), volume: volume);
   }
+
+  /// The path FlameAudio is given, from a bundle path.
+  ///
+  /// FlameAudio prefixes `assets/audio/` itself, so a path that already starts
+  /// with it asks for `assets/audio/assets/audio/<cue>.wav`, a file that does
+  /// not exist. The cue table names files from the bundle root, which is how a
+  /// human reads them; this is where that becomes the path the loader wants.
+  static String audioLayerPath(String asset) =>
+      asset.startsWith(audioRoot) ? asset.substring(audioRoot.length) : asset;
+
+  /// Where the synthesiser writes, and where FlameAudio looks.
+  static const String audioRoot = 'assets/audio/';
 
   @override
   Future<void> startLoop(String asset, {double volume = 1}) async {
@@ -28,7 +40,7 @@ class FlameAudioSink implements AudioSink {
     final current = _loop;
     _loop = null;
     if (current != null) await current.stop();
-    _loop = await FlameAudio.loop(asset, volume: volume);
+    _loop = await FlameAudio.loop(audioLayerPath(asset), volume: volume);
   }
 
   @override

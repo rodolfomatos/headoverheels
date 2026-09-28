@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:knightlore/knightlore.dart';
 
@@ -21,6 +23,25 @@ Future<KnightLoreGame> playingGame() async {
 }
 
 void main() {
+  test('every sound resolves to a file the audio layer can load', () {
+    // FlameAudio prefixes `assets/audio/` itself, so a path that already starts
+    // with it asks for a file that does not exist and the game plays silence.
+    for (final cue in AudioCue.values) {
+      final path = FlameAudioSink.audioLayerPath(
+          '${FlameAudioSink.audioRoot}${cue.name}.wav');
+      expect(
+        path,
+        isNot(startsWith('assets/')),
+        reason: 'FlameAudio adds the assets/ prefix; $cue already has it',
+      );
+      expect(
+        File('${FlameAudioSink.audioRoot}$path').existsSync(),
+        isTrue,
+        reason: 'nothing to play for $cue: $path',
+      );
+    }
+  });
+
   test('walking makes a step, a wall makes a bump', () async {
     final game = await playingGame();
     addTearDown(game.dispose);

@@ -17,10 +17,18 @@ class AudioSystem {
   static List<String> get allAssets =>
       HohCue.values.map(assetFor).map(relativeAsset).toList(growable: false);
 
-  /// FlameAudio resolves assets from the bundle root, so a path loses its
-  /// `assets/` prefix.
+  /// The path the audio layer is given, from a cue's bundle path.
+  ///
+  /// FlameAudio prefixes `assets/audio/` itself, so handing it a path that
+  /// already starts with `assets/` asks for a file that has never existed:
+  /// `assets/audio/assets/audio/sfx/jump.wav`. The cue table names files from
+  /// the bundle root because that is how a human reads them; this is where that
+  /// becomes the path the loader wants.
   static String relativeAsset(String asset) =>
-      asset.startsWith('assets/') ? asset.substring('assets/'.length) : asset;
+      asset.startsWith(audioRoot) ? asset.substring(audioRoot.length) : asset;
+
+  /// Where the synthesiser writes, and where FlameAudio looks.
+  static const String audioRoot = 'assets/audio/';
 
   bool _musicEnabled = true;
   bool _sfxEnabled = true;

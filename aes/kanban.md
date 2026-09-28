@@ -234,6 +234,18 @@ first game onto the same platform
   says so when a tileset is missing.
   What is not: the renderer is still not proven by a test that ends, T059, and
   only one of the five planets has a tileset, T058.
+* The audio of both games, found while chasing T059 and worth more than the
+  chase. FlameAudio prefixes `assets/audio/` itself, and both games handed it a
+  path that already began with it: Head over Heels asked for
+  `assets/audio/audio/sfx/jump.wav` and Knight Lore for
+  `assets/audio/assets/audio/step.wav`. Neither file has ever existed, so both
+  games play silence, in the browser, with no error: FlameAudio reports a
+  missing asset and carries on. The HoH screen test printed the failure while
+  loading, and nothing had noticed, because every audio test checked the other
+  half of the problem: that the WAVs exist, that they decode, that they are
+  audible, that the cue list is complete. Not one of them asked for the path the
+  loader is given. Each game now has that test, and the two old assertions that
+  encoded the doubled prefix as a requirement are corrected.
 * Audit of the Sprint 09 backlog, checked against the code rather than the
   board. T025, the atlas: `scripts/pack_atlas.py` is referenced by nothing, the
   Makefile never runs it, and `assets/sprites/atlases/` is empty. The game loads

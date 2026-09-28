@@ -27,7 +27,7 @@ tailored to a single game.
 | `packages/iso_editor` | Map editor, sprite manager, world graph editor, tileset authoring. Opens either game | 60 tests |
 | `packages/iso_builder_cli` | Project scaffolding and validation | 2 tests |
 | `games/knightlore` | The second game: 15 rooms, 5 areas, the curse rules, the six ingredients, 27 synthesised sounds | 160 tests, playable |
-| `games/headoverheels` | The first game: 20 rooms, 5 planets, 65 sprite sheets, 30 synthesised sounds | 63 tests, opens and draws |
+| `games/headoverheels` | The first game: 20 rooms, 5 planets, 65 sprite sheets, 30 synthesised sounds | 64 tests, opens and draws |
 
 Nothing at the top level is a package. Each game and each library is its own
 Flutter package, and every Makefile target says which directory it runs in.
@@ -226,11 +226,11 @@ map format.
 
 | | |
 |---|---|
-| Tests | 303 across five packages, and 169 sprite checks |
+| Tests | 305 across five packages, and 169 sprite checks |
 | Knight Lore | 15 rooms, 5 areas, finished and playable |
 | Head over Heels | 20 rooms, 5 planets, opens and draws; the pixel proof is not a test yet |
 | Sprites | 65 sheets, one manifest per game |
-| Sounds | 57, every one computed by the synthesiser |
+| Sounds | 57, every one computed by the synthesiser and loaded from the path the player hears |
 | Board | 93 ticket rows, from the first audit to the editor layout work |
 
 The plain summary: one finished game, one that compiles and cannot be played

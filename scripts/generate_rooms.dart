@@ -44,26 +44,54 @@ String generateTMX(String roomId, String theme, List<dynamic> triggers) {
     ' <tileset firstgid="1" '
     'source="assets/levels/tilesets/${tileset.existsSync() ? theme : 'castle'}.tsx"/>',
   );
+  // The tileset, in ids rather than gids: 0-15 are floors and 16-31 are walls,
+  // and a gid of 0 is no tile at all. The floors used to be all zeros, so every
+  // room drew nothing but its border, and the border used gid 2, which is tile id
+  // 1: a cracked *floor* tile, not a wall. See scripts/generate_castle_tileset.py
+  // for what each id is.
+  const plainFloor = 1;
+  const wornFloor = 3;
+  const mossyFloor = 4;
+  const plainWall = 17;
+  const topLeftWall = 18;
+  const topRightWall = 19;
+
   sb.writeln(' <layer id="1" name="Floor" width="16" height="16">');
   sb.writeln('  <data encoding="csv">');
-  // Empty floor
   for (int y = 0; y < 16; y++) {
-    sb.write('0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0');
-    if (y < 15) sb.writeln(',');
+    for (int x = 0; x < 16; x++) {
+      // A worn path across the room and moss along its walls, so twenty rooms
+      // are not twenty copies of one grid. The pattern is arithmetic, not random,
+      // because the maps are committed and a rerun must not change them.
+      final tile = (x + y) % 9 == 0
+          ? wornFloor
+          : (x < 2 || y < 2)
+          ? mossyFloor
+          : plainFloor;
+      sb.write('$tile');
+      if (x < 15 || y < 15) sb.write(',');
+    }
+    if (y < 15) sb.writeln();
   }
   sb.writeln();
   sb.writeln('  </data>');
   sb.writeln(' </layer>');
   sb.writeln(' <layer id="2" name="Walls" width="16" height="16">');
   sb.writeln('  <data encoding="csv">');
-  // Border walls
   for (int y = 0; y < 16; y++) {
-    if (y == 0 || y == 15) {
-      sb.write('0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0');
-    } else {
-      sb.write('0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0');
+    for (int x = 0; x < 16; x++) {
+      final onBorder = x == 0 || y == 0 || x == 15 || y == 15;
+      final tile = !onBorder
+          ? 0
+          : (y == 0 && x == 0)
+          ? topLeftWall
+          : (y == 0 && x == 15)
+          ? topRightWall
+          : plainWall;
+      sb.write('$tile');
+      if (x < 15 || y < 15) sb.write(',');
     }
-    if (y < 15) sb.writeln(',');
+    if (y < 15) sb.writeln();
   }
   sb.writeln();
   sb.writeln('  </data>');

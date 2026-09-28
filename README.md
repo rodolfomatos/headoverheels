@@ -13,8 +13,10 @@ tailored to a single game.
 > visual test that renders it to images and fails if a room comes out blank or
 > cropped. Head over Heels now opens its world, loads the room map, the tileset
 > and the sprites, and shows the game: five tests stand the real screen up. What
-> is not finished is the proof and four of the five planets, which have no
-> tileset of their own yet. The board in `aes/kanban.md` is the authority on
+> is not finished is the room: the game's load never completes, so a rendered
+> frame of the real screen is black apart from the HUD and the touch controls,
+> which is T062. Four of the five planets also have no tileset of their own
+> yet, which is T058. The board in `aes/kanban.md` is the authority on
 > what is done and what is not.
 
 ---
@@ -27,7 +29,7 @@ tailored to a single game.
 | `packages/iso_editor` | Map editor, sprite manager, world graph editor, tileset authoring. Opens either game | 60 tests |
 | `packages/iso_builder_cli` | Project scaffolding and validation | 2 tests |
 | `games/knightlore` | The second game: 15 rooms, 5 areas, the curse rules, the six ingredients, 27 synthesised sounds | 160 tests, playable |
-| `games/headoverheels` | The first game: 20 rooms, 5 planets, 65 sprite sheets, 30 synthesised sounds | 72 tests, opens and draws |
+| `games/headoverheels` | The first game: 20 rooms, 5 planets, 65 sprite sheets, 30 synthesised sounds | 76 tests, screen up, room still loading |
 
 Nothing at the top level is a package. Each game and each library is its own
 Flutter package, and every Makefile target says which directory it runs in.
@@ -62,6 +64,10 @@ four of its own, the guardian of that throne room counts those and no others,
 and the HUD shows the same number the guardian reads. The bag is worn rather
 than held, and carries four items behind the one in the hand, with no
 dispensary in the world to empty it at, which is T061.
+
+The room maps draw a floor and a border again: the floors had been a sheet of
+zeros, which Tiled reads as no tile at all, and the borders had been made of
+floor tiles. Four tests read the numbers in the maps and would fail on either.
 
 Two things are known to be unfinished. Only the castle has a tileset, so the
 other four planets draw with the castle one until they have their own art. And
@@ -232,7 +238,7 @@ map format.
 
 | | |
 |---|---|
-| Tests | 313 across five packages, and 169 sprite checks |
+| Tests | 317 across five packages, and 169 sprite checks |
 | Knight Lore | 15 rooms, 5 areas, finished and playable |
 | Head over Heels | 20 rooms, 5 planets, opens and draws; the pixel proof is not a test yet |
 | Sprites | 65 sheets, one manifest per game |

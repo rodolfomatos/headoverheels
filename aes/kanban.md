@@ -140,6 +140,7 @@ current_ticket: "T050"
 | T058 | Four of the five planets have no tileset | pending |
 | T059 | The pixel-level visual proof of the HoH renderer | pending |
 | T061 | Nowhere to empty the bag: the world has no dispensary | pending |
+| T062 | The game screen is black: the room never finishes loading | pending |
 
 ## Sprint 10 — Builder Platform
 **Goal**: Extract a reusable isometric engine and build editor/CLI foundations
@@ -186,6 +187,7 @@ first game onto the same platform
 * T058: Four of the five planets have no tileset
 * T059: The pixel-level visual proof of the HoH renderer
 * T061: Nowhere to empty the bag: the world has no dispensary
+* T062: The game screen is black: the room never finishes loading
 
 
 ## Notes
@@ -286,6 +288,31 @@ first game onto the same platform
   in the world out of the real data and checks which planet it belongs to. That
   test is the one that was missing: nothing had ever built an entity out of the
   real world and looked at it.
+* T028, and it found two things, one of them the reason the game is black.
+  The room maps had a floor of nothing: every tile was gid 0, which Tiled reads
+  as no tile at all, so twenty rooms drew nothing but their border. And the
+  border used gid 2, which is tile id 1, and tile id 1 is a cracked *floor* in
+  `scripts/generate_castle_tileset.py`: the walls were floor. The generator
+  writes the ids the tileset actually has now, floors on the floor and walls on
+  the walls, with a worn path across the room and moss along its edges so twenty
+  rooms are not twenty copies of one grid, and all twenty maps are regenerated.
+  `test/room_maps_test.dart` reads the numbers in the files and would fail on
+  either: no floor, no border, a walled-in room, a gid past the end of the
+  tileset, or walls lined with floor tiles.
+  The second thing is worse. A rendered frame of the real screen is black: the
+  joystick, the buttons and the HUD are there, and the room is not. The frame
+  measured 1465 distinct colours, and every one of them came from the widgets
+  around the game. `HeadOverHeelsGame.onLoad` never finishes: pumping 900 frames
+  gets as far as `await add(room)` and stops there, `isLoaded` stays false, and
+  `currentRoom` is null. Nothing had noticed, because the game-screen tests
+  assert that a `GameWidget` exists, and the screen builds one as soon as the
+  world arrives whether or not the game has loaded. A test that stands the real
+  screen up and checks that a *room* came up, rather than a widget, is what was
+  missing. That is T062, and T028 is not closed until it is.
+  What the capture needed to work at all: pumping until `isLoaded`, not a fixed
+  number of frames. The world, the room map, the tileset and 65 sprite sheets
+  load through awaits that only resolve when the test pumps, so a fixed count
+  catches the game half-loaded.
 * Audit of the Sprint 09 backlog, checked against the code rather than the
   board. T025, the atlas: `scripts/pack_atlas.py` is referenced by nothing, the
   Makefile never runs it, and `assets/sprites/atlases/` is empty. The game loads

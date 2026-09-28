@@ -1,400 +1,174 @@
-# Head over Heels — Flutter Port
+# An isometric platform, and two games on it
 
 ![Flutter](https://img.shields.io/badge/Flutter-3.16+-02569B?logo=flutter&logoColor=white)
 ![Dart](https://img.shields.io/badge/Dart-3.2+-0175C2?logo=dart&logoColor=white)
-![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
-![Build](https://img.shields.io/badge/Build-passing-brightgreen)
 
-A **production-ready**, modern Flutter/Dart port of the classic 1987 isometric puzzle-platformer **"Head over Heels"** for Android, featuring dual-character mechanics, 5 planets, 21 rooms, adaptive audio, and touch-optimized controls.
+A Flutter platform for 2:1 isometric games, with two games built on it and an
+editor that opens either one. The first game is a port of **Head over Heels**
+(1987); the second, **Knight Lore** (1984), exists to prove the platform is not
+tailored to a single game.
 
-> **Status**: ✅ **COMPLETE** — All 15 tickets delivered across 7 sprints (AES Protocol)
-
----
-
-## 🎮 Features
-
-### Core Gameplay
-- **Dual-Character System** — Control **Head** (high jump, doughnuts) and **Heels** (fast walk, carry items) independently or combined (Head rides Heels)
-- **Character Swop** — Instant toggle between characters with `SWOP` button
-- **21 Rooms across 5 Planets** — Complete original world map faithfully recreated:
-  - 🏰 **Blacktooth Castle** (6 rooms) — Medieval fortress, secret passages
-  - 🏺 **Egyptus** (4 rooms) — Pyramids, tombs, hieroglyphic puzzles
-  - 🔒 **Penitentiary** (3 rooms) — High-security prison, conveyor mazes
-  - 🌴 **Safari** (3 rooms) — Jungle ruins, wild guardians
-  - 📚 **Book World** (3 rooms) — Library labyrinth, final throne room
-- **19 Puzzle Entity Types** — Switches, doors, conveyors, springs, teleports, ladders, reincarnation fish, crowns, doughnuts, bags, keys, hush puppies, monsters, guardians
-- **Fixed-Timestep Physics** — Deterministic 60Hz simulation with sub-tick interpolation
-
-### Modern UX
-- **Virtual Joystick** — 8-directional analog movement with visual direction indicators
-- **Action Buttons** — JUMP, CARRY, FIRE, SWOP with contextual enable/disable states
-- **Adaptive HUD** — Lives, crowns, active character, doughnut count, carried item
-- **Material 3 Theme** — Dark mode, dynamic colors, accessibility support
-- **Pause/Resume** — In-game overlay with restart, settings, quit
-
-### Audio System
-- **8 Music Tracks** — Unique soundtrack per planet + main menu, boss, game over
-- **27 Sound Effects** — Jump, land, pickup, switch, door, teleport, spring, conveyor, fire, hits, death, fish, crown, bag, hush puppy, swop, UI
-- **Persistent Settings** — Volume sliders, mute toggles saved via SharedPreferences
-- **Adaptive Playback** — Auto-switches music on room transitions
-
-### Technical Highlights
-- **2:1 Dimetric Isometric** — 64×32 logical tiles, classic 8-bit aesthetic
-- **Riverpod + Freezed** — Immutable state, compile-safe providers, pattern matching
-- **Flame Engine** — Game loop, TMX loading, component system, collision callbacks
-- **AES Protocol** — Structured engineering with kanban, sprints, hostile analysis
+> **State, plainly.** Knight Lore is finished: playable, with audio, and a
+> visual test that renders it to images and fails if a room comes out blank or
+> cropped. Head over Heels is mid-migration: the rules compile and the pickups
+> reach the characters, but the game screen still shows a placeholder, so it
+> cannot be played yet. The board in `aes/kanban.md` is the authority on what is
+> done and what is not.
 
 ---
 
-## 🏗 Architecture
+## What is here
 
-### Technology Stack
-| Layer | Technology | Version |
-|-------|------------|---------|
-| Framework | Flutter | 3.16+ |
-| Language | Dart | 3.2+ |
-| Game Engine | Flame | 1.17+ |
-| State Mgmt | Riverpod | 2.6+ |
-| Data Modeling | Freezed | 2.5+ |
-| JSON Serialization | json_serializable | 6.8+ |
-| Audio | just_audio / flame_audio | 0.9+ / 1.0+ |
-| Math | vector_math | 2.1+ |
-| Persistence | shared_preferences | 2.2+ |
-
-### Project Structure
-```
-headoverheels/
-├── games/
-│   ├── headoverheels/          # The first game: Head over Heels
-│   │   ├── android/ ios/ linux/ macos/ web/ windows/
-│   │   ├── assets/
-│   │   │   ├── levels/         # world.json, 21 TMX rooms, tilesets
-│   │   │   ├── sprites/        # Character and item sprites, manifest.yaml
-│   │   │   └── audio/          # Sound; still to be synthesised (T049)
-│   │   ├── style/              # palette.json, geometry.json, the style guide
-│   │   ├── lib/                # The game itself
-│   │   │   ├── core/           # Isometric coordinates, utilities
-│   │   │   ├── entities/       # CharacterState
-│   │   │   ├── features/
-│   │   │   │   ├── audio/      # AudioSystem, AudioSettings
-│   │   │   │   ├── gameplay/   # entities, room, state, systems
-│   │   │   │   └── ui/         # Screens, widgets, theme
-│   │   │   └── main.dart       # App entry point
-│   │   ├── test/               # Unit and widget tests
-│   │   └── pubspec.yaml
-│   └── knightlore/             # The second game: Knight Lore, on iso_core
-│       ├── lib/src/            # rules, world, renderer, synthesised audio
-│       ├── assets/             # rooms, tiles, sprites, generated WAVs
-│       └── pubspec.yaml
-├── packages/                   # Reusable builder platform
-│   ├── iso_core/               # 2:1 dimetric runtime, assets, levels, physics
-│   ├── iso_editor/             # Map editor, sprite gallery, world graph
-│   └── iso_builder_cli/        # Project scaffolding and validation
-├── aes/                        # AES Protocol project management
-│   ├── kanban.md               # Project board
-│   ├── sprints/                # Sprint definitions
-│   └── tickets/                # Ticket specs
-├── docs/                       # Documentation
-│   ├── ARCHITECTURE.md
-│   ├── BUILDER_ARCHITECTURE.md
-│   ├── REQUIREMENTS.md
-│   ├── VISION.md
-│   └── RESEARCH/
-├── scripts/                    # Generators and validators
-│   ├── generate_knightlore_assets.py   # Draws the Knight Lore art
-│   ├── generate_rooms.dart             # TMX from world.json
-│   ├── publish_assets.py               # Writes each pubspec's asset list
-│   ├── validation_pipeline.py          # Sprite pipeline checks
-│   └── validate_sprites.py             # Manifest, palette and naming checks
-├── prompts/                    # AES prompt library
-├── Makefile                    # Build automation for both games
-└── CLAUDE.md                   # Operational contract
-```
+| | What it is | State |
+|---|---|---|
+| `packages/iso_core` | The shared runtime: isometric maths, world graph, assets, physics, and a pure-Dart sound synthesiser | 18 tests |
+| `packages/iso_editor` | Map editor, sprite manager, world graph editor, tileset authoring. Opens either game | 60 tests |
+| `packages/iso_builder_cli` | Project scaffolding and validation | 2 tests |
+| `games/knightlore` | The second game: 15 rooms, 5 areas, the curse rules, the six ingredients, 27 synthesised sounds | 160 tests, playable |
+| `games/headoverheels` | The first game: 20 rooms, 5 planets, 65 sprite sheets, 30 synthesised sounds | 58 tests, not playable yet |
 
 Nothing at the top level is a package. Each game and each library is its own
-Flutter package, and every Makefile target names the directory it runs in:
+Flutter package, and every Makefile target says which directory it runs in.
 
-```
-make setup                  # pub get in both games and both libraries
-make run-headoverheels      # the first game, on :8080
-make run-knightlore         # the second game, on :8081
-make test                   # tests for the first game
-make test-packages          # iso_core, iso_editor, iso_builder_cli, knightlore
-make check                  # format, lint, every test, asset validation
-```
+### The shared core
 
+`iso_core` is the point of the repository. Both games read the same world graph
+format, use the same asset manifest, project through the same isometric maths and
+share one synthesiser. A ticket that moves behaviour into the core is a ticket
+that makes the second game cheaper, which is how Knight Lore came to exist at
+all: its rules were written against the core, not against the first game.
 
-### Key Design Decisions (ADR)
-1. **Flame Engine** — Built-in game loop, TMX support, component system
-2. **Riverpod + Freezed** — Immutable state, compile-safe providers, pattern matching
-3. **2:1 Dimetric Projection** — 64×32 logical tiles, classic 8-bit isometric
-4. **Grid-Based Physics** — Deterministic, no Box2D needed
-5. **Riverpod → Flame (One-Way Sync)** — Authoritative state in Riverpod; Flame only renders
-6. **AES Protocol** — Kanban → Ticket → Hostile Analysis → Implement → Verify → Learn
+### Knight Lore
+
+The rules of the original, reimplemented from the published documentation, with
+no asset or level data from the original: forty days and six ingredients, the
+sabreman and the werewolf, four knights that split at night, six decaying
+spells, traps that catch you once and cost a day, and a room graph the editor
+can read. `games/knightlore/README.md` has the balance numbers, measured and
+printed by the tests rather than asserted by taste.
+
+### Head over Heels
+
+Twenty rooms across five planets, nineteen puzzle entity types, dual-character
+mechanics and a world graph with 43 exits and 134 triggers. The rules, the
+entities, the state and the assets are all here; what is missing is the game on
+the screen, which is T055.
 
 ---
 
-## 🚀 Quick Start
+## Quick start
 
-### Prerequisites
-- Flutter SDK 3.16+ (`flutter doctor -v`)
-- Android SDK 34+ (for building)
-- Java 17+ (for Gradle)
-
-### Install & Run
 ```bash
-# Clone and navigate
 git clone https://github.com/rodolfomatos/headoverheels.git
 cd headoverheels
 
-# Install dependencies in both games and both libraries
-make setup
+make setup                 # pub get in both games and both libraries
+make check                 # format, lint, every test, asset validation
 
-# Run quality checks (format → analyze → test → asset validation)
-make check
+make run-knightlore        # the finished game, in a browser, on :8081
+make run-headoverheels     # the first game, on :8080
 
-# Run a game in the browser
-make run-headoverheels   # :8080
-make run-knightlore      # :8081
+make build-headoverheels   # release web build
+make build-knightlore
+```
 
-# Run on a device, from the game's directory
+For a device, run from the game's own directory:
+
+```bash
 cd games/headoverheels
-flutter run -d linux    # Linux
-flutter run -d macos    # macOS
-flutter run -d windows  # Windows
-flutter run -d web      # Web
-flutter run             # Android device or emulator
+flutter run                # Android device or emulator
+flutter run -d linux       # or macos, windows, web
 ```
 
-### Build Commands
-```bash
-# Debug APK
-cd games/headoverheels && flutter build apk --debug
+### Quality gates
 
-# Release APK (obfuscated, split debug info)
-make build-release-apk
-# flutter build apk --release --obfuscate --split-debug-info=build/debug_info
-
-# Release App Bundle (Play Store)
-make build-release-appbundle
-# flutter build appbundle --release --obfuscate --split-debug-info=build/debug_info
-
-# Build both APK + AAB
-make build-release-all
-
-# Build with version from pubspec.yaml
-make build-version
-
-# Install release APK on connected device
-make install
-```
-
-### Code Generation
-```bash
-# Regenerate Freezed/JSON serializable code
-make generate
-# dart run build_runner build --delete-conflicting-outputs
-
-# Watch mode for development
-dart run build_runner watch --delete-conflicting-outputs
-```
-
-### Generate Room TMX Files
-```bash
-# Auto-generates all 21 room TMX files from world.json
-dart run scripts/generate_rooms.dart
-```
-
----
-
-## 📋 Development Workflow
-
-### AES Protocol (Ambrósio Engineering System)
-This project follows **AES-project** — full lifecycle with kanban, sprints, tickets.
-
-```bash
-# View project board
-cat aes/kanban.md
-
-# View sprint definition
-cat aes/sprints/sprint-01.md
-
-# View ticket spec
-cat aes/tickets/T005-puzzle-mechanics.md
-
-# View phase outputs
-cat aes/tickets/T005-plan.md    # Technical spec
-cat aes/tickets/T005-build.md   # Implementation diffstory
-cat aes/tickets/T005-review.md  # Code review findings
-cat aes/tickets/T005-learn.md   # Learnings & hostile audit
-```
-
-### Quality Gates (Must Pass)
 ```bash
 make check
-# Runs:
 # 1. dart format --output=none --set-exit-if-changed games packages
-# 2. flutter analyze --no-fatal-infos --no-fatal-warnings, in the first game
+# 2. flutter analyze, in the first game
 # 3. flutter test, in the first game
 # 4. iso_core, iso_editor, iso_builder_cli and knightlore tests
-# 5. asset validation pipelines, over the first game's sprites
+# 5. the sprite validation pipeline and the generated asset lists
+
+make test-packages         # every package except the first game
+make lint
+make format
 ```
 
-### Pre-Commit Checklist
-- [ ] `make check` passes (zero errors)
-- [ ] `dart run build_runner build --delete-conflicting-outputs` clean
-- [ ] Ticket spec implemented per plan
-- [ ] Hostile analysis completed (what could break?)
-- [ ] No hardcoded secrets (`make security-scan`)
+Two gates exist because both were needed the hard way. `assets-check` runs the
+sprite validator and then checks that each game's pubspec asset list matches its
+tree, because a pubspec entry ending in `/` ships only the files directly inside
+that directory: without the generated list, a browser build got one file of 157
+and no sprites. And `test/gameplay_compiles_test.dart` imports the gameplay layer
+so that a compiler error cannot hide behind an `ignore` comment, which is how a
+layer that had never compiled stayed invisible.
 
 ---
 
-## 🎨 Asset Pipeline
-
-### Tileset (castle.tsx)
-- 64×32 isometric tiles (2:1 dimetric)
-- Layers: Floor (z=0), Walls (z=1), Props (z=2)
-- External tileset reference in TMX
-
-### Room TMX Format
-```xml
-<map orientation="isometric" tilewidth="64" tileheight="32">
-  <tileset firstgid="1" source="../tilesets/castle.tsx"/>
-  <layer name="Floor">...</layer>
-  <layer name="Walls">...</layer>
-  <objectgroup name="Entities">
-    <object name="switch_1" type="switchTrigger" x="320" y="160">
-      <properties>
-        <property name="targetId" value="door_1"/>
-      </properties>
-    </object>
-  </objectgroup>
-</map>
-```
-
-### World Graph (world.json)
-```json
-{
-  "rooms": {
-    "castle_start": {
-      "file": "castle/castle_start.tmx",
-      "theme": "castle",
-      "exits": [{"direction": "east", "room": "castle_cell", "entrance": "west"}],
-      "spawnPoint": {"x": 1, "y": 1, "z": 0},
-      "triggers": [...]
-    }
-  },
-  "startRoom": "castle_start",
-  "planets": [...]
-}
-```
-
----
-
-## 🧰 Builder Platform
-
-The repository is being structured as a reusable isometric game builder:
-
-- `packages/iso_core` — platform-neutral Flutter/Flame runtime: dimetric coordinates, physics, entity contracts, manifest-driven assets, level loading and sprite resolution.
-- `packages/iso_editor` — editor: serializable map document, undo/redo, storage abstraction, dimetric map view with tileset preview, TMX import/export, TSX palette browser, file-picker gateways, sprite manager/animator with manifest editing and frame import, and a world graph viewer/editor with topology validation, all inside an `EditorShell` with tools, layers and inspector.
-- `games/knightlore` — second example game on `iso_core`: knight classes, six decaying spells, sixteen slot inventory, curse/day-night and filmation rules, and a 15 room world in the shared `world.json` format.
-- `packages/iso_builder_cli` — project scaffolding and validation:
-  ```bash
-  dart run packages/iso_builder_cli/bin/iso_builder.dart create "My Game"
-  dart run packages/iso_builder_cli/bin/iso_builder.dart analyze games/my_game
-  ```
-
-Head over Heels specific state and mechanics remain in the game layer; the generic core does not depend on Head, Heels or their puzzle entities.
-
-See `docs/BUILDER_ARCHITECTURE.md`.
-
----
-
-## 🧪 Testing
+## Generating things
 
 ```bash
-# Run all tests
-flutter test
+# Knight Lore's art, drawn from scratch
+python3 scripts/generate_knightlore_assets.py
 
-# With coverage
-make test-coverage
-# flutter test --coverage && genhtml coverage/lcov.info -o coverage/html
+# Knight Lore's room maps, checked against the world
+cd games/knightlore && flutter test test/room_maps_test.dart
 
-# Specific test file
-flutter test test/widget_test.dart
+# Either game's audio, computed rather than recorded
+cd games/knightlore && dart run tool/generate_audio.dart
+cd games/headoverheels && dart run tool/generate_audio.dart
 
-# Integration tests (if added)
-flutter test integration_test/
+# The asset list in a game's pubspec
+python3 scripts/publish_assets.py games/knightlore            # write
+python3 scripts/publish_assets.py games/knightlore --check    # verify
+
+# Head over Heels' room maps
+dart run scripts/generate_rooms.dart
+
+# Code generation, for the first game
+cd games/headoverheels && dart run build_runner build --delete-conflicting-outputs
 ```
 
----
+### About the assets
 
-## 📦 Release Checklist
-
-- [ ] Version bumped in `pubspec.yaml` (format: `version: 1.0.0+1`)
-- [ ] `make check` passes
-- [ ] `make generate` clean
-- [ ] `make security-scan` clean
-- [ ] Release keystore configured (`android/key.properties`)
-- [ ] App signed: `make build-release-appbundle`
-- [ ] App Bundle tested on device: `make install`
-- [ ] Play Store listing assets ready (screenshots, feature graphic, icon)
-- [ ] Privacy policy URL configured
-- [ ] Content rating questionnaire completed
+Nothing in this repository comes from either original game. The art is drawn by
+`scripts/generate_knightlore_assets.py` and by hand; the audio is computed by a
+synthesiser in `iso_core`, so the WAV files under `assets/audio` are a build
+product of this code rather than a recording; the rooms and puzzles were written
+from the published descriptions of the games.
 
 ---
 
-## 📚 Documentation
+## Working on it
 
-| Document | Description |
-|----------|-------------|
-| `CLAUDE.md` | Operational contract for AI agents |
-| `docs/ARCHITECTURE.md` | Technical architecture deep-dive |
-| `docs/VISION.md` | Product vision & success metrics |
-| `docs/REQUIREMENTS.md` | Functional & non-functional requirements |
-| `docs/PERSONAS.md` | User personas & accessibility needs |
-| `docs/PLAY_STORE_LISTING.md` | Store listing copy, assets, keywords |
-| `docs/QUALITY_GATES.md` | Quality gate definitions |
-| `docs/RESEARCH/original-game-analysis.md` | Original game mechanics research |
-| `aes/kanban.md` | Project board (single source of truth) |
+The board is `aes/kanban.md`: every ticket, its state, and a note under each
+finished one saying what the work found. The tickets carry the detail, the
+`docs/` directory carries the design, and `aes/tickets/` holds the older
+specifications.
 
----
+```bash
+cat aes/kanban.md
+cat docs/BUILDER_ARCHITECTURE.md   # the platform
+cat docs/ARCHITECTURE.md           # the first game
+```
 
-## 🤝 Contributing
+A habit worth keeping: every claim in the board is checked against the code, not
+against the board. An audit of five pending tickets found four were stale and one
+was a real gap, and the audit itself is in the board's notes.
 
-1. **Read** `CLAUDE.md` — operational contract
-2. **Follow** AES protocol — kanban → ticket → hostile analysis → implement → verify → learn
-3. **Run** `make check` before committing
-4. **All changes require human approval** — no auto-merge
-5. **Open an issue** for bugs/features before starting work
+## Technology
 
-### Code Style
-- `dart format .` — enforced
-- `flutter analyze` — zero errors required
-- Freezed for immutable data
-- Riverpod providers for all state
-- Component composition over inheritance
-
----
-
-## ⚖️ Legal
-
-### Fan Project Disclaimer
-This is a **non-commercial fan project** for educational and portfolio purposes.
-
-> **"Head over Heels"** is a trademark of Ocean Software / Atari. The original 1987 game code, assets, and design are copyrighted by their respective owners.
-
-This port:
-- Uses **original artwork** created specifically for this project
-- Does **not** include extracted assets from the original game
-- Is **not affiliated** with Ocean Software, Atari, or any rights holders
-- Contains **no commercial intent** — no ads, no IAP, no data collection
-
-### Original Game References
-- ZX Spectrum TZX: https://worldofspectrum.net/pub/sinclair/games/h/HeadOverHeels.tzx.zip
-- Game Manual: https://worldofspectrum.net/item/0002259/
-- WebMSX Playable: https://www.file-hunter.com/Homebrew/?id=headoverheels
+| Layer | Used for |
+|---|---|
+| Flutter, Dart | both games and the editor |
+| Flame | the game loop, components, collisions |
+| Riverpod | the first game's state, the editor's dependency graph |
+| Freezed, json_serializable | the first game's immutable state |
+| flame_audio, just_audio | playing the synthesised sounds |
+| vector_math | isometric projection |
+| shared_preferences | volume and settings |
+| xml, tiled | TMX and TSX maps |
 
 ---
 
@@ -428,31 +202,30 @@ SOFTWARE.
 
 ## 🙏 Acknowledgments
 
-- **Original Creators** — Jon Ritman & Bernie Drummond (1987 masterpiece)
-- **Ocean Software** — Publisher of the original
-- **Flame Engine Team** — Excellent 2D game engine for Flutter
-- **Riverpod Team** — Reactive state management done right
-- **Freezed Team** — Immutable data classes with zero boilerplate
-- **AES Protocol** — Structured engineering methodology
+The two games are not ours. Their rules were reimplemented from published
+documentation, and no asset, level or recording from either was taken:
+
+- **Head over Heels** — Jon Ritman and Bernie Drummond, 1987, published by
+  Ocean Software
+- **Knight Lore** — Chris Stamper, 1984, published by Ultimate Play The Game
+
+And the tools this stands on: the Flame engine, Riverpod, Freezed, and the Tiled
+map format.
 
 ---
 
-## 📊 Project Stats
+## Where it stands
 
-| Metric | Value |
-|--------|-------|
-| Lines of Code (Dart) | ~12,000 |
-| Files | 150+ |
-| Test Coverage | Smoke test only (expandable) |
-| Puzzle Entities | 19 types |
-| Rooms | 21 |
-| Planets | 5 |
-| Sprint Tickets | 15 |
-| Audio Assets | 35 OGG files |
-| TMX Rooms | 21 generated |
+| | |
+|---|---|
+| Tests | 298 across five packages, and 169 sprite checks |
+| Knight Lore | 15 rooms, 5 areas, finished and playable |
+| Head over Heels | 20 rooms, 5 planets, compiles, not on the screen yet |
+| Sprites | 65 sheets, one manifest per game |
+| Sounds | 57, every one computed by the synthesiser |
+| Board | 93 ticket rows, from the first audit to the editor layout work |
 
----
+The plain summary: one finished game, one that compiles and cannot be played
+yet, a platform underneath both, and a board that says which is which.
 
-**Built with ❤️ using Flutter, Flame, Riverpod & AES Protocol**
-
-[Repository](https://github.com/rodolfomatos/headoverheels) • [Issues](https://github.com/rodolfomatos/headoverheels/issues) • [Releases](https://github.com/rodolfomatos/headoverheels/releases)
+**Repository** · [Issues](https://github.com/rodolfomatos/headoverheels/issues) · [Releases](https://github.com/rodolfomatos/headoverheels/releases)

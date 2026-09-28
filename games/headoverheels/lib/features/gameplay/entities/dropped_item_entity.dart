@@ -5,6 +5,7 @@ import 'package:flutter/material.dart' show Color, Icons, IconData;
 import 'package:flutter/painting.dart' show Color, Paint;
 import 'package:headoverheels/features/gameplay/entities/character_component.dart';
 import 'package:headoverheels/features/gameplay/entities/puzzle_entity.dart';
+import 'package:headoverheels/features/gameplay/state/character_notifier.dart';
 import 'package:headoverheels/entities/character_state.dart';
 
 /// Dropped item entity - can be picked up by Heels.
@@ -34,16 +35,28 @@ class DroppedItemEntity extends PuzzleEntity {
   @override
   void onInteract(CharacterComponent character) {
     if (!character.canCarry) return;
-    if (character.currentState.carriedItem != CarriedItem.none()) return;
 
-    _pickupItem(character);
-  }
+    final notifier = _notifierFor(character);
+    if (notifier == null) return;
 
-  void _pickupItem(CharacterComponent character) {
+    // A full hand sends the item to the bag, which is what the bag is for. With
+    // the hand free it goes in the hand, as before.
+    if (character.currentState.carriedItem == CarriedItem.none()) {
+      notifier.pickUp(item);
+    } else if (!notifier.stow(item)) {
+      // No room in the bag either, so the item stays where it is.
+      return;
+    }
+
     final game = this.game;
     game.onItemPickedUp(character, item);
     removeFromParent();
   }
+
+  /// The character state of [character], which is what the hand and the bag live
+  /// in. The game owns the mapping from a component to its notifier.
+  CharacterStateNotifier? _notifierFor(CharacterComponent character) =>
+      game.notifierFor(character);
 
   (IconData, Color) _getItemVisual(CarriedItem item) {
     return item.when(

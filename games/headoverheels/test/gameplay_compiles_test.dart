@@ -8,6 +8,7 @@ import 'package:headoverheels/features/gameplay/room/room_graph.dart';
 import 'package:headoverheels/features/gameplay/room/world_loader.dart';
 import 'package:headoverheels/features/gameplay/state/character_notifier.dart';
 import 'package:headoverheels/features/gameplay/entities/guardian_entity.dart';
+import 'package:headoverheels/features/gameplay/entities/crown_entity.dart';
 import 'package:headoverheels/features/gameplay/entities/entity_factory.dart';
 
 /// Compiles the gameplay layer and checks the notifications the puzzle
@@ -58,6 +59,37 @@ void main() {
       );
     }
   });
+
+  test(
+    'a crown built from the world belongs to the planet of its room',
+    () async {
+      // The data was right and the game was wrong: the factory read a `planet`
+      // key that no trigger has and fell back to `castle`, so every crown in the
+      // game was Blacktooth's. No test built an entity out of the real world, so
+      // the four crowns that open a throne room opened the castle one and the
+      // other four planets could never be finished.
+      final graph = await loadWorldGraph();
+      var crowns = 0;
+      for (final room in graph.rooms.values) {
+        for (final trigger in room.triggers) {
+          if (trigger.type != TriggerType.crown) continue;
+          crowns++;
+          final entity = EntityFactory.create(trigger, room.id);
+          expect(
+            entity,
+            isA<CrownEntity>(),
+            reason: '${trigger.id} did not build a crown',
+          );
+          expect(
+            (entity! as CrownEntity).planetId,
+            room.theme,
+            reason: '${trigger.id} in ${room.id} is not ${room.theme}\'s',
+          );
+        }
+      }
+      expect(crowns, greaterThan(0), reason: 'the world has no crowns at all');
+    },
+  );
 
   test('a guardian guards the planet its room is on', () async {
     // The planet of a room is its theme, and the crowns in it agree: a throne
@@ -151,6 +183,50 @@ void main() {
       );
     });
 
+    test('the bag is worn, and it leaves the hand free', () async {
+      // The bag used to be recorded as the hand's item, so the one slot a
+      // character carries in held a bag nobody could use, and the key on the
+      // floor could not be picked up after it.
+      final notifier = container.read(heelsProvider.notifier);
+      notifier.pickUp(const CarriedItem.key('key_1'));
+      game.onBagCollected(_character(container, CharacterType.heels));
+
+      expect(
+        notifier.state.carriedItem,
+        const CarriedItem.key('key_1'),
+        reason: 'wearing the bag took the hand',
+      );
+      expect(notifier.state.hasBag, isTrue);
+    });
+
+    test('the bag carries four, and the fifth stays behind', () async {
+      // The magic bag carries four. Anything more and there is nowhere to put it:
+      // the world has no dispensary, which is T061.
+      final notifier = container.read(heelsProvider.notifier);
+      game.onBagCollected(_character(container, CharacterType.heels));
+
+      for (var slot = 0; slot < bagCapacity; slot++) {
+        expect(
+          notifier.stow(CarriedItem.other('item_$slot')),
+          isTrue,
+          reason: 'slot $slot of the bag should take its item',
+        );
+      }
+      expect(notifier.state.bagItems, hasLength(bagCapacity));
+      expect(
+        notifier.stow(const CarriedItem.other('item_overflow')),
+        isFalse,
+        reason: 'the bag carried five',
+      );
+      expect(notifier.state.bagItems, hasLength(bagCapacity));
+    });
+
+    test('a character with no bag cannot stow anything', () async {
+      final notifier = container.read(heelsProvider.notifier);
+      expect(notifier.stow(const CarriedItem.other('item_0')), isFalse);
+      expect(notifier.state.bagItems, isEmpty);
+    });
+
     test('the guardian reports itself beaten', () {
       expect(game.guardianDefeated, isFalse);
       game.onGuardianDefeated();
@@ -168,20 +244,6 @@ void main() {
         container.read(headProvider).carriedItem,
         const CarriedItem.key('gold_key'),
         reason: 'the key never reached the character',
-      );
-    });
-
-    test('the bag is carried, even though it does nothing yet', () {
-      final character = CharacterComponent(
-        type: CharacterType.heels,
-        ref: container.read(_refProvider),
-      );
-      game.onBagCollected(character);
-
-      expect(
-        container.read(heelsProvider).carriedItem,
-        const CarriedItem.other('bag'),
-        reason: 'T056: the bag has no effect, but it should not be lost',
       );
     });
   });
@@ -238,11 +300,10 @@ Future<GuardianEntity> _guardian(
   return guardian;
 }
 
-CharacterComponent _character(ProviderContainer container) =>
-    CharacterComponent(
-      type: CharacterType.head,
-      ref: container.read(_refProvider),
-    );
+CharacterComponent _character(
+  ProviderContainer container, [
+  CharacterType type = CharacterType.head,
+]) => CharacterComponent(type: type, ref: container.read(_refProvider));
 
 /// The notifications never read the world, so the tests hand the game a graph
 /// with one empty room rather than loading a thousand.

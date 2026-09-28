@@ -25,6 +25,26 @@ class Vector3Converter implements JsonConverter<Vector3, List<double>> {
   List<double> toJson(Vector3 object) => [object.x, object.y, object.z];
 }
 
+/// The bag's contents: a list of items, each in the shape [CarriedItemConverter]
+/// reads.
+class CarriedItemsConverter
+    implements JsonConverter<List<CarriedItem>, List<dynamic>> {
+  const CarriedItemsConverter();
+
+  @override
+  List<CarriedItem> fromJson(List<dynamic> json) => json
+      .map(
+        (entry) => const CarriedItemConverter().fromJson(
+          entry as Map<String, dynamic>,
+        ),
+      )
+      .toList();
+
+  @override
+  List<dynamic> toJson(List<CarriedItem> object) =>
+      object.map((item) => const CarriedItemConverter().toJson(item)).toList();
+}
+
 class CarriedItemConverter
     implements JsonConverter<CarriedItem, Map<String, dynamic>> {
   const CarriedItemConverter();

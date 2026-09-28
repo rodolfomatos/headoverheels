@@ -27,7 +27,7 @@ tailored to a single game.
 | `packages/iso_editor` | Map editor, sprite manager, world graph editor, tileset authoring. Opens either game | 60 tests |
 | `packages/iso_builder_cli` | Project scaffolding and validation | 2 tests |
 | `games/knightlore` | The second game: 15 rooms, 5 areas, the curse rules, the six ingredients, 27 synthesised sounds | 160 tests, playable |
-| `games/headoverheels` | The first game: 20 rooms, 5 planets, 65 sprite sheets, 30 synthesised sounds | 69 tests, opens and draws |
+| `games/headoverheels` | The first game: 20 rooms, 5 planets, 65 sprite sheets, 30 synthesised sounds | 72 tests, opens and draws |
 
 Nothing at the top level is a package. Each game and each library is its own
 Flutter package, and every Makefile target says which directory it runs in.
@@ -59,7 +59,9 @@ and the joystick are the same objects the touch controls write to.
 
 The crowns of a planet are the crowns of that planet: a throne room asks for
 four of its own, the guardian of that throne room counts those and no others,
-and the HUD shows the same number the guardian reads.
+and the HUD shows the same number the guardian reads. The bag is worn rather
+than held, and carries four items behind the one in the hand, with no
+dispensary in the world to empty it at, which is T061.
 
 Two things are known to be unfinished. Only the castle has a tileset, so the
 other four planets draw with the castle one until they have their own art. And
@@ -230,7 +232,7 @@ map format.
 
 | | |
 |---|---|
-| Tests | 310 across five packages, and 169 sprite checks |
+| Tests | 313 across five packages, and 169 sprite checks |
 | Knight Lore | 15 rooms, 5 areas, finished and playable |
 | Head over Heels | 20 rooms, 5 planets, opens and draws; the pixel proof is not a test yet |
 | Sprites | 65 sheets, one manifest per game |

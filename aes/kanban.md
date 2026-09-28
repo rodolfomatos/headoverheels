@@ -135,10 +135,11 @@ current_ticket: "T050"
 | T029 | Final Asset Migration | done |
 | T053 | The sprite registry should read the manifest, not repeat it | pending |
 | T055 | Show the game on the game screen: it is a placeholder | done |
-| T056 | The bag is carried but does nothing yet | pending |
+| T056 | The bag is carried but does nothing yet | done |
 | T057 | The guardian trigger does not say which planet it guards | done |
 | T058 | Four of the five planets have no tileset | pending |
 | T059 | The pixel-level visual proof of the HoH renderer | pending |
+| T061 | Nowhere to empty the bag: the world has no dispensary | pending |
 
 ## Sprint 10 — Builder Platform
 **Goal**: Extract a reusable isometric engine and build editor/CLI foundations
@@ -182,9 +183,9 @@ first game onto the same platform
   to it breaks the shell layout
 * T053: The sprite registry should read the manifest, not repeat it
 * T054: Gameplay tests: the rules are barely covered
-* T056: The bag is carried but does nothing yet
 * T058: Four of the five planets have no tileset
 * T059: The pixel-level visual proof of the HoH renderer
+* T061: Nowhere to empty the bag: the world has no dispensary
 
 
 ## Notes
@@ -262,6 +263,29 @@ first game onto the same platform
   read. Five tests: two on the data, because a trigger that loses its `planetId`
   in an edit is this bug coming back, and three on the rule: the wrong planet
   does not open a throne room, the right one does, and three crowns do not.
+* T056, the bag, which was carried and did nothing, and was worse than nothing.
+  It was recorded as the character's hand item: `CarriedItem.other('bag')`. The
+  hand carries one thing, so picking the bag up filled the only slot a character
+  has with a bag nobody can use, and the key on the floor could no longer be
+  picked up. The bag is worn. It is now `hasBag`, the hand is left alone, and
+  the bag has four slots of its own: an item goes in the hand when the hand is
+  free and in the bag when it is not. Four tests, including that the fifth item
+  stays on the floor.
+  What the bag cannot do yet is be emptied. The world has ten bag triggers, no
+  dispensary and no swop: there is no trigger type in the whole world file for
+  either, so a bag that fills stays full. That is T061, and it is level design
+  rather than a bug, so it is named rather than guessed at.
+* The crown bug behind T057, found while working on the bag and worth more than
+  the bag. The crown factory read `trigger.properties['planet']`, a key no
+  trigger in the world has, and fell back to `castle`. Every crown in the game
+  was Blacktooth's: the four that opened a throne room opened the castle one,
+  and no other planet could ever be finished, however many crowns the player
+  carried. The data was right and the rule was right, and the code that read
+  them was wrong, which is what a578399 said it had fixed and had not. The
+  factory reads `planetId` now, refuses to guess, and a test builds every crown
+  in the world out of the real data and checks which planet it belongs to. That
+  test is the one that was missing: nothing had ever built an entity out of the
+  real world and looked at it.
 * Audit of the Sprint 09 backlog, checked against the code rather than the
   board. T025, the atlas: `scripts/pack_atlas.py` is referenced by nothing, the
   Makefile never runs it, and `assets/sprites/atlases/` is empty. The game loads

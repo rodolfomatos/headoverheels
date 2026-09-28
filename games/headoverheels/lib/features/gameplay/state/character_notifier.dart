@@ -55,6 +55,24 @@ class CharacterStateNotifier extends StateNotifier<CharacterState> {
     state = state.copyWith(carriedItem: const CarriedItem.none());
   }
 
+  /// Wears the magic bag. The hand is left alone: the bag is worn, and holding
+  /// it used to fill the one slot a character has with an item nobody could use.
+  void wearBag() {
+    state = state.copyWith(hasBag: true);
+  }
+
+  /// Puts [item] in the bag, if the bag is worn and has room.
+  ///
+  /// The magic bag carries four. With no dispensary in the world to take
+  /// anything out at, the bag fills and stays full: that is T061, and this is
+  /// the half that is a fact about the game rather than a guess about it.
+  bool stow(CarriedItem item) {
+    if (!state.hasBag) return false;
+    if (state.bagItems.length >= bagCapacity) return false;
+    state = state.copyWith(bagItems: [...state.bagItems, item]);
+    return true;
+  }
+
   // Actions
   void carry() {
     if (!state.canCarry) return;

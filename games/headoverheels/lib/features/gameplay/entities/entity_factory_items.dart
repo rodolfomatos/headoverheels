@@ -48,7 +48,18 @@ class EntityFactoryItems {
   }
 
   static PuzzleEntity _createCrown(TriggerZone trigger, RoomId roomId) {
-    final planetId = trigger.properties?['planet'] as String? ?? 'castle';
+    // The key is `planetId`, the same one the crowns and the guardians carry.
+    // This read `planet`, a key no trigger in the world has, and fell back to
+    // `castle`: every crown in the game was credited to Blacktooth, so the four
+    // that opened a throne room opened the castle one and nothing else could
+    // ever open theirs.
+    final planetId = trigger.properties?['planetId'] as String?;
+    if (planetId == null || planetId.isEmpty) {
+      throw StateError(
+        'The crown ${trigger.id} in $roomId does not say which planet it is '
+        'for: its trigger needs a planetId.',
+      );
+    }
     return CrownEntity(
       id: trigger.id,
       triggerZone: trigger,

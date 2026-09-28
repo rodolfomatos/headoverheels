@@ -1279,6 +1279,20 @@ mixin _$CharacterState {
   int get jumpFramesRemaining => throw _privateConstructorUsedError;
   @CarriedItemConverter()
   CarriedItem get carriedItem => throw _privateConstructorUsedError;
+
+  /// Whether this character wears the magic bag.
+  ///
+  /// The bag is worn, not held: it used to be recorded as the hand's item, which
+  /// made the hand full of a bag nobody could use, so the item on the floor
+  /// could no longer be picked up. The bag's own slots are [bagItems].
+  bool get hasBag => throw _privateConstructorUsedError;
+
+  /// What the bag holds, on top of the one item in the hand.
+  ///
+  /// The magic bag carries four. Nothing empties it yet: the world has no
+  /// dispensary to take the items out at, which is T061.
+  @CarriedItemsConverter()
+  List<CarriedItem> get bagItems => throw _privateConstructorUsedError;
   int get doughnutCount => throw _privateConstructorUsedError;
   @PowerUpConverter()
   List<PowerUp> get activePowerUps => throw _privateConstructorUsedError;
@@ -1309,6 +1323,8 @@ abstract class $CharacterStateCopyWith<$Res> {
     int jumpPhase,
     int jumpFramesRemaining,
     @CarriedItemConverter() CarriedItem carriedItem,
+    bool hasBag,
+    @CarriedItemsConverter() List<CarriedItem> bagItems,
     int doughnutCount,
     @PowerUpConverter() List<PowerUp> activePowerUps,
     bool isControllable,
@@ -1341,6 +1357,8 @@ class _$CharacterStateCopyWithImpl<$Res, $Val extends CharacterState>
     Object? jumpPhase = null,
     Object? jumpFramesRemaining = null,
     Object? carriedItem = null,
+    Object? hasBag = null,
+    Object? bagItems = null,
     Object? doughnutCount = null,
     Object? activePowerUps = null,
     Object? isControllable = null,
@@ -1385,6 +1403,14 @@ class _$CharacterStateCopyWithImpl<$Res, $Val extends CharacterState>
                 ? _value.carriedItem
                 : carriedItem // ignore: cast_nullable_to_non_nullable
                       as CarriedItem,
+            hasBag: null == hasBag
+                ? _value.hasBag
+                : hasBag // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            bagItems: null == bagItems
+                ? _value.bagItems
+                : bagItems // ignore: cast_nullable_to_non_nullable
+                      as List<CarriedItem>,
             doughnutCount: null == doughnutCount
                 ? _value.doughnutCount
                 : doughnutCount // ignore: cast_nullable_to_non_nullable
@@ -1438,6 +1464,8 @@ abstract class _$$CharacterStateImplCopyWith<$Res>
     int jumpPhase,
     int jumpFramesRemaining,
     @CarriedItemConverter() CarriedItem carriedItem,
+    bool hasBag,
+    @CarriedItemsConverter() List<CarriedItem> bagItems,
     int doughnutCount,
     @PowerUpConverter() List<PowerUp> activePowerUps,
     bool isControllable,
@@ -1470,6 +1498,8 @@ class __$$CharacterStateImplCopyWithImpl<$Res>
     Object? jumpPhase = null,
     Object? jumpFramesRemaining = null,
     Object? carriedItem = null,
+    Object? hasBag = null,
+    Object? bagItems = null,
     Object? doughnutCount = null,
     Object? activePowerUps = null,
     Object? isControllable = null,
@@ -1514,6 +1544,14 @@ class __$$CharacterStateImplCopyWithImpl<$Res>
             ? _value.carriedItem
             : carriedItem // ignore: cast_nullable_to_non_nullable
                   as CarriedItem,
+        hasBag: null == hasBag
+            ? _value.hasBag
+            : hasBag // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        bagItems: null == bagItems
+            ? _value._bagItems
+            : bagItems // ignore: cast_nullable_to_non_nullable
+                  as List<CarriedItem>,
         doughnutCount: null == doughnutCount
             ? _value.doughnutCount
             : doughnutCount // ignore: cast_nullable_to_non_nullable
@@ -1552,12 +1590,16 @@ class _$CharacterStateImpl implements _CharacterState {
     required this.jumpPhase,
     required this.jumpFramesRemaining,
     @CarriedItemConverter() required this.carriedItem,
+    this.hasBag = false,
+    @CarriedItemsConverter()
+    final List<CarriedItem> bagItems = const <CarriedItem>[],
     required this.doughnutCount,
     @PowerUpConverter() required final List<PowerUp> activePowerUps,
     required this.isControllable,
     required this.isInvulnerable,
     required this.lives,
-  }) : _activePowerUps = activePowerUps;
+  }) : _bagItems = bagItems,
+       _activePowerUps = activePowerUps;
 
   factory _$CharacterStateImpl.fromJson(Map<String, dynamic> json) =>
       _$$CharacterStateImplFromJson(json);
@@ -1583,6 +1625,35 @@ class _$CharacterStateImpl implements _CharacterState {
   @override
   @CarriedItemConverter()
   final CarriedItem carriedItem;
+
+  /// Whether this character wears the magic bag.
+  ///
+  /// The bag is worn, not held: it used to be recorded as the hand's item, which
+  /// made the hand full of a bag nobody could use, so the item on the floor
+  /// could no longer be picked up. The bag's own slots are [bagItems].
+  @override
+  @JsonKey()
+  final bool hasBag;
+
+  /// What the bag holds, on top of the one item in the hand.
+  ///
+  /// The magic bag carries four. Nothing empties it yet: the world has no
+  /// dispensary to take the items out at, which is T061.
+  final List<CarriedItem> _bagItems;
+
+  /// What the bag holds, on top of the one item in the hand.
+  ///
+  /// The magic bag carries four. Nothing empties it yet: the world has no
+  /// dispensary to take the items out at, which is T061.
+  @override
+  @JsonKey()
+  @CarriedItemsConverter()
+  List<CarriedItem> get bagItems {
+    if (_bagItems is EqualUnmodifiableListView) return _bagItems;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_bagItems);
+  }
+
   @override
   final int doughnutCount;
   final List<PowerUp> _activePowerUps;
@@ -1603,7 +1674,7 @@ class _$CharacterStateImpl implements _CharacterState {
 
   @override
   String toString() {
-    return 'CharacterState(type: $type, position: $position, velocity: $velocity, animation: $animation, facing: $facing, isGrounded: $isGrounded, jumpPhase: $jumpPhase, jumpFramesRemaining: $jumpFramesRemaining, carriedItem: $carriedItem, doughnutCount: $doughnutCount, activePowerUps: $activePowerUps, isControllable: $isControllable, isInvulnerable: $isInvulnerable, lives: $lives)';
+    return 'CharacterState(type: $type, position: $position, velocity: $velocity, animation: $animation, facing: $facing, isGrounded: $isGrounded, jumpPhase: $jumpPhase, jumpFramesRemaining: $jumpFramesRemaining, carriedItem: $carriedItem, hasBag: $hasBag, bagItems: $bagItems, doughnutCount: $doughnutCount, activePowerUps: $activePowerUps, isControllable: $isControllable, isInvulnerable: $isInvulnerable, lives: $lives)';
   }
 
   @override
@@ -1627,6 +1698,8 @@ class _$CharacterStateImpl implements _CharacterState {
                 other.jumpFramesRemaining == jumpFramesRemaining) &&
             (identical(other.carriedItem, carriedItem) ||
                 other.carriedItem == carriedItem) &&
+            (identical(other.hasBag, hasBag) || other.hasBag == hasBag) &&
+            const DeepCollectionEquality().equals(other._bagItems, _bagItems) &&
             (identical(other.doughnutCount, doughnutCount) ||
                 other.doughnutCount == doughnutCount) &&
             const DeepCollectionEquality().equals(
@@ -1653,6 +1726,8 @@ class _$CharacterStateImpl implements _CharacterState {
     jumpPhase,
     jumpFramesRemaining,
     carriedItem,
+    hasBag,
+    const DeepCollectionEquality().hash(_bagItems),
     doughnutCount,
     const DeepCollectionEquality().hash(_activePowerUps),
     isControllable,
@@ -1686,6 +1761,8 @@ abstract class _CharacterState implements CharacterState {
     required final int jumpPhase,
     required final int jumpFramesRemaining,
     @CarriedItemConverter() required final CarriedItem carriedItem,
+    final bool hasBag,
+    @CarriedItemsConverter() final List<CarriedItem> bagItems,
     required final int doughnutCount,
     @PowerUpConverter() required final List<PowerUp> activePowerUps,
     required final bool isControllable,
@@ -1717,6 +1794,20 @@ abstract class _CharacterState implements CharacterState {
   @override
   @CarriedItemConverter()
   CarriedItem get carriedItem;
+  @override
+  /// Whether this character wears the magic bag.
+  ///
+  /// The bag is worn, not held: it used to be recorded as the hand's item, which
+  /// made the hand full of a bag nobody could use, so the item on the floor
+  /// could no longer be picked up. The bag's own slots are [bagItems].
+  bool get hasBag;
+  @override
+  /// What the bag holds, on top of the one item in the hand.
+  ///
+  /// The magic bag carries four. Nothing empties it yet: the world has no
+  /// dispensary to take the items out at, which is T061.
+  @CarriedItemsConverter()
+  List<CarriedItem> get bagItems;
   @override
   int get doughnutCount;
   @override

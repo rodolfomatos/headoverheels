@@ -179,8 +179,9 @@ class HeadOverHeelsGame extends FlameGame
     _currentRoom = null;
   }
 
-  /// The notifier behind a character, so a pickup can reach its state.
-  CharacterStateNotifier? _notifierFor(CharacterComponent character) {
+  /// The notifier behind a character, so a pickup can reach its state: the hand
+  /// and the bag live in there.
+  CharacterStateNotifier? notifierFor(CharacterComponent character) {
     final provider = character.type == CharacterType.head
         ? headProvider
         : heelsProvider;
@@ -189,9 +190,10 @@ class HeadOverHeelsGame extends FlameGame
 
   @override
   void onBagCollected(CharacterComponent character) {
-    // The bag changes nothing yet, which is T056. Recording it means the item
-    // is not lost, and a character has a slot to hold it in.
-    _notifierFor(character)?.pickUp(const CarriedItem.other('bag'));
+    // The bag is worn. It used to be put in the hand as a fake item, which made
+    // the one slot a character has hold a bag nobody could use, so the key on
+    // the floor could no longer be picked up after the bag was.
+    notifierFor(character)?.wearBag();
   }
 
   @override
@@ -201,7 +203,7 @@ class HeadOverHeelsGame extends FlameGame
 
   @override
   void onItemPickedUp(CharacterComponent character, CarriedItem item) {
-    _notifierFor(character)?.pickUp(item);
+    notifierFor(character)?.pickUp(item);
   }
 
   /// How many crowns a planet has collected: its own, and no other's.

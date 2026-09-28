@@ -79,7 +79,7 @@ class HUD extends ConsumerWidget {
                 AppColors.doughnutColor,
               ),
               const SizedBox(width: AppSpacing.md),
-              _buildBagIcon(carriedItem),
+              _buildBagIcon(carriedItem, heelsState.bagItems),
             ],
           ),
         ],
@@ -145,22 +145,30 @@ class HUD extends ConsumerWidget {
     );
   }
 
-  Widget _buildBagIcon(CarriedItem item) {
-    return item.when(
-      none: () =>
-          _buildBagIconContent(Icons.backpack_outlined, AppColors.darkMuted),
-      key: (keyId) =>
-          _buildBagIconContent(Icons.key_rounded, AppColors.crownColor),
-      crown: () => _buildBagIconContent(
-        Icons.emoji_events_rounded,
-        AppColors.crownColor,
-      ),
-      other: (itemId) =>
-          _buildBagIconContent(Icons.backpack_rounded, AppColors.heelsColor),
-    );
+  /// What is in the hand, and what the bag holds behind it.
+  ///
+  /// The bag is worn, so the empty hand used to show a bag: the icon was drawn
+  /// from the hand's item, and the hand's item used to be a bag.
+  Widget _buildBagIcon(CarriedItem item, List<CarriedItem> bag) {
+    final icon = _iconFor(item, bag);
+    final count = bag.isEmpty ? null : '${bag.length}/$bagCapacity';
+    return _buildBagIconContent(icon, AppColors.heelsColor, count: count);
   }
 
-  Widget _buildBagIconContent(IconData icon, Color color) {
+  IconData _iconFor(CarriedItem item, List<CarriedItem> bag) {
+    if (item != const CarriedItem.none()) {
+      return item.when(
+        none: () => Icons.backpack_outlined,
+        key: (keyId) => Icons.key_rounded,
+        crown: () => Icons.emoji_events_rounded,
+        other: (itemId) => Icons.backpack_rounded,
+      );
+    }
+    if (bag.isNotEmpty) return Icons.backpack_rounded;
+    return Icons.backpack_outlined;
+  }
+
+  Widget _buildBagIconContent(IconData icon, Color color, {String? count}) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.xs),
       decoration: BoxDecoration(
@@ -168,7 +176,23 @@ class HUD extends ConsumerWidget {
         borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(color: AppColors.darkBorder),
       ),
-      child: Icon(icon, color: color, size: 24),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: color, size: 24),
+          if (count != null) ...[
+            const SizedBox(width: AppSpacing.xs),
+            Text(
+              count,
+              style: TextStyle(
+                color: color,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }

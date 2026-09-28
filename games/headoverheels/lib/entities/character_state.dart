@@ -122,6 +122,21 @@ abstract class CharacterState with _$CharacterState {
     required int jumpPhase,
     required int jumpFramesRemaining,
     @CarriedItemConverter() required CarriedItem carriedItem,
+
+    /// Whether this character wears the magic bag.
+    ///
+    /// The bag is worn, not held: it used to be recorded as the hand's item, which
+    /// made the hand full of a bag nobody could use, so the item on the floor
+    /// could no longer be picked up. The bag's own slots are [bagItems].
+    @Default(false) bool hasBag,
+
+    /// What the bag holds, on top of the one item in the hand.
+    ///
+    /// The magic bag carries four. Nothing empties it yet: the world has no
+    /// dispensary to take the items out at, which is T061.
+    @Default(<CarriedItem>[])
+    @CarriedItemsConverter()
+    List<CarriedItem> bagItems,
     required int doughnutCount,
     @PowerUpConverter() required List<PowerUp> activePowerUps,
     required bool isControllable,
@@ -148,6 +163,8 @@ abstract class CharacterState with _$CharacterState {
       jumpPhase: 0,
       jumpFramesRemaining: 0,
       carriedItem: const CarriedItem.none(),
+      hasBag: false,
+      bagItems: const [],
       doughnutCount: 0,
       activePowerUps: [],
       isControllable: true,
@@ -156,6 +173,9 @@ abstract class CharacterState with _$CharacterState {
     );
   }
 }
+
+/// What the magic bag carries. Four, with the one in the hand on top.
+const int bagCapacity = 4;
 
 /// Extension methods for CharacterState to add computed properties.
 extension CharacterStateExtension on CharacterState {

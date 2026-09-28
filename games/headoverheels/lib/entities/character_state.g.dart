@@ -20,6 +20,10 @@ _$CharacterStateImpl _$$CharacterStateImplFromJson(
   carriedItem: const CarriedItemConverter().fromJson(
     json['carriedItem'] as Map<String, dynamic>,
   ),
+  hasBag: json['hasBag'] as bool? ?? false,
+  bagItems: json['bagItems'] == null
+      ? const <CarriedItem>[]
+      : const CarriedItemsConverter().fromJson(json['bagItems'] as List),
   doughnutCount: (json['doughnutCount'] as num).toInt(),
   activePowerUps: (json['activePowerUps'] as List<dynamic>)
       .map((e) => const PowerUpConverter().fromJson(e as Map<String, dynamic>))
@@ -41,6 +45,8 @@ Map<String, dynamic> _$$CharacterStateImplToJson(
   'jumpPhase': instance.jumpPhase,
   'jumpFramesRemaining': instance.jumpFramesRemaining,
   'carriedItem': const CarriedItemConverter().toJson(instance.carriedItem),
+  'hasBag': instance.hasBag,
+  'bagItems': const CarriedItemsConverter().toJson(instance.bagItems),
   'doughnutCount': instance.doughnutCount,
   'activePowerUps': instance.activePowerUps
       .map(const PowerUpConverter().toJson)

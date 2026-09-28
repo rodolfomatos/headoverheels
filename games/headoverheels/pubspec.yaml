@@ -68,6 +68,7 @@ flutter:
     - assets/audio/
     - assets/audio/music/
     - assets/audio/sfx/
+    - assets/images/
     - assets/levels/
     - assets/levels/rooms/
     - assets/levels/rooms/bookworld/

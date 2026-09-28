@@ -30,6 +30,10 @@ class RoomComponent extends PositionComponent with HasGameReference {
     _tiledComponent = await TiledComponent.load(
       definition.tmxFile,
       Vector2(IsometricCoordinates.tileWidth, IsometricCoordinates.tileHeight),
+      // The world's file paths already start at the bundle root, and
+      // flame_tiled would otherwise put "assets/tiles/" in front of them, which
+      // is a path that has never existed.
+      prefix: '',
     );
     _tileMap = _tiledComponent!.tileMap;
     add(_tiledComponent!);

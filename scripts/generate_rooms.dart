@@ -29,7 +29,21 @@ String generateTMX(String roomId, String theme, List<dynamic> triggers) {
   sb.writeln(
     '<map version="1.10" tiledversion="1.10.0" orientation="isometric" renderorder="right-down" width="16" height="16" tilewidth="64" tileheight="32" infinite="0" nextobjectid="100">',
   );
-  sb.writeln(' <tileset firstgid="1" source="../tilesets/castle.tsx"/>');
+  // The path the runtime resolves. It has to start at the bundle root, and the
+  // tileset has to exist: a map pointing at art nobody drew is a room that
+  // cannot load.
+  final tileset = File('games/headoverheels/assets/levels/tilesets/$theme.tsx');
+  if (!tileset.existsSync()) {
+    // The castle tileset stands in for every planet until the other four are
+    // drawn. See T058.
+    stderr.writeln(
+      'No tileset for the $theme of $roomId; using the castle one. T058.',
+    );
+  }
+  sb.writeln(
+    ' <tileset firstgid="1" '
+    'source="assets/levels/tilesets/${tileset.existsSync() ? theme : 'castle'}.tsx"/>',
+  );
   sb.writeln(' <layer id="1" name="Floor" width="16" height="16">');
   sb.writeln('  <data encoding="csv">');
   // Empty floor

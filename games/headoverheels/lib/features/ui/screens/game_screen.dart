@@ -1,11 +1,14 @@
 // Game screen for Head over Heels.
 
+import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:headoverheels/features/gameplay/game.dart';
 import 'package:headoverheels/features/ui/theme/app_theme.dart';
 import 'package:headoverheels/features/ui/widgets/virtual_joystick.dart';
 import 'package:headoverheels/features/ui/widgets/action_buttons.dart';
 import 'package:headoverheels/features/ui/widgets/hud.dart';
+import 'package:headoverheels/features/gameplay/room/room_graph.dart';
 import 'package:headoverheels/features/gameplay/state/input_system.dart';
 import 'package:headoverheels/features/audio/audio_system.dart';
 import 'package:headoverheels/features/audio/audio_settings.dart';
@@ -21,8 +24,31 @@ class GameScreen extends ConsumerStatefulWidget {
   ConsumerState<GameScreen> createState() => _GameScreenState();
 }
 
+/// What the canvas area says while there is no game to draw.
+class _CanvasMessage extends StatelessWidget {
+  const _CanvasMessage({super.key, required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => ColoredBox(
+    color: AppColors.darkBackground,
+    child: Center(
+      child: Text(text, style: const TextStyle(color: Colors.white54)),
+    ),
+  );
+}
+
 class _GameScreenState extends ConsumerState<GameScreen> {
   bool _showPauseMenu = false;
+
+  /// The game, built once the world has arrived. Held here so it survives
+  /// rebuilds and can be disposed when the screen goes.
+  HeadOverHeelsGame? _game;
+
+  /// Kept so the music can be stopped on the way out: Riverpod does not allow
+  /// a read in dispose().
+  AudioSystem? _audioSystem;
 
   @override
   void initState() {
@@ -39,6 +65,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
   Future<void> _initAudio() async {
     final audioSystem = ref.read(audioSystemProvider);
+    _audioSystem = audioSystem;
     final settings = await ref.read(audioSettingsProvider.future);
 
     await audioSystem.initialize();
@@ -46,17 +73,25 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     audioSystem.setSfxEnabled(settings.sfxEnabled);
     audioSystem.setMusicVolume(settings.musicVolume);
     audioSystem.setSfxVolume(settings.sfxVolume);
-
-    // Play main menu music initially
-    audioSystem.playMusic('main_menu');
   }
 
   @override
   void dispose() {
-    // Pause music when leaving game screen
-    ref.read(audioSystemProvider).pauseMusic();
+    // The audio system is a plain object held by the container, not a widget,
+    // so the music keeps playing between screens unless it is told to stop.
+    // Riverpod forbids reading ref in here, so the reference is kept from when
+    // the screen was alive.
+    _audioSystem?.pauseMusic();
+    // The game owns components, sprites and listeners, and GameWidget does not
+    // dispose a game it was handed.
+    _game?.dispose();
     super.dispose();
   }
+
+  /// Builds the game the first time the world arrives, and only once: a new
+  /// game would throw away the party's position and every loaded sprite.
+  HeadOverHeelsGame _gameFor(WorldGraph world) =>
+      _game ??= createHeadOverHeelsGame(ref.read(gameRefProvider), world);
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +112,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       child: Scaffold(
         body: Stack(
           children: [
-            // Game canvas (Flame game widget would go here)
+            // The game itself. The world arrives asynchronously, so until it
+            // does there is nothing to put in here.
             _buildGameCanvas(),
 
             // HUD
@@ -138,14 +174,21 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   }
 
   Widget _buildGameCanvas() {
-    // Placeholder for Flame game widget
-    return Container(
-      color: AppColors.darkBackground,
-      child: const Center(
-        child: Text(
-          'Game Canvas (Flame GameWidget goes here)',
-          style: TextStyle(color: Colors.white54),
-        ),
+    final world = ref.watch(worldGraphProvider);
+    return world.when(
+      loading: () => const _CanvasMessage(
+        key: Key('game-loading'),
+        text: 'Loading the castle\u2026',
+      ),
+      error: (error, stack) => _CanvasMessage(
+        key: const Key('game-error'),
+        text: 'Could not load the world: $error',
+      ),
+      data: (graph) => GameWidget<HeadOverHeelsGame>(
+        key: const Key('game-canvas'),
+        game: _gameFor(graph),
+        backgroundBuilder: (context) =>
+            ColoredBox(color: AppColors.darkBackground),
       ),
     );
   }

@@ -57,7 +57,7 @@ class EditorProject {
     manifestKey: 'games/headoverheels/assets/sprites/manifest.yaml',
     assetsBasePath: 'games/headoverheels/assets/sprites',
     roomsBasePath: 'games/headoverheels/assets/levels/rooms',
-    tilesetImageBasePath: 'games/headoverheels/assets/levels/tilesets',
+    tilesetImageBasePath: 'games/headoverheels/assets/images',
   );
 
   /// The second game, the one that proves the editor is not tailored to one.

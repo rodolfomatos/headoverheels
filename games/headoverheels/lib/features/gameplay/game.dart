@@ -45,8 +45,9 @@ class HeadOverHeelsGame extends FlameGame
   Future<void> onLoad() async {
     await super.onLoad();
 
-    // Initialize input system
-    _inputSystem = InputSystem(ref);
+    // The same input system the touch controls write to. Building a second one
+    // here would mean the joystick talking to an object the game never reads.
+    _inputSystem = ref.read(inputSystemProvider);
 
     // Load initial room from world graph
     _currentRoomId = _worldGraph.startRoom;
@@ -263,11 +264,16 @@ final worldGraphProvider = FutureProvider<WorldGraph>((ref) async {
   return loadWorldGraph();
 });
 
-/// Provider for the game instance.
-final gameProvider = Provider<HeadOverHeelsGame>((ref) {
-  final worldGraph = ref.watch(worldGraphProvider).asData?.value;
-  if (worldGraph == null) {
-    throw StateError('WorldGraph not loaded yet');
-  }
-  return HeadOverHeelsGame(ref, worldGraph);
-});
+/// The container's [Ref], for the widget layer to pass to the game.
+///
+/// A [WidgetRef] is a different type and does not fit where the game needs a
+/// [Ref], so the screen reads this instead of trying to pass its own.
+final gameRefProvider = Provider<Ref>((ref) => ref);
+
+/// Builds the game over a world that is already loaded.
+///
+/// A provider for the game itself was a trap: the world arrives asynchronously,
+/// so reading the provider before it resolved threw. The screen waits for
+/// [worldGraphProvider] and calls this, which is the one way a game gets made.
+HeadOverHeelsGame createHeadOverHeelsGame(Ref ref, WorldGraph worldGraph) =>
+    HeadOverHeelsGame(ref, worldGraph);

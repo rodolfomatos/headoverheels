@@ -134,9 +134,11 @@ current_ticket: "T050"
 | T028 | Visual QA | pending |
 | T029 | Final Asset Migration | done |
 | T053 | The sprite registry should read the manifest, not repeat it | pending |
-| T055 | Show the game on the game screen: it is a placeholder | pending |
+| T055 | Show the game on the game screen: it is a placeholder | done |
 | T056 | The bag is carried but does nothing yet | pending |
 | T057 | The guardian trigger does not say which planet it guards | pending |
+| T058 | Four of the five planets have no tileset | pending |
+| T059 | The pixel-level visual proof of the HoH renderer | pending |
 
 ## Sprint 10 — Builder Platform
 **Goal**: Extract a reusable isometric engine and build editor/CLI foundations
@@ -172,17 +174,18 @@ first game onto the same platform
 | T036 | TSX authoring: edit tile types/properties and export TSX | done |
 
 ## In Progress
-* T028: Visual QA. The renderer has never been drawn, and the screen shows a
-  placeholder instead of the game (T055)
+* T028: Visual QA. The screen now shows the game (T055) and the renderer draws a
+  real room, but the proof still has to be made into a test that ends: see T059.
 
 ## Queued
 * T052: The Palette panel squeezes its controls out of reach, and adding a tab
   to it breaks the shell layout
 * T053: The sprite registry should read the manifest, not repeat it
 * T054: Gameplay tests: the rules are barely covered
-* T055: Show the game on the game screen: it is a placeholder
 * T056: The bag is carried but does nothing yet
 * T057: The guardian trigger does not say which planet it guards
+* T058: Four of the five planets have no tileset
+* T059: The pixel-level visual proof of the HoH renderer
 
 
 ## Notes
@@ -210,6 +213,27 @@ first game onto the same platform
   prerequisite for the visual proof this ticket is really after. The bag is
   recorded and does nothing, T056. The guardian counts every crown because its
   trigger does not say which planet it guards, T057.
+* T055, the screen, and the three real bugs only a real load could find. The
+  screen watched nothing, built no game and printed "Game Canvas (Flame
+  GameWidget goes here)". `gameProvider` was declared and never read, and it
+  threw whenever the world had not arrived, so the game object was never
+  constructed. The screen now watches `worldGraphProvider`, shows a loader, an
+  error, and a `GameWidget<HeadOverHeelsGame>`; the game is built once and
+  disposed on the way out; the game reads the same `InputSystem` the touch
+  controls write to, so the joystick now reaches the party. Five tests in
+  `test/game_screen_test.dart`, and they stand the real screen up: real world,
+  real room map, real tileset, real sprites.
+  Those five tests found three defects that no amount of reading would have:
+  `TiledComponent.load` prefixes `assets/tiles/` by default, so every room
+  resolved to `assets/tiles/assets/levels/rooms/...`, a path that has never
+  existed; the loader resolves a tileset image under `assets/images/`, and
+  `castle.png` sat next to its TSX in `assets/levels/tilesets/`, where nothing
+  looks; and the screen read a provider inside `dispose()`, which Riverpod
+  forbids. The tileset image now lives in `assets/images/`, the maps name their
+  tileset from the bundle root, and the generator writes paths that resolve and
+  says so when a tileset is missing.
+  What is not: the renderer is still not proven by a test that ends, T059, and
+  only one of the five planets has a tileset, T058.
 * Audit of the Sprint 09 backlog, checked against the code rather than the
   board. T025, the atlas: `scripts/pack_atlas.py` is referenced by nothing, the
   Makefile never runs it, and `assets/sprites/atlases/` is empty. The game loads

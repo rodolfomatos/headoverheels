@@ -11,10 +11,11 @@ tailored to a single game.
 
 > **State, plainly.** Knight Lore is finished: playable, with audio, and a
 > visual test that renders it to images and fails if a room comes out blank or
-> cropped. Head over Heels is mid-migration: the rules compile and the pickups
-> reach the characters, but the game screen still shows a placeholder, so it
-> cannot be played yet. The board in `aes/kanban.md` is the authority on what is
-> done and what is not.
+> cropped. Head over Heels now opens its world, loads the room map, the tileset
+> and the sprites, and shows the game: five tests stand the real screen up. What
+> is not finished is the proof and four of the five planets, which have no
+> tileset of their own yet. The board in `aes/kanban.md` is the authority on
+> what is done and what is not.
 
 ---
 
@@ -26,7 +27,7 @@ tailored to a single game.
 | `packages/iso_editor` | Map editor, sprite manager, world graph editor, tileset authoring. Opens either game | 60 tests |
 | `packages/iso_builder_cli` | Project scaffolding and validation | 2 tests |
 | `games/knightlore` | The second game: 15 rooms, 5 areas, the curse rules, the six ingredients, 27 synthesised sounds | 160 tests, playable |
-| `games/headoverheels` | The first game: 20 rooms, 5 planets, 65 sprite sheets, 30 synthesised sounds | 58 tests, not playable yet |
+| `games/headoverheels` | The first game: 20 rooms, 5 planets, 65 sprite sheets, 30 synthesised sounds | 63 tests, opens and draws |
 
 Nothing at the top level is a package. Each game and each library is its own
 Flutter package, and every Makefile target says which directory it runs in.
@@ -51,9 +52,16 @@ printed by the tests rather than asserted by taste.
 ### Head over Heels
 
 Twenty rooms across five planets, nineteen puzzle entity types, dual-character
-mechanics and a world graph with 43 exits and 134 triggers. The rules, the
-entities, the state and the assets are all here; what is missing is the game on
-the screen, which is T055.
+mechanics and a world graph with 43 exits and 134 triggers. The game screen
+watches the world, shows a loader while it arrives, reports a world that will not
+load, and puts a single `HeadOverHeelsGame` on the canvas: the party, the room
+and the joystick are the same objects the touch controls write to.
+
+Two things are known to be unfinished. Only the castle has a tileset, so the
+other four planets draw with the castle one until they have their own art. And
+the pixel-level proof of the renderer is not a test yet: the frame was measured
+at 1465 distinct colours and written to a PNG, but the test that did it never
+finished, so the capture method has to change before it can guard anything.
 
 ---
 
@@ -218,9 +226,9 @@ map format.
 
 | | |
 |---|---|
-| Tests | 298 across five packages, and 169 sprite checks |
+| Tests | 303 across five packages, and 169 sprite checks |
 | Knight Lore | 15 rooms, 5 areas, finished and playable |
-| Head over Heels | 20 rooms, 5 planets, compiles, not on the screen yet |
+| Head over Heels | 20 rooms, 5 planets, opens and draws; the pixel proof is not a test yet |
 | Sprites | 65 sheets, one manifest per game |
 | Sounds | 57, every one computed by the synthesiser |
 | Board | 93 ticket rows, from the first audit to the editor layout work |

@@ -4,6 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:headoverheels/features/ui/theme/app_theme.dart';
 
+/// What the menu says under the title.
+///
+/// The port is a port: it adds a touch screen and a new soundtrack to the 1987
+/// game rather than remaking it, and the one build runs in a browser and on a
+/// phone. The menu used to claim a remaster for Android, which was none of that.
+const String appSubtitle = 'A Flutter port, on the web and on Android';
+
+/// The version the menu shows, which `pubspec.yaml` also has.
+///
+/// Two places to write a version is one too many, and a test compares them, so
+/// this cannot quietly fall behind the real one.
+const String appVersion = '1.0.0';
+
 class MainMenuScreen extends ConsumerWidget {
   const MainMenuScreen({super.key});
 
@@ -69,7 +82,7 @@ class MainMenuScreen extends ConsumerWidget {
 
                   // Version info
                   Text(
-                    'Head over Heels v1.0.0',
+                    'Head over Heels v\$appVersion',
                     style: AppTypography.small.copyWith(
                       color: AppColors.darkMuted,
                     ),
@@ -131,7 +144,11 @@ class MainMenuScreen extends ConsumerWidget {
         ),
         const SizedBox(height: AppSpacing.xs),
         Text(
-          'Remastered for Android',
+          // What this is: a Flutter port that builds for the web and for
+          // Android. The menu used to say "Remastered for Android", which
+          // claims a remaster nobody made and a platform it cannot know it is
+          // running on: the same build serves the web and an APK.
+          appSubtitle,
           style: AppTypography.body.copyWith(color: AppColors.darkMuted),
         ),
       ],

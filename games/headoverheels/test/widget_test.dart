@@ -1,5 +1,7 @@
 // The app's entry point: what a player sees first, and where the menu leads.
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -55,6 +57,41 @@ void main() {
       findsOneWidget,
       reason: 'the menu led nowhere, or the world never arrived',
     );
+  });
+
+  testWidgets('the menu says what this is', (tester) async {
+    // "Remastered for Android" claimed a remaster nobody made and a platform the
+    // same build cannot know it is on: it serves the web and an APK.
+    await start(tester);
+
+    expect(find.text('Head over Heels'), findsOneWidget);
+    expect(find.text(appSubtitle), findsOneWidget);
+    expect(
+      find.textContaining('Remastered'),
+      findsNothing,
+      reason: 'a port is not a remaster, and saying so is worth a check',
+    );
+  });
+
+  testWidgets('the version the menu shows is the version the game has', (
+    tester,
+  ) async {
+    // The version was written in the menu and in the pubspec, and nothing
+    // compared them: a release would have shown the number it used to have.
+    final pubspec = File('pubspec.yaml').readAsStringSync();
+    final declared = RegExp(
+      r'^version: (\S+)',
+      multiLine: true,
+    ).firstMatch(pubspec)!.group(1)!.split('+').first;
+
+    expect(
+      appVersion,
+      declared,
+      reason: 'the menu shows a version the pubspec does not have',
+    );
+
+    await start(tester);
+    expect(find.text('Head over Heels v\$appVersion'), findsOneWidget);
   });
 
   testWidgets('Settings answers, with the settings the game reads', (

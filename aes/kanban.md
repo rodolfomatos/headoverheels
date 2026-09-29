@@ -141,7 +141,7 @@ current_ticket: "T050"
 | T059 | The pixel-level visual proof of the HoH renderer | pending |
 | T061 | Nowhere to empty the bag: the world has no dispensary | done |
 | T063 | The manifest promised frames the art did not have | done, characters still one pose |
-| T064 | The menu calls the game a remaster for Android | pending |
+| T064 | The menu calls the game a remaster for Android | done |
 | T065 | The first frame waits a minute for the whole sprite registry | done |
 | T066 | Entities draw coloured rectangles, not the sprites the registry loaded | done |
 | T062 | The game screen is black: the first frame waits for 65 sprites | answered: the room draws |
@@ -192,7 +192,6 @@ first game onto the same platform
 * T061: Nowhere to empty the bag: the world has no dispensary
 * T062: The game screen is black: the room never finishes loading
 * T063: The manifest promises 4 and 8 frames; the art has one pose
-* T064: The menu calls the game a remaster for Android
 * T065: The first frame waits a minute for the whole sprite registry
 * T066: Entities draw coloured rectangles, not the sprites the registry loaded
 
@@ -464,6 +463,15 @@ first game onto the same platform
   nothing. Two tests hold the rule: a full bag comes out onto the floor with the
   bag still worn, and a character with no bag, or with an empty one, changes
   nothing.
+* T064, one line, and it was worth two tests. The menu said "Remastered for
+  Android": a remaster nobody made, claimed by a menu that cannot know what
+  platform it is on, since the same build serves the web and an APK. It now says
+  what this is, a Flutter port on the web and on Android. The version beside it
+  was written in the menu and in the pubspec and nothing compared them, so a
+  release would have shown the number it used to have; the menu reads one
+  constant now and a test compares it with the pubspec. A third test holds the
+  menu's own words, which nothing did: the title, the subtitle, and the absence
+  of the old claim.
 * Audit of the Sprint 09 backlog, checked against the code rather than the
   board. T025, the atlas: `scripts/pack_atlas.py` is referenced by nothing, the
   Makefile never runs it, and `assets/sprites/atlases/` is empty. The game loads

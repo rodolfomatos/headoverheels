@@ -130,6 +130,13 @@ class KnightLoreWorld {
       triggers: [
         trigger('ball_2', 'ball', 3, 4),
         trigger(
+          'chest_14',
+          'chest',
+          2,
+          2,
+          properties: {'itemId': 'scroll_magic_armour'},
+        ),
+        trigger(
           'falling_1',
           'fallingBlock',
           6,
@@ -262,6 +269,13 @@ class KnightLoreWorld {
           4,
           properties: {'itemId': 'casket'},
         ),
+        trigger(
+          'chest_15',
+          'chest',
+          2,
+          2,
+          properties: {'itemId': 'scroll_invisibility'},
+        ),
       ],
     );
 
@@ -288,6 +302,13 @@ class KnightLoreWorld {
           properties: {'ingredientsRequired': CurseIngredients.required},
         ),
         trigger('witch_3', 'witch', 2, 2),
+        trigger(
+          'chest_16',
+          'chest',
+          6,
+          5,
+          properties: {'itemId': 'scroll_flip'},
+        ),
       ],
     );
 

@@ -167,7 +167,7 @@ current_ticket: "T050"
 | T070 | A tap missed its cell once the grid had been dragged | done |
 | T071 | The assets could only be seen in a directory listing | done |
 | T072 | Knight Lore's scrolls and ingredients are not drawn | done |
-| T073 | Three of the six scrolls are in no chest anywhere | open |
+| T073 | Three of the six scrolls are in no chest anywhere | done |
 | T074 | Knight Lore's web build never reaches a rendered room | open |
 
 ## Sprint 11 — Knight Lore Completion
@@ -613,8 +613,27 @@ first game onto the same platform
   every night, the party splits, and nothing in the world can prevent it. The
   game is still winnable, because the curse lifts on six ingredients in the
   cauldron and scrolls are never demanded, so this is a headline mechanic with
-  no answer rather than an unwinnable game. Adding three chests is a balance
-  decision, so it is asked for rather than made.
+  no answer rather than an unwinnable game. Adding three chests was a balance
+  decision, so it was asked for; and then it was made, and the decision is
+  written down, because a decision nobody can read is a decision nobody can
+  check.
+  Magic Armour is in the great hall, one room from the gatehouse. The night is
+  the first thing that can kill you, and the answer to it cannot be the deepest
+  treasure in the world; the hall holds no cauldron either, so the answer to the
+  wolf is not something the party has to stand next to the remedy to find.
+  Invisibility is in the jungle ruins, three rooms in, beside the casket. Flip
+  is in the cauldron cave, which had no chest at all: the whole cauldron area,
+  where the remedy is brewed, was treasure-free.
+  The rule behind those three lives in a test rather than in this paragraph.
+  Every chest in every room has to stand on a walkable tile a party can walk to,
+  measured by flooding the real `.tmx` terrain from the room's own spawn; the
+  two defensive scrolls have to be within three rooms of the gatehouse on the
+  room graph and must never share a room with a cauldron; and every scroll in
+  the catalogue has to be in some chest. Both of the new tests were run before
+  the chests were placed and named all three missing scrolls, so they can fail.
+  The flood fill found nothing this time — the tiles were checked before the
+  chests went in — but the ten older chests pass through it, and a chest added
+  inside a wall tomorrow will not.
 * T074, measured rather than assumed. The Knight Lore web build sits on
   "Loading the castle…" and never draws a room. It is not T072: with the eight
   original prop types the build fetches 50 images and still never draws within

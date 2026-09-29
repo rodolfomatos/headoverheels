@@ -24,5 +24,6 @@
   <objectgroup id="2" name="Objects">
     <object id="1" name="cauldron_3" type="cauldron" x="256.0" y="160.0" width="32" height="32"/>
     <object id="2" name="witch_3" type="witch" x="128.0" y="96.0" width="32" height="32"/>
+    <object id="3" name="chest_16" type="chest" x="384.0" y="192.0" width="32" height="32"/>
   </objectgroup>
 </map>

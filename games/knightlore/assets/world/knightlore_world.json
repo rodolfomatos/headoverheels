@@ -108,6 +108,22 @@
           }
         },
         {
+          "id": "chest_14",
+          "type": "chest",
+          "position": {
+            "x": 2.0,
+            "y": 2.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          },
+          "properties": {
+            "itemId": "scroll_magic_armour"
+          }
+        },
+        {
           "id": "falling_1",
           "type": "fallingBlock",
           "position": {
@@ -523,6 +539,22 @@
           "properties": {
             "itemId": "casket"
           }
+        },
+        {
+          "id": "chest_15",
+          "type": "chest",
+          "position": {
+            "x": 2.0,
+            "y": 2.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          },
+          "properties": {
+            "itemId": "scroll_invisibility"
+          }
         }
       ]
     },
@@ -614,6 +646,22 @@
           "size": {
             "width": 1.0,
             "height": 1.0
+          }
+        },
+        {
+          "id": "chest_16",
+          "type": "chest",
+          "position": {
+            "x": 6.0,
+            "y": 5.0,
+            "z": 0.0
+          },
+          "size": {
+            "width": 1.0,
+            "height": 1.0
+          },
+          "properties": {
+            "itemId": "scroll_flip"
           }
         }
       ]

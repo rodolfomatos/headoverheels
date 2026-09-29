@@ -35,13 +35,21 @@ class CharacterComponent extends PositionComponent with CollisionCallbacks {
     _animation = SpriteAnimationComponent(size: size, anchor: Anchor.center);
     add(_animation);
 
-    // Only this character's sprites, which is what the party needs to be on the
-    // first frame. The registry used to load all 65 entries here, so the room
-    // waited for props and effects the player is not looking at.
-    await SpriteRegistry().loadCharacter(_spriteKeyFor(type));
+    final provider = type == CharacterType.head ? headProvider : heelsProvider;
+    final registry = SpriteRegistry();
+    // Only the animation this character stands in while the game is arriving.
+    // The registry used to load all 65 entries here, and then a character's
+    // twelve: both made the first frame wait for sprites nobody was looking at.
+    await registry.loadCharacter(_spriteKeyFor(type));
+
+    // When the rest of the manifest arrives, take up the animation the state
+    // asks for. The state does not change by itself, so without this a
+    // character would stand in idle for ever.
+    registry.addLoadListener(() {
+      if (isMounted) _syncFromState(ref.read(provider));
+    });
 
     // Listen to state changes via Riverpod's ref.listen
-    final provider = type == CharacterType.head ? headProvider : heelsProvider;
     ref.listen(provider, (_, next) {
       _syncFromState(next);
     });

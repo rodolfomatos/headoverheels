@@ -26,6 +26,9 @@ class SpriteRegistry {
   /// The manifest ids that are loaded, so nothing is asked for twice.
   final Set<String> _loaded = {};
 
+  /// Who wants to know when the rest of the manifest has arrived.
+  final List<void Function()> _loadListeners = [];
+
   /// The images this game loads, with no prefix of their own.
   ///
   /// Flame's shared [Flame.images] prefixes `assets/images/`, and the frames
@@ -51,17 +54,28 @@ class SpriteRegistry {
   /// props, tiles, UI and effects were never loaded either.
   Future<void> initialize() async {
     await _loadWhere((_) => true);
+    _announceLoaded();
   }
 
-  /// Loads the sprites of one character: `head`, `heels` or `duo`.
+  /// The animation a character stands in while the game is still arriving.
+  static const String firstFrameAnimation = 'idle';
+
+  /// Loads one animation of one character: `head`, `heels` or `duo`.
   ///
-  /// The party waits for this and for nothing else. Waiting for all 65 entries
-  /// meant the first frame of the game came after every sprite in the project,
-  /// which on a slow machine is a minute of black screen: `GameWidget` draws
-  /// nothing until the game's load is finished, so the room the player is
-  /// standing in waited for props and effects nobody is looking at.
-  Future<void> loadCharacter(String character) async {
-    await _loadWhere((entry) => entry.character == character);
+  /// The party waits for [firstFrameAnimation] and for nothing else. Waiting for
+  /// all 65 entries meant the first frame of the game came after every sprite in
+  /// the project, which on a slow machine is a minute of black screen:
+  /// `GameWidget` draws nothing until the game's load is finished, so the room
+  /// the player is standing in waited for props and effects nobody is looking
+  /// at. Waiting for a character's twelve animations instead of four made the
+  /// same mistake one level down.
+  Future<void> loadCharacter(
+    String character, {
+    String animation = firstFrameAnimation,
+  }) async {
+    await _loadWhere(
+      (entry) => entry.character == character && entry.animation == animation,
+    );
   }
 
   /// Loads the sprites of one entity type, for the same reason: a room asks for
@@ -81,6 +95,22 @@ class SpriteRegistry {
       if (!wanted(entry)) continue;
       if (_loaded.contains(entry.id)) continue;
       await _load(entry);
+    }
+  }
+
+  /// Called when [initialize] has finished, so a character that asked only for
+  /// its first animation can pick up the rest.
+  ///
+  /// Without this a character would keep the animation it had at the first
+  /// frame: its walk would never appear, because the state it listens to does
+  /// not change again by itself.
+  void addLoadListener(void Function() listener) {
+    _loadListeners.add(listener);
+  }
+
+  void _announceLoaded() {
+    for (final listener in List.of(_loadListeners)) {
+      listener();
     }
   }
 

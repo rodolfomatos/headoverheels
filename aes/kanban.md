@@ -142,7 +142,7 @@ current_ticket: "T050"
 | T061 | Nowhere to empty the bag: the world has no dispensary | pending |
 | T063 | The manifest promises 4 and 8 frames; the art has one pose | pending |
 | T064 | The menu calls the game a remaster for Android | pending |
-| T065 | The first frame waits a minute for the whole sprite registry | halved, refine idle |
+| T065 | The first frame waits a minute for the whole sprite registry | done |
 | T066 | Entities draw coloured rectangles, not the sprites the registry loaded | pending |
 | T062 | The game screen is black: the first frame waits for 65 sprites | answered: the room draws |
 
@@ -388,7 +388,14 @@ first game onto the same platform
   T065 is the same mistake one level down: a character waits for twelve
   animations when the first frame needs `idle`, which is four files. Loading that
   first and the rest in the background should bring the first frame to a few
-  seconds.
+  seconds, and it does: `loadCharacter` takes an animation and defaults to
+  `idle`, which is four files, and a character subscribes to the registry so it
+  picks its real animation up when the rest arrives instead of standing in idle
+  for ever. Measured in the same browser, the room is on screen at 7 seconds,
+  from a minute. Five tests hold the first frame to what it should wait for: that
+  it is one animation of one character, that it is four files and not sixty-five,
+  that no entity, prop or effect sprite is in its way, and that every file the
+  manifest will ask for is really in the bundle.
 * Audit of the Sprint 09 backlog, checked against the code rather than the
   board. T025, the atlas: `scripts/pack_atlas.py` is referenced by nothing, the
   Makefile never runs it, and `assets/sprites/atlases/` is empty. The game loads

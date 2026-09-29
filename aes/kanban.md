@@ -161,6 +161,7 @@ current_ticket: "T050"
 | T051 | Publish nested assets: a pubspec entry ships only its own files | done |
 | T050 | Clear the analyzer warnings in the HoH code | done |
 | T052 | The Palette panel squeezes its controls out of reach | done |
+| T067 | Knight Lore sat on "Loading the castle" with no reason | done |
 
 ## Sprint 11 — Knight Lore Completion
 **Goal**: turn the second example game into a finished product, then migrate the
@@ -495,6 +496,31 @@ first game onto the same platform
   The third step is not done and not pretended: the inspector is still in the
   panel's own column, and moving it into a tab of its own is now a small change
   rather than a layout rescue.
+* T067, reported by a person running `make run-knightlore` and shown here as a
+  black screen saying "Loading the castle". Two faults, and one thing that is
+  not a fault at all.
+  The art is forty-nine images and they were decoded one at a time: `await` inside
+  a loop, so the browser was asked for the next image only after the last one had
+  finished decoding. Measured in a headless browser, the first fifty assets came
+  in five seconds and then the load crawled, two images every thirty seconds, for
+  as long as it took. They load in batches of eight now, and a test holds that:
+  a bundle that counts how many loads are open at once fails if the peak is one.
+  On the machine here the improvement is not visible in the request pattern,
+  because the image codec queues decodes whatever asks for them: the test proves
+  the asking changed, and the wall is the codec.
+  The second fault is worse for the person playing. A load that *failed* said
+  nothing: the reason was drawn by an overlay that only appears once the assets
+  are ready, and the loader was drawn on top of that overlay for ever. A missing
+  world file, or any asset that is not there, produced a screen that never said
+  anything again. The reason is on the screen now, in place of the loader, and a
+  test drives a game whose world is missing and reads the message.
+  And the third thing is not a fault: `The AudioContext was not allowed to start`
+  is Chrome's autoplay policy, which is a rule about a page needing a click
+  before it can make a sound. It is not the cause of the black screen, and it
+  stops on its own when the player clicks.
+  One thing a person should know, which is not in the code: `make run-knightlore`
+  serves a *debug* build, where the whole program is compiled in the browser as it
+  loads. For playing the game, build it and serve it, or run it in release.
 * T064, one line, and it was worth two tests. The menu said "Remastered for
   Android": a remaster nobody made, claimed by a menu that cannot know what
   platform it is on, since the same build serves the web and an APK. It now says

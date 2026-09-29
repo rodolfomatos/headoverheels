@@ -110,7 +110,14 @@ class _KnightLoreScreenState extends State<KnightLoreScreen> {
               Positioned.fill(
                 child: IgnorePointer(child: GameOverlay(game: _game)),
               ),
-            if (!_game.assetsReady) const _Loader(),
+            // A load that failed says so. The loader covered the error, because
+            // the error is drawn by the overlay and the overlay only appears
+            // once the assets are ready: a game whose world file was missing
+            // sat on "Loading the castle" for ever with the reason underneath
+            // it.
+            if (!_game.assetsReady && _game.error == null) const _Loader(),
+            if (!_game.assetsReady && _game.error != null)
+              _LoadFailed(error: _game.error!),
           ],
         ),
       ),
@@ -129,6 +136,40 @@ class _NightVeil extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 600),
         color: isNight ? const Color(0x552A3B7A) : const Color(0x00000000),
+      ),
+    );
+  }
+}
+
+/// What a player sees when the game could not load.
+class _LoadFailed extends StatelessWidget {
+  const _LoadFailed({required this.error});
+
+  final String error;
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: const Color(0xE6101216),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 640),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'The game could not load.',
+                style: TextStyle(color: Color(0xFFE57373), fontSize: 18),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                error,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Color(0xFF9AA3B2), fontSize: 13),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -137,23 +137,50 @@ class KnightLoreGame extends FlameGame {
     session = RoomSession(world: world, terrain: terrain);
   }
 
-  Future<void> _loadArt() async {
+  /// How many images are decoded at once.
+  ///
+  /// The art is forty-nine images, and it was decoded one at a time: the browser
+  /// fetched the first fifty assets in five seconds and then the load crawled,
+  /// two images every thirty seconds, and the screen said "Loading the castle"
+  /// the whole while. Decoding is the work, and doing forty-nine of them in a
+  /// row is a queue with nothing in it. Eight at a time uses the browser's own
+  /// concurrency without asking it for fifty decoded bitmaps at once.
+  static const int artDecodeBatch = 8;
+
+  /// The images the game needs, by the key it looks them up under.
+  Map<String, String> _artToLoad() {
+    final wanted = <String, String>{};
     for (final area in KlAreas.all) {
-      _tilesets[area] = await _image(
-        '${config.tilesBasePath}/$area.png',
-      );
+      wanted['tileset_$area'] = '${config.tilesBasePath}/$area.png';
       for (final prop in KnightLoreManifest.propTypes) {
-        final key = '${prop}_$area';
-        _sprites[key] = await _image(
-          '${config.spritesBasePath}/props/${prop}_$area.png',
-        );
+        wanted['${prop}_$area'] =
+            '${config.spritesBasePath}/props/${prop}_$area.png';
       }
     }
     for (final knight in KnightClass.values) {
-      _sprites['character_${knight.id}'] = await _image(
-        '${config.spritesBasePath}/knights/'
-        '${knight.id}_${knight == KnightClass.sabreman ? 'idle' : 'walk'}.png',
+      wanted['character_${knight.id}'] = '${config.spritesBasePath}/knights/'
+          '${knight.id}_${knight == KnightClass.sabreman ? 'idle' : 'walk'}.png';
+    }
+    return wanted;
+  }
+
+  Future<void> _loadArt() async {
+    final wanted = _artToLoad();
+    final keys = wanted.keys.toList(growable: false);
+
+    for (var start = 0; start < keys.length; start += artDecodeBatch) {
+      final batch = keys.skip(start).take(artDecodeBatch);
+      final images = await Future.wait(
+        batch.map((key) => _image(wanted[key]!)),
       );
+      for (var i = 0; i < batch.length; i++) {
+        final key = batch.elementAt(i);
+        if (key.startsWith('tileset_')) {
+          _tilesets[key.substring('tileset_'.length)] = images[i];
+        } else {
+          _sprites[key] = images[i];
+        }
+      }
     }
   }
 

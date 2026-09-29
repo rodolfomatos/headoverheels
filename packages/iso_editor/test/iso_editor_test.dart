@@ -276,6 +276,62 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('a tap lands on the cell under the pointer after a pan', (
+    tester,
+  ) async {
+    // The grid can be dragged, and after it was dragged a tap put a tile
+    // somewhere the pointer was not. The tap's position was already in the
+    // grid's coordinates and went through `toScene` as well, so the pan was
+    // applied twice: right until the first drag, wrong ever after.
+    tester.view.physicalSize = const Size(1200, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    final picked = <Vector3>[];
+    final document = EditorDocument(
+      projectName: 'demo',
+      theme: 'default',
+      width: 8,
+      height: 8,
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: MapEditorView(document: document, onCellSelected: picked.add),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    const point = Offset(600, 450);
+    await tester.tapAt(point);
+    await tester.pumpAndSettle();
+    expect(picked, hasLength(1), reason: 'the first tap chose nothing');
+
+    // Drag the grid, then tap the same place *on the grid* as before: where the
+    // grid moved to. It is the same cell, because the grid moved with it.
+    const drag = Offset(120, 0);
+    await tester.drag(
+      find.byType(InteractiveViewer),
+      drag,
+      warnIfMissed: false,
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tapAt(point + drag);
+    await tester.pumpAndSettle();
+
+    expect(picked, hasLength(2), reason: 'the second tap chose nothing');
+    expect(
+      picked[1].x,
+      closeTo(picked[0].x, 0.01),
+      reason: 'the same cell of the grid gave a different cell after a pan',
+    );
+    expect(
+      picked[1].y,
+      closeTo(picked[0].y, 0.01),
+      reason: 'the pan moved the grid sideways, not down',
+    );
+  });
+
   test('asset import stores png and upserts manifest', () async {
     final storage = MemoryEditorStorage();
     final service = AssetImportService(storage: storage);

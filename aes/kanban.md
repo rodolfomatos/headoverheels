@@ -163,6 +163,8 @@ current_ticket: "T050"
 | T052 | The Palette panel squeezes its controls out of reach | done |
 | T067 | Knight Lore sat on "Loading the castle" with no reason | done |
 | T068 | The editor could not be run: no entry point, no icon font | done |
+| T069 | The editor had no project to open | done |
+| T070 | A tap missed its cell once the grid had been dragged | done |
 
 ## Sprint 11 — Knight Lore Completion
 **Goal**: turn the second example game into a finished product, then migrate the
@@ -542,6 +544,30 @@ first game onto the same platform
   What the editor still does not do: keep anything. Its map lives in the page, so
   closing the browser loses the work. It reads and writes Tiled files through the
   file gateway and has nowhere to keep a project. That is the next thing it wants.
+* T069, the follow-up to T068, and the fault the entry point hid. The editor
+  opened an empty room: the Graph tab had no world, the sprite browser had no
+  sprites, the palette had no tileset, because the only storage was in memory
+  and a project's keys are repository-relative, `games/headoverheels/assets/
+  levels/world.json`. Picking a game in the picker changed which keys were asked
+  for and every one of them was missing. An editor that cannot open a project is
+  a widget.
+  It asks now. `FileSystemEditorStorage` resolves a project's keys against a
+  directory, and the editor asks for that directory before it opens anything, so
+  picking a game loads that game's real world, sprites and tileset, and writing
+  writes the file the game loads. A browser has no directory to open, so the file
+  system is behind a conditional import and the browser's build says so in words
+  rather than failing somewhere that does not explain itself.
+  Creating a new project still does not exist, and that is the honest answer to
+  the question behind this: a project is a directory with a world, a manifest and
+  some rooms, and making one means writing that scaffold. It is a feature, not a
+  bug, and it is not done here.
+* T070, a tap that missed its cell as soon as the grid had been dragged. The
+  `onTapUp` position was already in the grid's coordinates — the detector is the
+  child the viewer transforms — and it went through `toScene` as well, so the pan
+  was applied twice. The grid could not be dragged before the first drag, which
+  is why it looked right for so long. A test drives it: tap, drag, tap the same
+  place on the grid, and the same cell has to come back. It fails on the old code
+  with a cell one step out, and that was checked rather than assumed.
 * T064, one line, and it was worth two tests. The menu said "Remastered for
   Android": a remaster nobody made, claimed by a menu that cannot know what
   platform it is on, since the same build serves the web and an APK. It now says

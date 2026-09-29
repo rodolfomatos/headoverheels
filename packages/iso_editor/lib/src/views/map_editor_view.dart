@@ -46,7 +46,13 @@ class _MapEditorViewState extends State<MapEditorView> {
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTapUp: (details) {
-            final scene = _transformation.toScene(details.localPosition);
+            // The position is already the grid's, not the viewer's: this
+            // detector is the child the viewer transforms, so its local
+            // coordinates are scene coordinates. Running them through
+            // `toScene` applied the pan a second time, which is why a tap
+            // landed on the wrong cell as soon as the grid had been dragged and
+            // the cell was right until then.
+            final scene = details.localPosition;
             final originX = (widget.document.height - 1) * kTileWidth / 2;
             final cell = screenToGrid(Vector2(scene.dx - originX, scene.dy));
             widget.onCellSelected(Vector3(cell.x, cell.y, 0));

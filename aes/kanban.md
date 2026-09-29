@@ -138,7 +138,7 @@ current_ticket: "T050"
 | T056 | The bag is carried but does nothing yet | done |
 | T057 | The guardian trigger does not say which planet it guards | done |
 | T058 | Four of the five planets have no tileset | done |
-| T059 | The pixel-level visual proof of the HoH renderer | pending |
+| T059 | The pixel-level visual proof of the HoH renderer | half done: the load, not the draw |
 | T061 | Nowhere to empty the bag: the world has no dispensary | done |
 | T063 | The manifest promised frames the art did not have | done, characters still one pose |
 | T064 | The menu calls the game a remaster for Android | done |
@@ -463,6 +463,21 @@ first game onto the same platform
   nothing. Two tests hold the rule: a full bag comes out onto the floor with the
   bag still worn, and a character with no bag, or with an empty one, changes
   nothing.
+* T059, the audio sink, which is the half of it that turned out to be possible.
+  Knight Lore has had an `AudioSink` with a silent one for tests since T044, and
+  Head over Heels had none: the game starts the planet's music while it loads,
+  audioplayers has no implementation outside a device, and it throws out of an
+  initialiser the load is waiting on. So the game's load could not be finished
+  in a plain test, which is why a plain test could not draw a frame of it. The
+  game has the same shape now, `FlameAudioSink` and `SilentAudioSink`, and the
+  audio goes wherever it is told. One test: with the sounds going nowhere the
+  whole load runs, the room loads, and the map it names is there.
+  The other half is still open, and now for a stated reason. Drawn onto a plain
+  canvas in a plain test, a loaded game renders one colour: Flame's `render`
+  wants a *mounted* game, with a real viewport and a camera that has been
+  through a frame, and a test has no way to give it one. Drawing through the
+  widget instead does render, and that test never finishes. The browser check is
+  the evidence that stands, with a frame on disk.
 * T064, one line, and it was worth two tests. The menu said "Remastered for
   Android": a remaster nobody made, claimed by a menu that cannot know what
   platform it is on, since the same build serves the web and an APK. It now says

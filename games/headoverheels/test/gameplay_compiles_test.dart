@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:vector_math/vector_math.dart' show Vector2, Vector3;
 import 'package:headoverheels/entities/character_state.dart';
 import 'package:headoverheels/features/gameplay/entities/character_component.dart';
+import 'package:headoverheels/features/audio/audio_system.dart';
 import 'package:headoverheels/features/gameplay/game.dart';
 import 'package:headoverheels/features/gameplay/room/room_graph.dart';
 import 'package:headoverheels/features/gameplay/room/world_loader.dart';
@@ -296,6 +297,44 @@ void main() {
         reason: 'an item in a bag comes out',
       );
     });
+
+    test(
+      'the game loads to a finished room with the sounds going nowhere',
+      () async {
+        // The load used to be unfinishable in a test: the game starts the planet's
+        // music while it loads, audioplayers has no implementation outside a
+        // device, and it throws out of an initialiser the load is waiting on. With
+        // a silent sink the whole load runs, which is the first half of a visual
+        // proof and was not possible before.
+        final silent = ProviderContainer(
+          overrides: [
+            audioSystemProvider.overrideWithValue(
+              AudioSystem(sink: const SilentAudioSink()),
+            ),
+          ],
+        );
+        addTearDown(silent.dispose);
+        final world = await silent.read(worldGraphProvider.future);
+        final quiet = HeadOverHeelsGame(silent.read(_refProvider), world);
+        addTearDown(quiet.dispose);
+
+        await quiet.onLoad();
+
+        expect(
+          quiet.currentRoom,
+          isNotNull,
+          reason: 'the room never loaded, so nothing could ever be drawn',
+        );
+        // The room's map is loaded, which is what a frame is made of. Its
+        // puzzle things are not counted here: they arrive with the map, and
+        // a count of them is a different question, asked in another test.
+        expect(
+          quiet.currentRoom!.definition.tmxFile,
+          endsWith('.tmx'),
+          reason: 'a room with no map file cannot have been drawn',
+        );
+      },
+    );
 
     test('the guardian reports itself beaten', () {
       expect(game.guardianDefeated, isFalse);

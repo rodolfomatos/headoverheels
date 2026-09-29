@@ -26,7 +26,8 @@ tailored to a single game.
 > than the coloured rectangles they stood in for, so what a player sees is art
 > now. The manifest's frame counts are computed from the files' own headers
 > rather than trusted, so a monster is eight frames and walks, and a key is one
-> image and stands still. The magic bag carries four and every planet has a
+> image and stands still. The audio goes through a sink a test can replace,
+> which is what lets the game's whole load run outside a device. The magic bag carries four and every planet has a
 > dispensary in its entrance room, where the bag is emptied onto the floor. The board in `aes/kanban.md` is the authority on
 > what is done and what is not.
 
@@ -249,7 +250,7 @@ map format.
 
 | | |
 |---|---|
-| Tests | 333 across five packages, and 169 sprite checks |
+| Tests | 335 across five packages, and 169 sprite checks |
 | Knight Lore | 15 rooms, 5 areas, finished and playable |
 | Head over Heels | 20 rooms, 5 planets, opens and draws; the pixel proof is not a test yet |
 | Sprites | 65 sheets, one manifest per game |

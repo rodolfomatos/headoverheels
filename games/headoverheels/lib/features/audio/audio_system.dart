@@ -12,6 +12,73 @@ import '../../core/audio/hoh_cues.dart';
 /// that computes it, in `HohCue`, so a sound cannot be named in this class
 /// without a file behind it: `test/audio_test.dart` checks the list below against
 /// what `tool/generate_audio.dart` writes.
+/// Where the sounds go.
+///
+/// A test has no audio device and no plugin, and audioplayers does not fail
+/// politely in one: it throws out of an initialiser the game's load is waiting
+/// on, so a test that wanted to draw a frame of the game could not finish
+/// loading it. This is the seam Knight Lore already has, and the game that had
+/// no way to prove anything on screen is the one that needed it.
+abstract class AudioSink {
+  /// Plays a sound once.
+  Future<void> play(String asset, {double volume = 1});
+
+  /// Starts a sound looping, replacing the loop already going.
+  Future<void> startLoop(String asset, {double volume = 1});
+
+  /// Stops the loop.
+  Future<void> stopLoop();
+
+  /// Preloads an asset, so the first play of it is not late.
+  Future<void> preload(String asset);
+}
+
+/// The real sounds, through Flame's audio layer.
+class FlameAudioSink implements AudioSink {
+  AudioPlayer? _loop;
+
+  @override
+  Future<void> play(String asset, {double volume = 1}) async {
+    await FlameAudio.play(asset, volume: volume);
+  }
+
+  @override
+  Future<void> startLoop(String asset, {double volume = 1}) async {
+    final current = _loop;
+    _loop = null;
+    if (current != null) await current.stop();
+    _loop = await FlameAudio.loop(asset, volume: volume);
+  }
+
+  @override
+  Future<void> stopLoop() async {
+    final current = _loop;
+    _loop = null;
+    if (current != null) await current.stop();
+  }
+
+  @override
+  Future<void> preload(String asset) => FlameAudio.audioCache.load(asset);
+}
+
+/// A sink that hears nothing and says so, for a test and for a machine with no
+/// audio.
+class SilentAudioSink implements AudioSink {
+  const SilentAudioSink();
+
+  @override
+  Future<void> play(String asset, {double volume = 1}) async {}
+
+  @override
+  Future<void> startLoop(String asset, {double volume = 1}) async {}
+
+  @override
+  Future<void> stopLoop() async {}
+
+  @override
+  Future<void> preload(String asset) async {}
+}
+
 class AudioSystem {
   /// Every sound the game can make, and nothing else.
   static List<String> get allAssets =>
@@ -30,6 +97,11 @@ class AudioSystem {
   /// Where the synthesiser writes, and where FlameAudio looks.
   static const String audioRoot = 'assets/audio/';
 
+  /// Where the sounds go. A test passes a [SilentAudioSink].
+  final AudioSink sink;
+
+  AudioSystem({AudioSink? sink}) : sink = sink ?? FlameAudioSink();
+
   bool _musicEnabled = true;
   bool _sfxEnabled = true;
   double _musicVolume = 0.7;
@@ -41,7 +113,7 @@ class AudioSystem {
   Future<void> initialize() async {
     for (final asset in allAssets) {
       try {
-        await FlameAudio.audioCache.load(asset);
+        await sink.preload(asset);
       } catch (e) {
         // Log but don't crash - audio is optional
         debugPrint('Audio asset not found (non-fatal): $asset - $e');
@@ -61,7 +133,7 @@ class AudioSystem {
     _currentMusicCue = cue;
     _currentMusic = relativeAsset(assetFor(cue));
     try {
-      FlameAudio.bgm.play(_currentMusic!, volume: (volume ?? _musicVolume));
+      sink.startLoop(_currentMusic!, volume: volume ?? _musicVolume);
     } catch (e) {
       debugPrint('Failed to play music $_currentMusic: $e');
     }
@@ -69,27 +141,32 @@ class AudioSystem {
 
   /// Stop background music.
   void stopMusic() {
-    FlameAudio.bgm.stop();
+    sink.stopLoop();
     _currentMusic = null;
     _currentMusicCue = null;
   }
 
   /// Pause background music.
   void pauseMusic() {
-    FlameAudio.bgm.pause();
+    _pausedMusic = true;
   }
 
   /// Resume background music.
   void resumeMusic() {
-    FlameAudio.bgm.resume();
+    if (!_pausedMusic) return;
+    _pausedMusic = false;
+    final cue = _currentMusicCue;
+    if (cue != null) playLooping(cue);
   }
+
+  bool _pausedMusic = false;
 
   /// Play a sound effect.
   void playSfx(HohCue cue, {double? volume}) {
     if (!_sfxEnabled) return;
     final asset = relativeAsset(assetFor(cue));
     try {
-      FlameAudio.play(asset, volume: (volume ?? _sfxVolume));
+      sink.play(asset, volume: volume ?? _sfxVolume);
     } catch (e) {
       debugPrint('Failed to play SFX $asset: $e');
     }

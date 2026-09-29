@@ -40,6 +40,9 @@ class SpriteRegistry {
   /// The size each entity sprite is drawn at, as the manifest says.
   final Map<String, ({double x, double y})> _entitySizes = {};
 
+  /// The frames each entity has, where its art is a strip rather than one image.
+  final Map<String, SpriteAnimation> _entityAnimations = {};
+
   /// The images this game loads, with no prefix of their own.
   ///
   /// Flame's shared [Flame.images] prefixes `assets/images/`, and the frames
@@ -156,6 +159,22 @@ class SpriteRegistry {
         x: entry.width.toDouble(),
         y: entry.height.toDouble(),
       );
+      // The entity art is a strip: a monster is eight frames wide, not one
+      // picture. The manifest says how many, and the width of the file agrees,
+      // which `sprite_load_test` checks by reading the PNG's header.
+      final frames = (entry.frames ?? 1)
+          .clamp(1, image.width ~/ entry.width)
+          .toInt();
+      if (frames > 1) {
+        final frameWidth = image.width ~/ frames;
+        _entityAnimations[entity] = SpriteAnimation.spriteList([
+          for (var frame = 0; frame < frames; frame++)
+            Sprite(
+              image,
+              srcPosition: Vector2((frame * frameWidth).toDouble(), 0),
+            ),
+        ], stepTime: 0.14);
+      }
     }
 
     final animation = entry.animation;
@@ -268,6 +287,13 @@ class SpriteRegistry {
     final size = _entitySizes[id];
     return size == null ? null : Vector2(size.x, size.y);
   }
+
+  /// The frames of an entity's art, when it has more than one.
+  ///
+  /// A monster is a strip of eight frames, so it can walk. A key is one image, so
+  /// it cannot. The manifest says which is which and the test checks it.
+  SpriteAnimation? getEntityAnimation(String entity) =>
+      _entityAnimations[entity];
 
   /// The entity types the manifest has a sprite for.
   Iterable<String> get entityNames => _entitySprites.keys;

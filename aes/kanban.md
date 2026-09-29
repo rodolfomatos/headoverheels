@@ -140,7 +140,7 @@ current_ticket: "T050"
 | T058 | Four of the five planets have no tileset | pending |
 | T059 | The pixel-level visual proof of the HoH renderer | pending |
 | T061 | Nowhere to empty the bag: the world has no dispensary | pending |
-| T063 | The manifest promises 4 and 8 frames; the art has one pose | pending |
+| T063 | The manifest promised frames the art did not have | done, characters still one pose |
 | T064 | The menu calls the game a remaster for Android | pending |
 | T065 | The first frame waits a minute for the whole sprite registry | done |
 | T066 | Entities draw coloured rectangles, not the sprites the registry loaded | done |
@@ -413,6 +413,23 @@ first game onto the same platform
   small and dark, which is T063: the art is one pose per direction and the
   character sprite is nearly transparent, so what a player sees on a dark floor
   needs art work rather than code.
+  T063 was not what it looked like. The manifest promised four and eight frames
+  for the party and for the monsters, the springs, the doors, and the art has
+  one image for the party and a *strip* for everything else: a monster is eight
+  frames wide, 512 pixels, at 64 a frame. The character counts came from the
+  number of directions, the entity counts from the index the generator gave each
+  image in the sheet, and nothing read either number.
+  The first fix was wrong and the test said so: `frames: 1` everywhere, which
+  would have flattened the strips. The count is computable from the PNG's own
+  header, and the test computes it: a strip is as wide as the frames it claims.
+  The manifest now says what the files hold, 46 entries corrected, and the
+  registry builds an animation where the art is a strip, so a monster walks and a
+  spring bounces. Where the art is one image, a key or a crown, it stays still,
+  which is what it is.
+  What is left, and it is art: the party has one pose per direction. Walking is
+  a pose that does not change, so the party slides. The generator draws
+  `idle`, `walk` and `jump` with the same drawing, and real frames are a cycle of
+  leg positions that nobody has drawn.
 * Audit of the Sprint 09 backlog, checked against the code rather than the
   board. T025, the atlas: `scripts/pack_atlas.py` is referenced by nothing, the
   Makefile never runs it, and `assets/sprites/atlases/` is empty. The game loads

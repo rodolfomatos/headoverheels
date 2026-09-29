@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_test/flutter_test.dart';
@@ -122,6 +123,40 @@ void main() {
       }
     });
 
+    test(
+      'every frame count is the number of frames the file really has',
+      () async {
+        // The manifest promised four and eight frames for the party and the art
+        // has one image per animation: the count came from the number of
+        // directions, and from the index the generator gave each image in the
+        // sheet. Nothing read the number, so the promise sat there.
+        // The count is computable, and computing it is the check: a strip of
+        // frames is as wide as its frames claim.
+        final entries = await manifest();
+        for (final entry in entries) {
+          final declared = entry.frames;
+          if (declared == null) continue;
+
+          final file = File('$spritesRoot/${entry.file}');
+          final data = file.readAsBytesSync();
+          final width = _pngWidth(data);
+          final frameWidth = entry.width;
+          expect(
+            frameWidth,
+            greaterThan(0),
+            reason: '\$entry.id says its frames are \$frameWidth wide',
+          );
+          expect(
+            declared,
+            equals(width ~/ frameWidth),
+            reason:
+                '\${entry.id} says \$declared frames of \${frameWidth}px, and '
+                '${file.path} is ${width}px wide',
+          );
+        }
+      },
+    );
+
     test('the manifest names every character the game has', () async {
       final entries = await manifest();
       for (final character in ['head', 'heels']) {
@@ -148,3 +183,12 @@ String _manifestNameFor(String triggerType) => switch (triggerType) {
   'springItem' => 'spring',
   final other => other,
 };
+
+/// The width of a PNG, read from its header.
+///
+/// The width is all a frame count needs, and reading four bytes of the header
+/// keeps the test from needing an image library.
+int _pngWidth(Uint8List bytes) {
+  final data = ByteData.sublistView(bytes);
+  return data.getUint32(16, Endian.big);
+}

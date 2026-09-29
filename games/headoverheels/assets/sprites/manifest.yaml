@@ -7,7 +7,7 @@ assets:
   character: head
   animation: idle
   direction: n
-  frames: 4
+  frames: 1
   frame_duration: 200
   loop: true
   master: head_idle_front_master
@@ -27,7 +27,7 @@ assets:
   character: head
   animation: idle
   direction: ne
-  frames: 4
+  frames: 1
   frame_duration: 200
   loop: true
   master: head_idle_3q_master
@@ -47,7 +47,7 @@ assets:
   character: head
   animation: idle
   direction: e
-  frames: 4
+  frames: 1
   frame_duration: 200
   loop: true
   master: head_idle_side_master
@@ -67,7 +67,7 @@ assets:
   character: head
   animation: idle
   direction: s
-  frames: 4
+  frames: 1
   frame_duration: 200
   loop: true
   master: head_idle_back_master
@@ -87,7 +87,7 @@ assets:
   character: head
   animation: walk
   direction: n
-  frames: 8
+  frames: 1
   frame_duration: 100
   loop: true
   master: head_walk_front_master
@@ -107,7 +107,7 @@ assets:
   character: head
   animation: walk
   direction: ne
-  frames: 8
+  frames: 1
   frame_duration: 100
   loop: true
   master: head_walk_3q_master
@@ -127,7 +127,7 @@ assets:
   character: head
   animation: walk
   direction: e
-  frames: 8
+  frames: 1
   frame_duration: 100
   loop: true
   master: head_walk_side_master
@@ -147,7 +147,7 @@ assets:
   character: head
   animation: walk
   direction: s
-  frames: 8
+  frames: 1
   frame_duration: 100
   loop: true
   master: head_walk_back_master
@@ -167,7 +167,7 @@ assets:
   character: head
   animation: jump
   direction: n
-  frames: 4
+  frames: 1
   frame_duration: 150
   loop: false
   master: head_jump_front_master
@@ -187,7 +187,7 @@ assets:
   character: head
   animation: jump
   direction: ne
-  frames: 4
+  frames: 1
   frame_duration: 150
   loop: false
   master: head_jump_3q_master
@@ -207,7 +207,7 @@ assets:
   character: head
   animation: jump
   direction: e
-  frames: 4
+  frames: 1
   frame_duration: 150
   loop: false
   master: head_jump_side_master
@@ -227,7 +227,7 @@ assets:
   character: head
   animation: jump
   direction: s
-  frames: 4
+  frames: 1
   frame_duration: 150
   loop: false
   master: head_jump_back_master
@@ -247,7 +247,7 @@ assets:
   character: heels
   animation: idle
   direction: n
-  frames: 4
+  frames: 1
   frame_duration: 200
   loop: true
   master: heels_idle_front_master
@@ -267,7 +267,7 @@ assets:
   character: heels
   animation: idle
   direction: ne
-  frames: 4
+  frames: 1
   frame_duration: 200
   loop: true
   master: heels_idle_3q_master
@@ -287,7 +287,7 @@ assets:
   character: heels
   animation: idle
   direction: e
-  frames: 4
+  frames: 1
   frame_duration: 200
   loop: true
   master: heels_idle_side_master
@@ -307,7 +307,7 @@ assets:
   character: heels
   animation: idle
   direction: s
-  frames: 4
+  frames: 1
   frame_duration: 200
   loop: true
   master: heels_idle_back_master
@@ -327,7 +327,7 @@ assets:
   character: heels
   animation: walk
   direction: n
-  frames: 8
+  frames: 1
   frame_duration: 100
   loop: true
   master: heels_walk_front_master
@@ -347,7 +347,7 @@ assets:
   character: heels
   animation: walk
   direction: ne
-  frames: 8
+  frames: 1
   frame_duration: 100
   loop: true
   master: heels_walk_3q_master
@@ -367,7 +367,7 @@ assets:
   character: heels
   animation: walk
   direction: e
-  frames: 8
+  frames: 1
   frame_duration: 100
   loop: true
   master: heels_walk_side_master
@@ -387,7 +387,7 @@ assets:
   character: heels
   animation: walk
   direction: s
-  frames: 8
+  frames: 1
   frame_duration: 100
   loop: true
   master: heels_walk_back_master
@@ -407,7 +407,7 @@ assets:
   character: heels
   animation: run
   direction: n
-  frames: 8
+  frames: 1
   frame_duration: 75
   loop: true
   master: heels_run_front_master
@@ -427,7 +427,7 @@ assets:
   character: heels
   animation: run
   direction: ne
-  frames: 8
+  frames: 1
   frame_duration: 75
   loop: true
   master: heels_run_3q_master
@@ -447,7 +447,7 @@ assets:
   character: heels
   animation: run
   direction: e
-  frames: 8
+  frames: 1
   frame_duration: 75
   loop: true
   master: heels_run_side_master
@@ -467,7 +467,7 @@ assets:
   character: heels
   animation: run
   direction: s
-  frames: 8
+  frames: 1
   frame_duration: 75
   loop: true
   master: heels_run_back_master
@@ -487,7 +487,7 @@ assets:
   character: heels
   animation: jump
   direction: n
-  frames: 4
+  frames: 1
   frame_duration: 150
   loop: false
   master: heels_jump_front_master
@@ -507,7 +507,7 @@ assets:
   character: heels
   animation: jump
   direction: ne
-  frames: 4
+  frames: 1
   frame_duration: 150
   loop: false
   master: heels_jump_3q_master
@@ -527,7 +527,7 @@ assets:
   character: heels
   animation: jump
   direction: e
-  frames: 4
+  frames: 1
   frame_duration: 150
   loop: false
   master: heels_jump_side_master
@@ -547,7 +547,7 @@ assets:
   character: heels
   animation: jump
   direction: s
-  frames: 4
+  frames: 1
   frame_duration: 150
   loop: false
   master: heels_jump_back_master
@@ -567,7 +567,7 @@ assets:
   character: heels
   animation: carry
   direction: n
-  frames: 4
+  frames: 1
   frame_duration: 200
   loop: true
   master: heels_carry_front_master
@@ -587,7 +587,7 @@ assets:
   character: heels
   animation: carry
   direction: ne
-  frames: 4
+  frames: 1
   frame_duration: 200
   loop: true
   master: heels_carry_3q_master
@@ -607,7 +607,7 @@ assets:
   character: heels
   animation: carry
   direction: e
-  frames: 4
+  frames: 1
   frame_duration: 200
   loop: true
   master: heels_carry_side_master
@@ -627,7 +627,7 @@ assets:
   character: heels
   animation: carry
   direction: s
-  frames: 4
+  frames: 1
   frame_duration: 200
   loop: true
   master: heels_carry_back_master
@@ -647,7 +647,7 @@ assets:
   character: duo
   animation: idle
   direction: n
-  frames: 4
+  frames: 1
   frame_duration: 200
   loop: true
   master: duo_idle_front_master
@@ -686,7 +686,7 @@ assets:
   category: entity
   entity: rabbit
   animation: hop
-  frames: 4
+  frames: 8
   frame_duration: 200
   loop: true
   master: rabbit_hop_master
@@ -726,7 +726,7 @@ assets:
   category: entity
   entity: spring
   animation: idle
-  frames: 3
+  frames: 8
   frame_duration: 200
   loop: true
   master: spring_master
@@ -746,7 +746,7 @@ assets:
   category: entity
   entity: switch
   animation: 'off'
-  frames: 1
+  frames: 8
   frame_duration: 0
   loop: false
   master: switch_off_master
@@ -766,7 +766,7 @@ assets:
   category: entity
   entity: conveyor
   animation: belt
-  frames: 4
+  frames: 8
   frame_duration: 100
   loop: true
   master: conveyor_belt_master
@@ -786,7 +786,7 @@ assets:
   category: entity
   entity: teleport
   animation: swirl
-  frames: 4
+  frames: 8
   frame_duration: 150
   loop: true
   master: teleport_swirl_master
@@ -806,7 +806,7 @@ assets:
   category: entity
   entity: door
   animation: closed
-  frames: 1
+  frames: 8
   frame_duration: 0
   loop: false
   master: door_closed_master
@@ -886,7 +886,7 @@ assets:
   category: entity
   entity: bag
   animation: idle
-  frames: 1
+  frames: 8
   frame_duration: 0
   loop: false
   master: bag_idle_master
@@ -906,7 +906,7 @@ assets:
   category: entity
   entity: key
   animation: idle
-  frames: 1
+  frames: 8
   frame_duration: 0
   loop: false
   master: key_idle_master
@@ -926,7 +926,7 @@ assets:
   category: entity
   entity: doughnut
   animation: idle
-  frames: 1
+  frames: 8
   frame_duration: 0
   loop: false
   master: doughnut_idle_master

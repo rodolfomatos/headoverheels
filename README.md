@@ -23,7 +23,9 @@ tailored to a single game.
 > where it took a minute. Four of the five planets also have no tileset of their
 > own yet, which is T058. The entities draw the sprites the manifest holds rather
 > than the coloured rectangles they stood in for, so what a player sees is art
-> now, and small dark art, which is T063. The board in `aes/kanban.md` is the authority on
+> now. The manifest's frame counts are computed from the files' own headers
+> rather than trusted, so a monster is eight frames and walks, and a key is one
+> image and stands still. The board in `aes/kanban.md` is the authority on
 > what is done and what is not.
 
 ---
@@ -245,7 +247,7 @@ map format.
 
 | | |
 |---|---|
-| Tests | 325 across five packages, and 169 sprite checks |
+| Tests | 326 across five packages, and 169 sprite checks |
 | Knight Lore | 15 rooms, 5 areas, finished and playable |
 | Head over Heels | 20 rooms, 5 planets, opens and draws; the pixel proof is not a test yet |
 | Sprites | 65 sheets, one manifest per game |

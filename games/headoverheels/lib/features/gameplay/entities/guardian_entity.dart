@@ -1,7 +1,6 @@
 // Guardian entity for Head over Heels.
 
-import 'package:flame/components.dart';
-import 'package:flutter/painting.dart' show Color;
+import 'package:flutter/material.dart' show Color, Colors;
 import 'package:headoverheels/core/isometric.dart';
 import 'package:headoverheels/features/gameplay/entities/character_component.dart';
 import 'package:headoverheels/features/gameplay/entities/monster_entity.dart';
@@ -27,24 +26,22 @@ class GuardianEntity extends MonsterEntity {
   });
 
   @override
-  void onLoad() {
+  void onLoad() async {
     super.onLoad();
-    // Visual: larger, distinct appearance (purple)
-    final rect = children.whereType<RectangleComponent>().firstOrNull;
-    rect?.size = size * 1.2;
-    rect?.paint.color = const Color(0xFF8800FF); // Purple
+    // The guardian has art of its own, and it is bigger than a monster: the
+    // purple rectangle it used to be was a shade on a red one.
+    final sprite = await showManifestSprite('guardian');
+    sprite?.size = size * 1.2;
   }
 
   @override
   void freeze(int frames) {
     // Immune to doughnut freeze
-    // Visual feedback: flash red
-    final rect = children.whereType<RectangleComponent>().firstOrNull;
-    rect?.paint.color = const Color(0xFFFF0000);
+    // Visual feedback: flash red, the one thing about a monster a player can
+    // see past. Now a tint on the sprite rather than a change of colour.
+    tint(const Color(0xFFFF0000));
     Future.delayed(const Duration(milliseconds: 200), () {
-      if (!isFrozen) {
-        rect?.paint.color = const Color(0xFF8800FF);
-      }
+      if (!isFrozen) tint(Colors.transparent);
     });
   }
 

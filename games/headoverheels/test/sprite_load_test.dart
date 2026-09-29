@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:headoverheels/core/assets/sprite_registry.dart';
+import 'package:headoverheels/features/gameplay/room/world_loader.dart';
 import 'package:iso_core/iso_core.dart' show AssetEntry, AssetManifest;
 
 /// The first frame, and what it waits for.
@@ -93,6 +94,34 @@ void main() {
       }
     });
 
+    test('every entity in the world has a sprite in the manifest', () async {
+      // The entities used to draw a coloured rectangle because nothing asked the
+      // registry for the art that was already loaded. A world whose entities the
+      // manifest has nothing for would draw rectangles again, silently, so the
+      // names are compared here instead.
+      final entries = await manifest();
+      final withSprites = entries
+          .map((entry) => entry.entity)
+          .whereType<String>()
+          .toSet();
+      final world = await loadWorldGraph();
+      final used = world.rooms.values
+          .expand((room) => room.triggers)
+          .map((trigger) => trigger.type.name)
+          .toSet();
+
+      for (final type in used) {
+        // Ladders are part of the room they are in, not a thing with a sprite,
+        // and nothing in the world draws one.
+        if (type.startsWith('ladder')) continue;
+        expect(
+          withSprites,
+          contains(_manifestNameFor(type)),
+          reason: 'the world has a $type and the manifest has no sprite for it',
+        );
+      }
+    });
+
     test('the manifest names every character the game has', () async {
       final entries = await manifest();
       for (final character in ['head', 'heels']) {
@@ -105,3 +134,17 @@ void main() {
     });
   });
 }
+
+/// The name the manifest gives a world trigger type.
+///
+/// Two of them are spelled differently on the two sides, and the difference is
+/// here rather than spread through the entities: the enum says `switchTrigger`
+/// where the art says `switch`, and the enum says `hushPuppy` where the art says
+/// `hush_puppy`. A world that grows a type the manifest has nothing for fails
+/// the test above rather than drawing a rectangle.
+String _manifestNameFor(String triggerType) => switch (triggerType) {
+  'switchTrigger' => 'switch',
+  'hushPuppy' => 'hush_puppy',
+  'springItem' => 'spring',
+  final other => other,
+};

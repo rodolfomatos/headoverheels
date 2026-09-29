@@ -1,8 +1,8 @@
 // Hush Puppy entity for Head over Heels.
 
+import 'package:flutter/painting.dart' show Color;
 import 'package:collection/collection.dart';
 import 'package:flame/components.dart';
-import 'package:flutter/painting.dart' show Color, Paint;
 import 'package:headoverheels/core/isometric.dart';
 import 'package:headoverheels/entities/character_state.dart';
 import 'package:headoverheels/features/gameplay/entities/character_component.dart';
@@ -23,16 +23,12 @@ class HushPuppyEntity extends PuzzleEntity {
       _originalPosition = triggerZone.position;
 
   @override
-  void onLoad() {
+  void onLoad() async {
     super.onLoad();
-    // Visual indicator for hush puppy
-    add(
-      RectangleComponent(
-        size: size * 0.5,
-        anchor: Anchor.center,
-        paint: Paint()..color = const Color(0xFF888888), // Gray (sleeping)
-      ),
-    );
+    // The manifest calls it hush_puppy, with an underscore, where the world's
+    // trigger is `hushPuppy`. The sprite is looked up by the manifest's name.
+    await showManifestSprite('hush_puppy');
+    spriteComponent?.size = size * 0.5;
   }
 
   @override
@@ -72,8 +68,8 @@ class HushPuppyEntity extends PuzzleEntity {
       _returnTimer = returnDelay;
 
       // Visual: awake color
-      final rect = children.whereType<RectangleComponent>().firstOrNull;
-      rect?.paint.color = const Color(0xFF00FF00); // Green (awake)
+      // Awake: a tint, where a grey rectangle used to turn green.
+      tint(const Color(0xFF44FF44));
     }
   }
 
@@ -84,9 +80,8 @@ class HushPuppyEntity extends PuzzleEntity {
     // Return to original position
     position = IsometricCoordinates.gridToScreen(_originalPosition);
 
-    // Visual: sleeping color
-    final rect = children.whereType<RectangleComponent>().firstOrNull;
-    rect?.paint.color = const Color(0xFF888888); // Gray (sleeping)
+    // Back to sleeping: a tint, the way a rectangle went back to grey.
+    tint(const Color(0xFF888888));
   }
 
   Vector3? _findSafeTile() {

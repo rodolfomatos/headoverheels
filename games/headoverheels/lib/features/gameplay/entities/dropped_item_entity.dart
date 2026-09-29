@@ -1,8 +1,5 @@
 // Dropped item entity for Head over Heels.
 
-import 'package:flame/components.dart';
-import 'package:flutter/material.dart' show Color, Icons, IconData;
-import 'package:flutter/painting.dart' show Color, Paint;
 import 'package:headoverheels/features/gameplay/entities/character_component.dart';
 import 'package:headoverheels/features/gameplay/entities/puzzle_entity.dart';
 import 'package:headoverheels/features/gameplay/state/character_notifier.dart';
@@ -19,18 +16,22 @@ class DroppedItemEntity extends PuzzleEntity {
   });
 
   @override
-  void onLoad() {
+  void onLoad() async {
     super.onLoad();
-    // Visual indicator based on item type
-    final (icon, color) = _getItemVisual(item);
-    add(
-      RectangleComponent(
-        size: size * 0.5,
-        anchor: Anchor.center,
-        paint: Paint()..color = color,
-      ),
-    );
+    // The sprite the manifest has for this item, which is what a key, a doughnut
+    // and a spring look like. The manifest has no `none`, and nothing in the
+    // world drops one.
+    final sprite = await showManifestSprite(_manifestNameFor(item));
+    sprite?.size = size * 0.5;
   }
+
+  /// The name the manifest gives this item.
+  String _manifestNameFor(CarriedItem item) => item.when(
+    none: () => 'spring',
+    key: (keyId) => 'key',
+    crown: () => 'crown',
+    other: (itemId) => itemId,
+  );
 
   @override
   void onInteract(CharacterComponent character) {
@@ -57,15 +58,6 @@ class DroppedItemEntity extends PuzzleEntity {
   /// in. The game owns the mapping from a component to its notifier.
   CharacterStateNotifier? _notifierFor(CharacterComponent character) =>
       game.notifierFor(character);
-
-  (IconData, Color) _getItemVisual(CarriedItem item) {
-    return item.when(
-      none: () => (Icons.backpack_outlined, const Color(0xFF888888)),
-      key: (_) => (Icons.key_rounded, const Color(0xFFFFD700)),
-      crown: () => (Icons.emoji_events_rounded, const Color(0xFFFFD700)),
-      other: (_) => (Icons.backpack_rounded, const Color(0xFFF97316)),
-    );
-  }
 
   @override
   void updatePuzzle(double dt) {}

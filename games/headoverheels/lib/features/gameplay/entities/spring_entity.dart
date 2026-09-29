@@ -1,7 +1,5 @@
 // Spring entity for Head over Heels.
 
-import 'package:flame/components.dart';
-import 'package:flutter/painting.dart' show Color, Paint;
 import 'package:headoverheels/features/gameplay/entities/character_component.dart';
 import 'package:headoverheels/features/gameplay/entities/puzzle_entity.dart';
 
@@ -14,33 +12,25 @@ class SpringEntity extends PuzzleEntity {
     : _isCompressed = false;
 
   @override
-  void onLoad() {
+  void onLoad() async {
     super.onLoad();
-    // Visual indicator for spring
-    add(
-      RectangleComponent(
-        size: size * 0.8,
-        anchor: Anchor.center,
-        paint: Paint()..color = const Color(0xFFFFFF00),
-      ),
-    );
+    await showManifestSprite('spring');
+    spriteComponent?.size = size * 0.8;
   }
 
   @override
   void onEnter(CharacterComponent character) {
     // Character is on spring - ready to boost
     _isCompressed = true;
-    // Visual feedback
-    final rect = children.whereType<RectangleComponent>().firstOrNull;
-    rect?.size = size * 0.5;
+    // Visual feedback: the spring squashes under the party, as it did when it
+    // was a rectangle.
+    spriteComponent?.size = size * 0.5;
   }
 
   @override
   void onExit(CharacterComponent character) {
     _isCompressed = false;
-    // Reset visual
-    final rect = children.whereType<RectangleComponent>().firstOrNull;
-    rect?.size = size * 0.8;
+    spriteComponent?.size = size * 0.8;
   }
 
   @override

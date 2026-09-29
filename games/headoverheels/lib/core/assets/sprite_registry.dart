@@ -6,6 +6,7 @@ import 'dart:async';
 import 'dart:ui' show Image;
 
 import 'package:flame/cache.dart';
+import 'package:flame/components.dart' show Vector2;
 import 'package:flame/sprite.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:iso_core/iso_core.dart' show AssetEntry, AssetManifest;
@@ -28,6 +29,16 @@ class SpriteRegistry {
 
   /// Who wants to know when the rest of the manifest has arrived.
   final List<void Function()> _loadListeners = [];
+
+  /// The manifest id of each entity's sprite, by the name the manifest gives it.
+  ///
+  /// The manifest keys its entries by direction and animation, `entity.monster.
+  /// walk`, and an entity in the game only knows what it is, a monster. This is
+  /// the way from one to the other.
+  final Map<String, String> _entitySprites = {};
+
+  /// The size each entity sprite is drawn at, as the manifest says.
+  final Map<String, ({double x, double y})> _entitySizes = {};
 
   /// The images this game loads, with no prefix of their own.
   ///
@@ -138,6 +149,14 @@ class SpriteRegistry {
 
     _sprites[entry.id] = Sprite(image);
     _loaded.add(entry.id);
+    final entity = entry.entity;
+    if (entity != null) {
+      _entitySprites[entity] = entry.id;
+      _entitySizes[entry.id] = (
+        x: entry.width.toDouble(),
+        y: entry.height.toDouble(),
+      );
+    }
 
     final animation = entry.animation;
     final character = entry.character;
@@ -231,6 +250,27 @@ class SpriteRegistry {
   Sprite? getSprite(String assetId) {
     return _sprites[assetId];
   }
+
+  /// The sprite for an entity type, by the name the manifest gives it.
+  ///
+  /// Null when the manifest has none, which is a hole in the art rather than a
+  /// reason to draw a coloured rectangle: every entity that used to draw one is
+  /// in here now, and a type with no sprite says so in a test.
+  Sprite? getEntitySprite(String entity) {
+    final id = _entitySprites[entity];
+    return id == null ? null : _sprites[id];
+  }
+
+  /// The size the manifest says an entity's sprite is drawn at.
+  Vector2? entitySpriteSize(String entity) {
+    final id = _entitySprites[entity];
+    if (id == null) return null;
+    final size = _entitySizes[id];
+    return size == null ? null : Vector2(size.x, size.y);
+  }
+
+  /// The entity types the manifest has a sprite for.
+  Iterable<String> get entityNames => _entitySprites.keys;
 
   /// Get all registered animation IDs.
   Iterable<String> get animationIds => _animations.keys;

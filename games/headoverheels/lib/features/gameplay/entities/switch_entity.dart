@@ -1,8 +1,7 @@
 // Switch entity for Head over Heels.
 
 import 'package:collection/collection.dart';
-import 'package:flame/components.dart';
-import 'package:flutter/painting.dart' show Color, Paint;
+import 'package:flutter/material.dart' show Color, Colors;
 import 'package:headoverheels/entities/character_state.dart';
 import 'package:headoverheels/features/gameplay/entities/character_component.dart';
 import 'package:headoverheels/features/gameplay/entities/puzzle_entity.dart';
@@ -23,17 +22,10 @@ class SwitchEntity extends PuzzleEntity {
   }) : _cooldownTimer = 0;
 
   @override
-  void onLoad() {
+  void onLoad() async {
     super.onLoad();
-    // Visual indicator for switch state
-    add(
-      RectangleComponent(
-        size: size * 0.6,
-        anchor: Anchor.center,
-        paint: Paint()
-          ..color = isOn ? const Color(0xFF00FF00) : const Color(0xFFFF0000),
-      ),
-    );
+    await showManifestSprite('switch');
+    _showState();
   }
 
   @override
@@ -61,12 +53,15 @@ class SwitchEntity extends PuzzleEntity {
 
   void _toggle() {
     isOn = !isOn;
-    // Update visual
-    final rect = children.whereType<RectangleComponent>().firstOrNull;
-    rect?.paint.color = isOn
-        ? const Color(0xFF00FF00)
-        : const Color(0xFFFF0000);
+    _showState();
   }
+
+  /// A thrown switch is a tint, the way a coloured rectangle used to be one.
+  void _showState() => tint(isOn ? _thrownTint : Colors.transparent);
+
+  /// Green for a thrown switch. The rectangle had it the other way round, which
+  /// is not a thing anyone can read.
+  static const Color _thrownTint = Color(0xFF44FF44);
 
   void _notifyTarget() {
     // Find target entity in the same room

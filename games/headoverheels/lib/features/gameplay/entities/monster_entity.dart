@@ -1,7 +1,7 @@
 // Monster entity for Head over Heels.
 
 import 'package:flame/components.dart';
-import 'package:flutter/painting.dart' show Color, Paint;
+import 'package:flutter/material.dart' show Color, Colors;
 import 'package:headoverheels/core/isometric.dart';
 import 'package:headoverheels/features/gameplay/entities/character_component.dart';
 import 'package:headoverheels/features/gameplay/entities/puzzle_entity.dart';
@@ -33,16 +33,11 @@ class MonsterEntity extends PuzzleEntity {
        );
 
   @override
-  void onLoad() {
+  void onLoad() async {
     super.onLoad();
-    // Visual indicator for monster
-    add(
-      RectangleComponent(
-        size: size * 0.8,
-        anchor: Anchor.center,
-        paint: Paint()..color = const Color(0xFFFF0000),
-      ),
-    );
+    // The art the manifest holds, rather than a red rectangle standing in for a
+    // monster: the sprite was loaded all along and nothing asked for it.
+    await showManifestSprite('monster');
   }
 
   @override
@@ -51,9 +46,8 @@ class MonsterEntity extends PuzzleEntity {
       _freezeTimer--;
       if (_freezeTimer <= 0) {
         _isFrozen = false;
-        // Reset visual
-        final rect = children.whereType<RectangleComponent>().firstOrNull;
-        rect?.paint.color = const Color(0xFFFF0000);
+        // Back to its own colours, the way a rectangle went back to red.
+        tint(Colors.transparent);
       }
       return;
     }
@@ -110,9 +104,8 @@ class MonsterEntity extends PuzzleEntity {
   void freeze(int frames) {
     _freezeTimer = frames;
     _isFrozen = true;
-    // Visual feedback
-    final rect = children.whereType<RectangleComponent>().firstOrNull;
-    rect?.paint.color = const Color(0xFF0000FF);
+    // Visual feedback: frozen blue, the way a red rectangle used to turn.
+    tint(const Color(0xFF0000FF));
   }
 
   bool get isFrozen => _isFrozen;

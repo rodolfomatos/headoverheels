@@ -1,7 +1,5 @@
 // Crown entity for Head over Heels.
 
-import 'package:flame/components.dart';
-import 'package:flutter/painting.dart' show Color, Paint;
 import 'package:headoverheels/features/gameplay/entities/character_component.dart';
 import 'package:headoverheels/features/gameplay/entities/puzzle_entity.dart';
 
@@ -16,16 +14,9 @@ class CrownEntity extends PuzzleEntity {
   });
 
   @override
-  void onLoad() {
+  void onLoad() async {
     super.onLoad();
-    // Visual indicator for crown
-    add(
-      RectangleComponent(
-        size: size * 0.6,
-        anchor: Anchor.center,
-        paint: Paint()..color = const Color(0xFFFFD700), // Gold
-      ),
-    );
+    await showManifestSprite('crown');
   }
 
   @override

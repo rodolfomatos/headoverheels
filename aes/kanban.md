@@ -143,7 +143,7 @@ current_ticket: "T050"
 | T063 | The manifest promises 4 and 8 frames; the art has one pose | pending |
 | T064 | The menu calls the game a remaster for Android | pending |
 | T065 | The first frame waits a minute for the whole sprite registry | done |
-| T066 | Entities draw coloured rectangles, not the sprites the registry loaded | pending |
+| T066 | Entities draw coloured rectangles, not the sprites the registry loaded | done |
 | T062 | The game screen is black: the first frame waits for 65 sprites | answered: the room draws |
 
 ## Sprint 10 — Builder Platform
@@ -396,6 +396,23 @@ first game onto the same platform
   it is one animation of one character, that it is four files and not sixty-five,
   that no entity, prop or effect sprite is in its way, and that every file the
   manifest will ask for is really in the bundle.
+* T066, the entities. Every one of them drew a coloured rectangle: a red monster,
+  a brown bag, a gold crown, a grey character, a yellow spring. The art was in
+  the manifest the whole time, the registry had loaded it during that minute of
+  black screen, and nothing asked for it. `PuzzleEntity` asks now, through one
+  method, with the entity's own name, and the state that used to be a change of
+  colour became a tint on the sprite: a frozen monster goes blue, a thrown switch
+  goes green, a sleeping puppy wakes green, a spring squashes under the party.
+  Two names differ between the world and the manifest and the difference is
+  written down in the test rather than spread through the entities: the enum says
+  `switchTrigger` where the art says `switch`, and `hushPuppy` where the art says
+  `hush_puppy`. A sixth test compares the world's trigger types with the
+  manifest's entity names, so a room whose entity has no art fails instead of
+  quietly drawing a rectangle again.
+  In the browser the rectangles are gone and the sprites are there. They are also
+  small and dark, which is T063: the art is one pose per direction and the
+  character sprite is nearly transparent, so what a player sees on a dark floor
+  needs art work rather than code.
 * Audit of the Sprint 09 backlog, checked against the code rather than the
   board. T025, the atlas: `scripts/pack_atlas.py` is referenced by nothing, the
   Makefile never runs it, and `assets/sprites/atlases/` is empty. The game loads

@@ -1,8 +1,7 @@
 // Reincarnation fish entity for Head over Heels.
 
-import 'package:collection/collection.dart';
 import 'package:flame/components.dart';
-import 'package:flutter/painting.dart' show Color, Paint;
+import 'package:flutter/painting.dart' show Color;
 import 'package:headoverheels/features/gameplay/entities/character_component.dart';
 import 'package:headoverheels/features/gameplay/entities/puzzle_entity.dart';
 import 'package:headoverheels/features/gameplay/room/room_component.dart';
@@ -20,19 +19,10 @@ class FishEntity extends PuzzleEntity {
        _checkpointPosition = triggerZone.position;
 
   @override
-  void onLoad() {
+  void onLoad() async {
     super.onLoad();
-    // Visual indicator for fish
-    add(
-      RectangleComponent(
-        size: size * 0.6,
-        anchor: Anchor.center,
-        paint: Paint()
-          ..color = _isAlive
-              ? const Color(0xFF00FFFF)
-              : const Color(0xFF888888),
-      ),
-    );
+    await showManifestSprite('fish');
+    spriteComponent?.size = size * 0.6;
   }
 
   @override
@@ -56,9 +46,8 @@ class FishEntity extends PuzzleEntity {
     // Save checkpoint in game state (handled by game system)
     _isAlive = false;
 
-    // Update visual
-    final rect = children.whereType<RectangleComponent>().firstOrNull;
-    rect?.paint.color = const Color(0xFF888888);
+    // A dead fish goes grey, the way a cyan rectangle used to go grey.
+    tint(const Color(0xFF888888));
   }
 
   void _poisonCharacter(CharacterComponent character) {

@@ -23,6 +23,9 @@ class SpriteRegistry {
   // Asset ID -> SpriteAnimationData mapping
   final Map<String, SpriteAnimationData> _animationData = {};
 
+  /// The manifest ids that are loaded, so nothing is asked for twice.
+  final Set<String> _loaded = {};
+
   /// The images this game loads, with no prefix of their own.
   ///
   /// Flame's shared [Flame.images] prefixes `assets/images/`, and the frames
@@ -47,8 +50,36 @@ class SpriteRegistry {
   /// had no sprites at all. The four other loaders below were empty, so entities,
   /// props, tiles, UI and effects were never loaded either.
   Future<void> initialize() async {
+    await _loadWhere((_) => true);
+  }
+
+  /// Loads the sprites of one character: `head`, `heels` or `duo`.
+  ///
+  /// The party waits for this and for nothing else. Waiting for all 65 entries
+  /// meant the first frame of the game came after every sprite in the project,
+  /// which on a slow machine is a minute of black screen: `GameWidget` draws
+  /// nothing until the game's load is finished, so the room the player is
+  /// standing in waited for props and effects nobody is looking at.
+  Future<void> loadCharacter(String character) async {
+    await _loadWhere((entry) => entry.character == character);
+  }
+
+  /// Loads the sprites of one entity type, for the same reason: a room asks for
+  /// what is in it.
+  Future<void> loadEntity(String entity) async {
+    await _loadWhere((entry) => entry.entity == entity);
+  }
+
+  /// Loads every entry [wanted] accepts, skipping the ones already loaded.
+  ///
+  /// Loading is idempotent on purpose: the party loads its own sprites while the
+  /// room loads, and the rest of the manifest arrives afterwards without asking
+  /// for the same file twice.
+  Future<void> _loadWhere(bool Function(AssetEntry entry) wanted) async {
     final manifest = await _readManifest();
     for (final entry in manifest.assets) {
+      if (!wanted(entry)) continue;
+      if (_loaded.contains(entry.id)) continue;
       await _load(entry);
     }
   }
@@ -76,6 +107,7 @@ class SpriteRegistry {
     }
 
     _sprites[entry.id] = Sprite(image);
+    _loaded.add(entry.id);
 
     final animation = entry.animation;
     final character = entry.character;

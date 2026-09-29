@@ -1,7 +1,10 @@
 // Main game class for Head over Heels using Flame.
 
 import '../../core/audio/hoh_cues.dart';
+import 'dart:async';
+
 import 'package:flame/game.dart';
+import 'package:headoverheels/core/assets/sprite_registry.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:headoverheels/features/gameplay/state/input_system.dart';
 import 'package:headoverheels/features/gameplay/state/crowns_notifier.dart';
@@ -53,6 +56,11 @@ class HeadOverHeelsGame extends FlameGame
 
     // Add characters
     await _addCharacters();
+
+    // Everything else the manifest lists arrives after the first frame, and
+    // without holding the game up: the room is on screen, the party is on it, and
+    // the props and effects land as they come. T065.
+    unawaited(SpriteRegistry().initialize());
 
     // Set up camera
     camera.moveTo(Vector2.zero());

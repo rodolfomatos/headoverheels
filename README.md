@@ -16,10 +16,12 @@ tailored to a single game.
 > room now loads, which is T062: the patrol points in the world are lists and the
 > parser wanted a string, so the first monster in the first room threw and the
 > screen stayed black. Checked in a browser, on the web build, with the console
-> read: the room draws its isometric floor and its entities, and the minute of
-> black screen before it is the first frame waiting for every sprite in the
-> game, one at a time, which is T065. Four of the five planets also have no
-> tileset of their own yet, which is T058. The board in `aes/kanban.md` is the authority on
+> read: the room draws its isometric floor and its entities. The black screen
+> before it was the first frame waiting for every sprite in the game, 65 images
+> of 316 KB decoded one at a time; a character now waits for its own twelve
+> rather than for all of them, which brought the room on screen from a minute to
+> half a minute in the same browser, and T065 has the rest. Four of the five
+> planets also have no tileset of their own yet, which is T058. The board in `aes/kanban.md` is the authority on
 > what is done and what is not.
 
 ---

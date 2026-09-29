@@ -35,8 +35,10 @@ class CharacterComponent extends PositionComponent with CollisionCallbacks {
     _animation = SpriteAnimationComponent(size: size, anchor: Anchor.center);
     add(_animation);
 
-    // Initialize sprite registry and load animations
-    await SpriteRegistry().initialize();
+    // Only this character's sprites, which is what the party needs to be on the
+    // first frame. The registry used to load all 65 entries here, so the room
+    // waited for props and effects the player is not looking at.
+    await SpriteRegistry().loadCharacter(_spriteKeyFor(type));
 
     // Listen to state changes via Riverpod's ref.listen
     final provider = type == CharacterType.head ? headProvider : heelsProvider;
@@ -109,3 +111,10 @@ class CharacterComponent extends PositionComponent with CollisionCallbacks {
     return ref.read(provider);
   }
 }
+
+/// The name the manifest gives a character's sprites: `head`, `heels` or `duo`.
+String _spriteKeyFor(CharacterType type) => switch (type) {
+  CharacterType.head => 'head',
+  CharacterType.heels => 'heels',
+  CharacterType.combined => 'duo',
+};

@@ -232,6 +232,125 @@ assets:
     metadata:
       variant: "castle"
   -
+    id: "prop.scroll.idle.down"
+    file: "props/scroll_castle.png"
+    category: "prop"
+    entity: "scroll"
+    theme: "castle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "castle"
+  -
+    id: "prop.emerald.idle.down"
+    file: "props/emerald_castle.png"
+    category: "prop"
+    entity: "emerald"
+    theme: "castle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "castle"
+  -
+    id: "prop.jewel.idle.down"
+    file: "props/jewel_castle.png"
+    category: "prop"
+    entity: "jewel"
+    theme: "castle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "castle"
+  -
+    id: "prop.chalice.idle.down"
+    file: "props/chalice_castle.png"
+    category: "prop"
+    entity: "chalice"
+    theme: "castle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "castle"
+  -
+    id: "prop.casket.idle.down"
+    file: "props/casket_castle.png"
+    category: "prop"
+    entity: "casket"
+    theme: "castle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "castle"
+  -
+    id: "prop.pot_of_gold.idle.down"
+    file: "props/pot_of_gold_castle.png"
+    category: "prop"
+    entity: "pot_of_gold"
+    theme: "castle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "castle"
+  -
+    id: "prop.golden_key.idle.down"
+    file: "props/golden_key_castle.png"
+    category: "prop"
+    entity: "golden_key"
+    theme: "castle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "castle"
+  -
     id: "prop.ball.idle.down"
     file: "props/ball_jungle.png"
     category: "prop"
@@ -355,6 +474,125 @@ assets:
     file: "props/wizard_jungle.png"
     category: "prop"
     entity: "wizard"
+    theme: "jungle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "jungle"
+  -
+    id: "prop.scroll.idle.down"
+    file: "props/scroll_jungle.png"
+    category: "prop"
+    entity: "scroll"
+    theme: "jungle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "jungle"
+  -
+    id: "prop.emerald.idle.down"
+    file: "props/emerald_jungle.png"
+    category: "prop"
+    entity: "emerald"
+    theme: "jungle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "jungle"
+  -
+    id: "prop.jewel.idle.down"
+    file: "props/jewel_jungle.png"
+    category: "prop"
+    entity: "jewel"
+    theme: "jungle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "jungle"
+  -
+    id: "prop.chalice.idle.down"
+    file: "props/chalice_jungle.png"
+    category: "prop"
+    entity: "chalice"
+    theme: "jungle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "jungle"
+  -
+    id: "prop.casket.idle.down"
+    file: "props/casket_jungle.png"
+    category: "prop"
+    entity: "casket"
+    theme: "jungle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "jungle"
+  -
+    id: "prop.pot_of_gold.idle.down"
+    file: "props/pot_of_gold_jungle.png"
+    category: "prop"
+    entity: "pot_of_gold"
+    theme: "jungle"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "jungle"
+  -
+    id: "prop.golden_key.idle.down"
+    file: "props/golden_key_jungle.png"
+    category: "prop"
+    entity: "golden_key"
     theme: "jungle"
     runtime_size:
       width: 32
@@ -504,6 +742,125 @@ assets:
     metadata:
       variant: "cauldron"
   -
+    id: "prop.scroll.idle.down"
+    file: "props/scroll_cauldron.png"
+    category: "prop"
+    entity: "scroll"
+    theme: "cauldron"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "cauldron"
+  -
+    id: "prop.emerald.idle.down"
+    file: "props/emerald_cauldron.png"
+    category: "prop"
+    entity: "emerald"
+    theme: "cauldron"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "cauldron"
+  -
+    id: "prop.jewel.idle.down"
+    file: "props/jewel_cauldron.png"
+    category: "prop"
+    entity: "jewel"
+    theme: "cauldron"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "cauldron"
+  -
+    id: "prop.chalice.idle.down"
+    file: "props/chalice_cauldron.png"
+    category: "prop"
+    entity: "chalice"
+    theme: "cauldron"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "cauldron"
+  -
+    id: "prop.casket.idle.down"
+    file: "props/casket_cauldron.png"
+    category: "prop"
+    entity: "casket"
+    theme: "cauldron"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "cauldron"
+  -
+    id: "prop.pot_of_gold.idle.down"
+    file: "props/pot_of_gold_cauldron.png"
+    category: "prop"
+    entity: "pot_of_gold"
+    theme: "cauldron"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "cauldron"
+  -
+    id: "prop.golden_key.idle.down"
+    file: "props/golden_key_cauldron.png"
+    category: "prop"
+    entity: "golden_key"
+    theme: "cauldron"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "cauldron"
+  -
     id: "prop.ball.idle.down"
     file: "props/ball_mine.png"
     category: "prop"
@@ -640,6 +997,125 @@ assets:
     metadata:
       variant: "mine"
   -
+    id: "prop.scroll.idle.down"
+    file: "props/scroll_mine.png"
+    category: "prop"
+    entity: "scroll"
+    theme: "mine"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "mine"
+  -
+    id: "prop.emerald.idle.down"
+    file: "props/emerald_mine.png"
+    category: "prop"
+    entity: "emerald"
+    theme: "mine"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "mine"
+  -
+    id: "prop.jewel.idle.down"
+    file: "props/jewel_mine.png"
+    category: "prop"
+    entity: "jewel"
+    theme: "mine"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "mine"
+  -
+    id: "prop.chalice.idle.down"
+    file: "props/chalice_mine.png"
+    category: "prop"
+    entity: "chalice"
+    theme: "mine"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "mine"
+  -
+    id: "prop.casket.idle.down"
+    file: "props/casket_mine.png"
+    category: "prop"
+    entity: "casket"
+    theme: "mine"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "mine"
+  -
+    id: "prop.pot_of_gold.idle.down"
+    file: "props/pot_of_gold_mine.png"
+    category: "prop"
+    entity: "pot_of_gold"
+    theme: "mine"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "mine"
+  -
+    id: "prop.golden_key.idle.down"
+    file: "props/golden_key_mine.png"
+    category: "prop"
+    entity: "golden_key"
+    theme: "mine"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "mine"
+  -
     id: "prop.ball.static.down"
     file: "props/ball_tower.png"
     category: "prop"
@@ -763,6 +1239,125 @@ assets:
     file: "props/wizard_tower.png"
     category: "prop"
     entity: "wizard"
+    theme: "tower"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "tower"
+  -
+    id: "prop.scroll.static.down"
+    file: "props/scroll_tower.png"
+    category: "prop"
+    entity: "scroll"
+    theme: "tower"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "tower"
+  -
+    id: "prop.emerald.static.down"
+    file: "props/emerald_tower.png"
+    category: "prop"
+    entity: "emerald"
+    theme: "tower"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "tower"
+  -
+    id: "prop.jewel.static.down"
+    file: "props/jewel_tower.png"
+    category: "prop"
+    entity: "jewel"
+    theme: "tower"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "tower"
+  -
+    id: "prop.chalice.static.down"
+    file: "props/chalice_tower.png"
+    category: "prop"
+    entity: "chalice"
+    theme: "tower"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "tower"
+  -
+    id: "prop.casket.static.down"
+    file: "props/casket_tower.png"
+    category: "prop"
+    entity: "casket"
+    theme: "tower"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "tower"
+  -
+    id: "prop.pot_of_gold.static.down"
+    file: "props/pot_of_gold_tower.png"
+    category: "prop"
+    entity: "pot_of_gold"
+    theme: "tower"
+    runtime_size:
+      width: 32
+      height: 32
+    anchor:
+      x: 16
+      y: 31
+    alpha: "smooth"
+    palette: "base"
+    scale: 1
+    metadata:
+      variant: "tower"
+  -
+    id: "prop.golden_key.static.down"
+    file: "props/golden_key_tower.png"
+    category: "prop"
+    entity: "golden_key"
     theme: "tower"
     runtime_size:
       width: 32

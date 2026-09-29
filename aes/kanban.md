@@ -166,7 +166,9 @@ current_ticket: "T050"
 | T069 | The editor had no project to open | done |
 | T070 | A tap missed its cell once the grid had been dragged | done |
 | T071 | The assets could only be seen in a directory listing | done |
-| T072 | Knight Lore's scrolls and ingredients are not drawn | open |
+| T072 | Knight Lore's scrolls and ingredients are not drawn | done |
+| T073 | Three of the six scrolls are in no chest anywhere | open |
+| T074 | Knight Lore's web build never reaches a rendered room | open |
 
 ## Sprint 11 — Knight Lore Completion
 **Goal**: turn the second example game into a finished product, then migrate the
@@ -593,7 +595,36 @@ first game onto the same platform
   lying on the floor of a room is not on the screen. The game is six ingredients
   and two scrolls, and the player cannot see either. The tests never caught it
   because every test that mentions an item tests the item's logic — pickup,
-  casting, balance — and not one asks whether it is drawn. That is T072.
+  casting, balance — and not one asks whether it is drawn. That is T072,
+  and the tests have teeth: the coverage test names every item that has no
+  loaded sheet (twelve failures, six ingredients and six scrolls, named
+  individually), and the rendering test renders the gatehouse, opens a chest
+  through the real path and renders again, and demands that the second frame is
+  *lighter* — because an item's shadow is drawn whether or not the item is, so
+  light is the number that proves the item is there. Both were run with the
+  drawing switched off to be sure they could fail. The first version of the
+  pixel test passed with the drawing off, because it moved the knight between
+  the two frames and measured the knight; the party is now in place before the
+  first frame, so the only thing that can change the picture is the item.
+* T073, found while drawing T072 and not fixed there. Ten chests in the world
+  hold ten items: the six ingredients, the golden key, and three scrolls. The
+  catalogue has six scrolls and the night is only survivable with Magic Armour
+  or Invisibility — and neither is in any chest. The wolf takes the sabreman
+  every night, the party splits, and nothing in the world can prevent it. The
+  game is still winnable, because the curse lifts on six ingredients in the
+  cauldron and scrolls are never demanded, so this is a headline mechanic with
+  no answer rather than an unwinnable game. Adding three chests is a balance
+  decision, so it is asked for rather than made.
+* T074, measured rather than assumed. The Knight Lore web build sits on
+  "Loading the castle…" and never draws a room. It is not T072: with the eight
+  original prop types the build fetches 50 images and still never draws within
+  150 seconds, and with the fifteen it fetches 85 and still never draws within
+  250. Both were built and measured here. The suspicion is the software
+  renderer in this environment decoding 50-85 small PNGs, which is not what a
+  browser with a GPU does, but that is a suspicion and not a measurement of a
+  real browser, so it is not written down as an excuse. What it does mean is
+  that the item drawing has no browser evidence behind it, and the claim for it
+  rests on the pixel test alone.
 * T064, one line, and it was worth two tests. The menu said "Remastered for
   Android": a remaster nobody made, claimed by a menu that cannot know what
   platform it is on, since the same build serves the web and an APK. It now says

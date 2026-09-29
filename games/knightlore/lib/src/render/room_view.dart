@@ -135,6 +135,23 @@ class RoomView extends Component {
 
   void tick() => _animationTick++;
 
+  /// Every item in the current room, in the order a person would find them.
+  ///
+  /// The renderer asks the session what is on the floor rather than being told,
+  /// so an item cannot be added without becoming visible and an item cannot
+  /// become visible without being on the floor.
+  List<ItemPlacement> drawableItems() {
+    final found = <ItemPlacement>[];
+    for (final entry in session.itemsHere.entries) {
+      found.add(ItemPlacement(itemId: entry.key, position: entry.value));
+    }
+    found.sort((a, b) {
+      final byRow = a.position.y.compareTo(b.position.y);
+      return byRow != 0 ? byRow : a.position.x.compareTo(b.position.x);
+    });
+    return found;
+  }
+
   @override
   void render(ui.Canvas canvas) {
     final map = _map;
@@ -180,6 +197,10 @@ class RoomView extends Component {
         );
         canvas.drawOval(shape.bounds, shape.paint);
       }
+      for (final item in drawableItems()) {
+        final shape = ShadowShape(centre: screenOf(item.position), radius: 7);
+        canvas.drawOval(shape.bounds, shape.paint);
+      }
     }
 
     for (final object in map.objects) {
@@ -201,6 +222,10 @@ class RoomView extends Component {
         ui.Paint()..filterQuality = FilterQuality.none,
       );
     }
+
+    // Items lie on the floor, so they go under the party: a knight standing
+    // next to a scroll is in front of it.
+    _drawItems(canvas);
 
     _renderParty(canvas, frame);
 
@@ -297,6 +322,39 @@ class RoomView extends Component {
 
   String _characterKey(KnightClass knight) => 'character_${knight.id}';
 
+  /// How far below a standing prop an item on the floor is drawn, so a scroll
+  /// lies on the tile instead of standing on it.
+  static const double _itemDrop = 6;
+
+  void _drawItems(ui.Canvas canvas) {
+    for (final item in drawableItems()) {
+      final sprite = sprites[item.spriteName];
+      final centre =
+          screenOf(item.position).translate(0, -kTileHeight / 2 + _itemDrop);
+      if (sprite == null) {
+        // The game can reach this before the art does, and an item the player
+        // has to find cannot be allowed to be invisible: it gets a shape and a
+        // place on the floor rather than nothing.
+        canvas.drawCircle(
+          centre,
+          6,
+          ui.Paint()..color = const Color(0xFFF2D16B),
+        );
+        continue;
+      }
+      canvas.drawImageRect(
+        sprite,
+        Rect.fromLTWH(0, 0, sprite.width.toDouble(), sprite.height.toDouble()),
+        Rect.fromCenter(
+          center: centre,
+          width: sprite.width.toDouble(),
+          height: sprite.height.toDouble(),
+        ),
+        ui.Paint()..filterQuality = FilterQuality.none,
+      );
+    }
+  }
+
   void _drawFrame(
     ui.Canvas canvas,
     ui.Image sheet,
@@ -330,4 +388,19 @@ class RoomView extends Component {
     if (rect == null) return Size.zero;
     return rect.size;
   }
+}
+
+/// An item lying on the floor of a room, and the sheet it is drawn from.
+class ItemPlacement {
+  ItemPlacement({required this.itemId, required this.position});
+
+  /// The item's id in the catalogue, such as `scroll_flip`.
+  final String itemId;
+
+  /// Where it lies, in room coordinates.
+  final Vector3 position;
+
+  /// The name the sprite is looked up under: the item's own name, except for a
+  /// scroll, where all six are the same sheet.
+  String get spriteName => KnightLoreManifest.spriteForItem(itemId);
 }

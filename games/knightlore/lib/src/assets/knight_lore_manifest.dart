@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:iso_core/iso_core.dart';
 
 import '../knight.dart';
+import '../world/items.dart';
 import '../world/knight_lore_world.dart';
 
 /// The asset manifest for Knight Lore, written in the same format the
@@ -16,6 +17,12 @@ class KnightLoreManifest {
   static const String tilesBasePath = 'assets/world/tiles';
 
   /// Every trigger type that has art, in the order the manifest lists them.
+  /// Every prop, ingredient and key that has a sheet, in the order the manifest
+  /// lists them.
+  ///
+  /// The item names are the ones the renderer asks for, so this list is the
+  /// difference between a treasure being on the floor and being a placeholder
+  /// circle: an item whose sheet is not in here is an item nobody can see.
   static const List<String> propTypes = [
     'ball',
     'cauldron',
@@ -25,6 +32,15 @@ class KnightLoreManifest {
     'statue',
     'witch',
     'wizard',
+    // Items. `scroll` was missing here for the whole life of the game: six
+    // sheets were drawn and nothing asked for them.
+    'scroll',
+    'emerald',
+    'jewel',
+    'chalice',
+    'casket',
+    'pot_of_gold',
+    'golden_key',
   ];
 
   static AssetManifest build() {
@@ -83,6 +99,19 @@ class KnightLoreManifest {
 
   /// The tileset image for an area, keyed by the area id used in the world.
   static String tilesetFor(String area) => '$tilesBasePath/$area.png';
+
+  /// The sheet an item lying on the floor is drawn from.
+  ///
+  /// A scroll is one sheet for all six spells: a scroll is a scroll, and the
+  /// spell is written on it, which the inventory already says. Everything else
+  /// is named after the item, so a treasure is a `chalice` and a key is a
+  /// `golden_key`.
+  static String spriteForItem(String itemId) {
+    final item = KlItems.byId(itemId);
+    if (item == null) return itemId;
+    if (item.kind == ItemKind.scroll) return 'scroll';
+    return item.id;
+  }
 
   /// The sprite sheet for a prop in an area.
   static String spriteFor(String prop, String area) =>

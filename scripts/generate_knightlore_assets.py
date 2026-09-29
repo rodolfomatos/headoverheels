@@ -317,11 +317,53 @@ def prop_sprite(kind: str, accent: tuple[int, int, int]) -> Image.Image:
             fill=accent + (255,),
         )
         draw.line([(16, 6), (16, 28)], fill=(255, 255, 255, 180))
+    elif kind == "emerald":
+        draw.polygon([(16, 8), (23, 14), (16, 26), (9, 14)], fill=accent + (255,))
+        draw.polygon([(16, 8), (23, 14), (16, 14)], fill=shade(accent, 1.35) + (255,))
+        draw.line([(16, 8), (16, 26)], fill=shade(accent, 0.6) + (255,))
+    elif kind == "jewel":
+        # A cut stone on its side: a table, a crown and a point.
+        draw.polygon([(8, 12), (24, 12), (20, 26), (12, 26)], fill=accent + (255,))
+        draw.polygon([(8, 12), (24, 12), (21, 16), (11, 16)], fill=shade(accent, 1.4) + (255,))
+        draw.line([(11, 16), (16, 26)], fill=shade(accent, 0.65) + (255,))
+    elif kind == "chalice":
+        # A cup on a stem: the shape of the thing, not a box.
+        draw.polygon([(9, 9), (23, 9), (18, 20), (14, 20)], fill=accent + (255,))
+        draw.rectangle([15, 20, 17, 26], fill=shade(accent, 0.75) + (255,))
+        draw.rectangle([11, 26, 21, 28], fill=shade(accent, 0.6) + (255,))
+        draw.line([(11, 11), (21, 11)], fill=(255, 255, 255, 190))
+    elif kind == "casket":
+        # A long box with a domed lid and a band, because a casket is longer
+        # than it is tall and a chest sprite would be the wrong shape.
+        draw.rectangle([5, 14, 27, 27], fill=brown)
+        draw.rectangle([5, 11, 27, 16], fill=shade(brown[:3], 1.25) + (255,))
+        draw.rectangle([5, 15, 27, 17], fill=accent + (255,))
+        draw.rectangle([14, 17, 18, 24], fill=shade(accent, 0.8) + (255,))
+    elif kind == "pot_of_gold":
+        draw.ellipse([7, 14, 25, 28], fill=(72, 68, 76, 255))
+        draw.ellipse([6, 11, 26, 20], fill=shade((72, 68, 76), 1.3) + (255,))
+        # Coins heaped over the rim, which is the point of a pot of gold.
+        for cx, cy, r in ((11, 12, 3), (16, 10, 3), (21, 12, 3), (19, 8, 2)):
+            draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(226, 186, 74, 255))
+            draw.ellipse(
+                [cx - r, cy - r, cx + r, cy - 1], fill=(248, 224, 132, 255)
+            )
+    elif kind == "golden_key":
+        # Laid flat, because an item on the floor is lying down.
+        draw.rectangle([7, 14, 21, 18], fill=accent + (255,))
+        draw.ellipse([5, 12, 13, 20], outline=accent + (255,), width=2)
+        draw.rectangle([21, 16, 27, 18], fill=accent + (255,))
+        draw.rectangle([24, 18, 26, 22], fill=accent + (255,))
+        draw.rectangle([9, 14, 19, 15], fill=shade(accent, 1.5) + (255,))
     return image
 
 
+# Every prop that has art. The ingredient and key names are the item ids in
+# `KlItems`, because that is what the renderer looks a sheet up by: a mismatch
+# here is a chest that opens into nothing.
 PROPS = ["chest", "cauldron", "wizard", "ball", "statue", "witch", "portcullis",
-         "scroll", "diamond"]
+         "scroll", "diamond", "emerald", "jewel", "chalice", "casket",
+         "pot_of_gold", "golden_key"]
 
 
 def main() -> None:

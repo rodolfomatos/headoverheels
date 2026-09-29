@@ -162,6 +162,7 @@ current_ticket: "T050"
 | T050 | Clear the analyzer warnings in the HoH code | done |
 | T052 | The Palette panel squeezes its controls out of reach | done |
 | T067 | Knight Lore sat on "Loading the castle" with no reason | done |
+| T068 | The editor could not be run: no entry point, no icon font | done |
 
 ## Sprint 11 — Knight Lore Completion
 **Goal**: turn the second example game into a finished product, then migrate the
@@ -521,6 +522,26 @@ first game onto the same platform
   One thing a person should know, which is not in the code: `make run-knightlore`
   serves a *debug* build, where the whole program is compiled in the browser as it
   loads. For playing the game, build it and serve it, or run it in release.
+* T068, the editor, which could not be run at all. It was a library: the shell, the
+  palette, the sprite browser and the TSX authoring view all existed, all were
+  tested, and nothing put them on a screen. It has an entry point now, and
+  `make serve-editor` builds it and serves it on 8082, with `make run-editor` for
+  the debug build it now also has. `flutter create --platforms web` added the
+  scaffolding the web needs, and with it a README that said "A new Flutter
+  project" and a test for a counter: both replaced, the README with what the
+  editor is and does not do, the test with one that opens the app and opens the
+  project picker.
+  The icon font is the part worth remembering. `packages/iso_editor` was the only
+  package in the repository without `uses-material-design: true`, so the Material
+  icon font was never bundled and every icon in the editor rendered as an empty
+  box: the tools, the toolbar, the save button, the picker. It looked fine in a
+  debug build, which is the only way the editor had ever been run, because a
+  debug build does not need the flag. Nobody had seen the editor in a release
+  build because nobody could make one. Found by screenshotting the release build
+  and looking at it, the way every other visual fault in this board was found.
+  What the editor still does not do: keep anything. Its map lives in the page, so
+  closing the browser loses the work. It reads and writes Tiled files through the
+  file gateway and has nowhere to keep a project. That is the next thing it wants.
 * T064, one line, and it was worth two tests. The menu said "Remastered for
   Android": a remaster nobody made, claimed by a menu that cannot know what
   platform it is on, since the same build serves the web and an APK. It now says

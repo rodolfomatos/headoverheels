@@ -1,4 +1,4 @@
-.PHONY: setup run run-headoverheels run-knightlore build-headoverheels build-knightlore test test-packages test-coverage lint format format-check check assets-check doctor help build build-release build-release-apk build-release-appbundle build-release-all build-version generate clean security-scan install
+.PHONY: setup run run-headoverheels run-knightlore serve-headoverheels serve-knightlore serve-editor run-editor build-headoverheels build-knightlore build-editor test test-packages test-coverage lint format format-check check assets-check doctor help build build-release build-release-apk build-release-appbundle build-release-all build-version generate clean security-scan install
 
 # The repository holds two games and three libraries. Nothing at the top level is
 # a package of its own, so every command names the directory it runs in.
@@ -27,6 +27,41 @@ run-headoverheels:
 
 run-knightlore:
 	@cd games/knightlore && $(AES_RUN) --web-port 8081
+
+# Serves a game's web build the way a player would load it.
+#
+# `make run-<game>` is for working on the game: it serves a *debug* build, where
+# the whole program is compiled in the browser as it loads, which is why running
+# Knight Lore that way leaves a person on "Loading the castle" for minutes. These
+# build first and serve the result, so what is on the screen is the game.
+#
+# The server is a foreground process: Ctrl-C stops it. The ports are the same ones
+# `make run-<game>` uses, so the two cannot both be up at once.
+serve: serve-headoverheels
+
+serve-headoverheels:
+	@$(MAKE) build-headoverheels
+	@echo "Head over Heels, release build: http://localhost:8080 (Ctrl-C to stop)"
+	@cd games/headoverheels/build/web && python3 -m http.server 8080
+
+serve-knightlore:
+	@$(MAKE) build-knightlore
+	@echo "Knight Lore, release build: http://localhost:8081 (Ctrl-C to stop)"
+	@cd games/knightlore/build/web && python3 -m http.server 8081
+
+# The editor is a library that has an entry point, so it builds and serves like a
+# game. Its map lives in the page: it can read and write Tiled files through the
+# file gateway, and it keeps nothing between visits.
+build-editor:
+	@cd packages/iso_editor && flutter build web
+
+run-editor:
+	@cd packages/iso_editor && $(AES_RUN) --web-port 8082
+
+serve-editor:
+	@$(MAKE) build-editor
+	@echo "Iso Editor, release build: http://localhost:8082 (Ctrl-C to stop)"
+	@cd packages/iso_editor/build/web && python3 -m http.server 8082
 
 build-headoverheels:
 	@cd $(GAME) && flutter build web

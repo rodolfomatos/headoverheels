@@ -26,7 +26,9 @@ tailored to a single game.
 > than the coloured rectangles they stood in for, so what a player sees is art
 > now. The manifest's frame counts are computed from the files' own headers
 > rather than trusted, so a monster is eight frames and walks, and a key is one
-> image and stands still. Knight Lore decodes its forty-nine images in batches
+> image and stands still. The editor runs: `make serve-editor` builds it and
+> serves it on port 8082. It keeps its map in the page for now, so it does not
+> yet save a project. Knight Lore decodes its forty-nine images in batches
 > rather than one at a time, and a load that fails now says why instead of
 > waiting behind the loader. `make run-knightlore` serves a debug build; build it
 > and serve it to play. The audio goes through a sink a test can replace,
@@ -253,7 +255,7 @@ map format.
 
 | | |
 |---|---|
-| Tests | 340 across five packages, and 169 sprite checks |
+| Tests | 341 across five packages, and 169 sprite checks |
 | Knight Lore | 15 rooms, 5 areas, finished and playable |
 | Head over Heels | 20 rooms, 5 planets, opens and draws; the pixel proof is not a test yet |
 | Sprites | 65 sheets, one manifest per game |

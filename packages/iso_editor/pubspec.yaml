@@ -21,3 +21,10 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+
+flutter:
+  # Every icon in the editor is a Material one. Without this the font is not
+  # bundled and each of them renders as an empty box: the editor looked broken in
+  # a release build and fine in a debug one, which is the only way it had ever
+  # been run.
+  uses-material-design: true

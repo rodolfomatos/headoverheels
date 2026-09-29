@@ -185,6 +185,80 @@ void main() {
     expect(find.byKey(const Key('save-button')), findsOneWidget);
   });
 
+  testWidgets('the inspector panel takes a width and gives some back', (
+    tester,
+  ) async {
+    // The panel was a fixed 320 pixels, which is why its controls were out of
+    // reach and why a fifth tab could not fit: the width was not the window's to
+    // give. The board records two attempts at T052 that were reverted for a
+    // RenderFlex overflow of 98822 pixels, and this is the test that says the
+    // panel can be dragged without the shell breaking.
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    final storage = MemoryEditorStorage();
+    final controller = EditorController(storage: storage);
+    addTearDown(controller.dispose);
+    await tester.pumpWidget(
+      MaterialApp(home: EditorShell(controller: controller)),
+    );
+    await tester.pumpAndSettle();
+
+    final panel = find.byKey(const Key('inspector-panel'));
+    expect(panel, findsOneWidget);
+
+    final before = tester.getSize(panel).width;
+    await tester.drag(
+      find.byKey(const Key('inspector-resize-handle')),
+      const Offset(-80, 0),
+    );
+    await tester.pumpAndSettle();
+    final after = tester.getSize(panel).width;
+
+    expect(
+      after,
+      greaterThan(before),
+      reason: 'dragging the handle wider did nothing',
+    );
+    expect(
+      tester.takeException(),
+      isNull,
+      reason: 'resizing the panel broke the shell',
+    );
+  });
+
+  testWidgets('a narrow panel scrolls its tabs instead of overflowing', (
+    tester,
+  ) async {
+    // What T052 kept hitting: a fifth tab in a narrow column, where the tab bar
+    // could not fit the labels and overflowed by the width of the one that did
+    // not fit. The bar scrolls now, and the shell says so.
+    tester.view.physicalSize = const Size(1000, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    final storage = MemoryEditorStorage();
+    final controller = EditorController(storage: storage);
+    addTearDown(controller.dispose);
+    await tester.pumpWidget(
+      MaterialApp(home: EditorShell(controller: controller)),
+    );
+    await tester.pumpAndSettle();
+
+    final bar = tester.widget<TabBar>(find.byType(TabBar).last);
+    expect(
+      bar.isScrollable,
+      isTrue,
+      reason: 'a tab bar of words in a narrow panel has to scroll',
+    );
+    expect(
+      tester.takeException(),
+      isNull,
+      reason: 'the panel overflowed on a narrow window',
+    );
+  });
+
   testWidgets('map editor view renders a dimetric grid', (tester) async {
     final document = EditorDocument(
       projectName: 'demo',
@@ -370,6 +444,14 @@ void main() {
       ),
     );
 
+    // The tab bar scrolls, so a tab past the panel's edge is off it rather
+
+    // than missing: it has to be scrolled to before it can be tapped.
+
+    await tester.ensureVisible(find.text('Palette'));
+
+    await tester.pumpAndSettle();
+
     await tester.tap(find.text('Palette'));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('load-tsx-button')));
@@ -435,6 +517,14 @@ void main() {
         ),
       ),
     );
+
+    // The tab bar scrolls, so a tab past the panel's edge is off it rather
+
+    // than missing: it has to be scrolled to before it can be tapped.
+
+    await tester.ensureVisible(find.text('Sprites'));
+
+    await tester.pumpAndSettle();
 
     await tester.tap(find.text('Sprites'));
     await tester.pumpAndSettle();
@@ -819,6 +909,14 @@ void main() {
       ),
     );
 
+    // The tab bar scrolls, so a tab past the panel's edge is off it rather
+
+    // than missing: it has to be scrolled to before it can be tapped.
+
+    await tester.ensureVisible(find.text('Sprites'));
+
+    await tester.pumpAndSettle();
+
     await tester.tap(find.text('Sprites'));
     await tester.pumpAndSettle();
     await tester.tap(
@@ -1129,6 +1227,14 @@ void main() {
       MaterialApp(home: EditorShell(controller: controller)),
     );
 
+    // The tab bar scrolls, so a tab past the panel's edge is off it rather
+
+    // than missing: it has to be scrolled to before it can be tapped.
+
+    await tester.ensureVisible(find.text('Graph'));
+
+    await tester.pumpAndSettle();
+
     await tester.tap(find.text('Graph'));
     await tester.pumpAndSettle();
 
@@ -1156,6 +1262,14 @@ void main() {
         ),
       ),
     );
+
+    // The tab bar scrolls, so a tab past the panel's edge is off it rather
+
+    // than missing: it has to be scrolled to before it can be tapped.
+
+    await tester.ensureVisible(find.text('Sprites'));
+
+    await tester.pumpAndSettle();
 
     await tester.tap(find.text('Sprites'));
     await tester.pumpAndSettle();

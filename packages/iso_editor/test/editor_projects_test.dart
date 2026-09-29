@@ -169,6 +169,10 @@ void main() {
     expect(find.text('Knight Lore'), findsWidgets);
 
     // Open the graph tab and count what the Knight Lore world really holds.
+    // The tab bar scrolls, so a tab past the panel's edge is off it rather than
+    // missing: it has to be scrolled to before it can be tapped.
+    await tester.ensureVisible(find.text('Graph').first);
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Graph').first);
     await tester.pumpAndSettle();
     expect(

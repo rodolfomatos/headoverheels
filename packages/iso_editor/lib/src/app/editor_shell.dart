@@ -193,6 +193,52 @@ class _ProjectPicker extends StatelessWidget {
   );
 }
 
+/// The narrowest the room grid is left, in logical pixels.
+const double minCanvasWidth = 320;
+
+/// A panel whose width the person using the editor can drag.
+class _ResizablePanel extends StatelessWidget {
+  const _ResizablePanel({
+    required this.width,
+    required this.minWidth,
+    required this.maxWidth,
+    required this.onWidthChanged,
+    required this.child,
+    super.key,
+  });
+
+  final double width;
+  final double minWidth;
+  final double maxWidth;
+  final ValueChanged<double> onWidthChanged;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        SizedBox(width: width, child: child),
+        // The drag handle. It is the divider between the grid and the panel, so
+        // its position is the panel's width and dragging it moves the edge.
+        MouseRegion(
+          cursor: SystemMouseCursors.resizeLeftRight,
+          child: GestureDetector(
+            key: const Key('inspector-resize-handle'),
+            behavior: HitTestBehavior.opaque,
+            // Dragging the edge to the left makes the panel wider, so the delta
+            // is subtracted. Nothing happens when the drag ends: the width has
+            // already moved, and a final callback would put back the value from
+            // before the last frame.
+            onHorizontalDragUpdate: (details) =>
+                onWidthChanged(width - details.delta.dx),
+            child: const VerticalDivider(width: 8),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _EditorShellState extends State<EditorShell> {
   /// The key of the project this shell is showing.
   String get projectId => widget.project.id;
@@ -205,6 +251,26 @@ class _EditorShellState extends State<EditorShell> {
 
   EditorController get _controller => widget.controller;
   EditorFileGateway? get _fileGateway => widget.fileGateway;
+
+  /// How wide the inspector is, in logical pixels.
+  ///
+  /// The panel was a fixed 320 pixels, which is why a fifth tab could not fit and
+  /// why the controls in it were out of reach: the width was not the window's to
+  /// give. It is a number the person using the editor can change, clamped to what
+  /// the window can spare, so it can never squeeze the room grid away.
+  double _panelWidth = 320;
+  static const double minPanelWidth = 280;
+  static const double maxPanelWidth = 640;
+
+  void _setPanelWidth(double width) {
+    setState(() => _panelWidth = width.clamp(minPanelWidth, maxPanelWidth));
+  }
+
+  /// A width the window can spare: the canvas keeps at least this much.
+  double _panelWidthIn(double available) => _panelWidth.clamp(
+    minPanelWidth,
+    available < minPanelWidth ? available : maxPanelWidth,
+  );
 
   @override
   void initState() {
@@ -306,28 +372,34 @@ class _EditorShellState extends State<EditorShell> {
                 ),
               ),
               const VerticalDivider(width: 1),
-              SizedBox(
-                width: 320,
-                child: _InspectorPanel(
-                  controller: _controller,
-                  manifest: _manifest,
-                  assetsBasePath: widget.assetsBasePath,
-                  tilesets: _tilesets,
-                  selectedTileId: _tileId,
-                  onTileSelected: _selectPaletteTile,
-                  onLoadTileset: _loadTilesetFromFile,
-                  onNewTileset: _authorTileset,
-                  onTileEdited: _editTile,
-                  onTileDeleted: _deleteTile,
-                  onSaveTileset: _saveTileset,
-                  selectedTile: _selectedTile,
-                  onImportSprite: _importSprite,
-                  worldKey: widget.worldKey,
-                  storage: _controller.storage,
-                  onSaveAsset: _saveAsset,
-                  onDeleteAsset: _deleteAsset,
-                  onAddFrames: _addFrames,
-                  projectId: projectId,
+              LayoutBuilder(
+                builder: (context, constraints) => _ResizablePanel(
+                  key: const Key('inspector-panel'),
+                  width: _panelWidthIn(constraints.maxWidth - minCanvasWidth),
+                  minWidth: minPanelWidth,
+                  maxWidth: maxPanelWidth,
+                  onWidthChanged: _setPanelWidth,
+                  child: _InspectorPanel(
+                    controller: _controller,
+                    manifest: _manifest,
+                    assetsBasePath: widget.assetsBasePath,
+                    tilesets: _tilesets,
+                    selectedTileId: _tileId,
+                    onTileSelected: _selectPaletteTile,
+                    onLoadTileset: _loadTilesetFromFile,
+                    onNewTileset: _authorTileset,
+                    onTileEdited: _editTile,
+                    onTileDeleted: _deleteTile,
+                    onSaveTileset: _saveTileset,
+                    selectedTile: _selectedTile,
+                    onImportSprite: _importSprite,
+                    worldKey: widget.worldKey,
+                    storage: _controller.storage,
+                    onSaveAsset: _saveAsset,
+                    onDeleteAsset: _deleteAsset,
+                    onAddFrames: _addFrames,
+                    projectId: projectId,
+                  ),
                 ),
               ),
             ],
@@ -865,6 +937,11 @@ class _InspectorPanel extends StatelessWidget {
       child: Column(
         children: [
           const TabBar(
+            // Scrollable, because the panel can be narrow and the tabs are
+            // words: a non-scrollable bar overflows by the width of the label
+            // that does not fit, which is how a fifth tab broke the shell.
+            isScrollable: true,
+            tabAlignment: TabAlignment.start,
             tabs: [
               Tab(text: 'Project'),
               Tab(text: 'Palette'),

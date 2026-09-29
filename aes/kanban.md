@@ -133,14 +133,15 @@ current_ticket: "T050"
 | T027 | Gameplay Integration | compiles now |
 | T028 | Visual QA | pending |
 | T029 | Final Asset Migration | done |
-| T053 | The sprite registry should read the manifest, not repeat it | pending |
+| T053 | The sprite registry should read the manifest, not repeat it | done |
 | T055 | Show the game on the game screen: it is a placeholder | done |
 | T056 | The bag is carried but does nothing yet | done |
 | T057 | The guardian trigger does not say which planet it guards | done |
 | T058 | Four of the five planets have no tileset | pending |
 | T059 | The pixel-level visual proof of the HoH renderer | pending |
 | T061 | Nowhere to empty the bag: the world has no dispensary | pending |
-| T062 | The game screen is black: the room never finishes loading | pending |
+| T063 | The manifest promises 4 and 8 frames; the art has one pose | pending |
+| T062 | The game screen is black: the room never finishes loading | fixed, unproven |
 
 ## Sprint 10 — Builder Platform
 **Goal**: Extract a reusable isometric engine and build editor/CLI foundations
@@ -182,12 +183,12 @@ first game onto the same platform
 ## Queued
 * T052: The Palette panel squeezes its controls out of reach, and adding a tab
   to it breaks the shell layout
-* T053: The sprite registry should read the manifest, not repeat it
 * T054: Gameplay tests: the rules are barely covered
 * T058: Four of the five planets have no tileset
 * T059: The pixel-level visual proof of the HoH renderer
 * T061: Nowhere to empty the bag: the world has no dispensary
 * T062: The game screen is black: the room never finishes loading
+* T063: The manifest promises 4 and 8 frames; the art has one pose
 
 
 ## Notes
@@ -313,6 +314,36 @@ first game onto the same platform
   number of frames. The world, the room map, the tileset and 65 sprite sheets
   load through awaits that only resolve when the test pumps, so a fixed count
   catches the game half-loaded.
+  T062, the black screen, tracked down by rendering the screen and looking at
+  the frame. Three faults stood between the world and a picture.
+  `_parsePatrolPoints` cast `properties['patrolPoints']` to a `String`, and
+  every patrol point in the world is a list, `[[10, 5, 0], [15, 5, 0]]`. The
+  cast threw for the first monster in the first room, the room's load never
+  finished, and the screen stayed black. Monsters and guardians patrolled nothing
+  because of it, silently: an empty patrol list is a monster that stands still.
+  The parser reads the list the world actually has, and still the string the
+  editor writes.
+  The sprite registry rebuilt the manifest in Dart and got it wrong three ways.
+  It loaded through Flame's shared `Flame.images`, which prefixes
+  `assets/images/`, so every frame asked for
+  `assets/images/assets/sprites/...`: a file that has never existed. It named
+  frames with the direction in the name, `head_idle_n_01.png`, where the art says
+  `front`, `3q`, `side` and `back`. And the frame loop ended on the first
+  failure with a `catch`, so a wrong path and the end of an animation looked the
+  same: the animations came out empty, and the party had nothing to draw. Three
+  of the four other loaders were `TODO`, so entities, props, tiles, UI and
+  effects were never loaded at all. T053 is the fix: the registry reads
+  `assets/sprites/manifest.yaml` through `iso_core`'s `AssetManifest`, the same
+  manifest the editor reads, loads the file each entry names, and says so loudly
+  when a file the manifest promises is not there. All 65 entries load.
+  What is still not proven, and T028 stays open for it: no test in the suite
+  draws a frame of this game. A widget test cannot finish the game's load, because
+  the world, the map, the tileset and 65 sheets load through awaits that resolve
+  only when the test pumps, and the pumping cannot happen inside the `runAsync`
+  the asset decoding needs; a plain test has a real event loop but no audio
+  plugin, and the game starts the planet's music while it loads. Both were tried
+  and both are recorded here rather than left as folklore. The way out is a
+  browser check of the web build, or an audio sink that a test can substitute.
 * Audit of the Sprint 09 backlog, checked against the code rather than the
   board. T025, the atlas: `scripts/pack_atlas.py` is referenced by nothing, the
   Makefile never runs it, and `assets/sprites/atlases/` is empty. The game loads

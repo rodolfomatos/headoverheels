@@ -3,9 +3,17 @@
 
 import 'dart:async';
 
+import 'dart:ui' show Image;
+
+import 'package:flame/cache.dart';
 import 'package:flame/sprite.dart';
-import 'package:flame/flame.dart';
-import 'package:headoverheels/entities/character_state.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:iso_core/iso_core.dart' show AssetEntry, AssetManifest;
+
+/// Where the sprites are, and the file that says which ones there are. Both are
+/// the paths the pubspec publishes and a person reads.
+const String spritesRoot = 'assets/sprites';
+const String manifestKey = '$spritesRoot/manifest.yaml';
 
 /// Central registry for all sprite animations and atlas frames.
 class SpriteRegistry {
@@ -15,102 +23,81 @@ class SpriteRegistry {
   // Asset ID -> SpriteAnimationData mapping
   final Map<String, SpriteAnimationData> _animationData = {};
 
+  /// The images this game loads, with no prefix of their own.
+  ///
+  /// Flame's shared [Flame.images] prefixes `assets/images/`, and the frames
+  /// below are named from the bundle root, so every sprite asked for
+  /// `assets/images/assets/sprites/...`: a file that has never existed. The
+  /// catch that ends the frame loop then hid it, and the animations came out
+  /// empty, so the party drew nothing at all.
+  final Images _images = Images(prefix: '');
+
   static final SpriteRegistry _instance = SpriteRegistry._internal();
   factory SpriteRegistry() => _instance;
   SpriteRegistry._internal();
 
-  /// Initialize the registry with all sprite assets.
+  /// Loads every sprite the manifest lists.
+  ///
+  /// The manifest is the truth: it names the file for each sprite, the
+  /// animation, the direction and the timing, and the editor reads the same one.
+  /// This used to rebuild that knowledge in Dart: it guessed file names from the
+  /// character, the animation and the direction, with `n`, `ne`, `e` and `s` in
+  /// the name where the art says `front`, `3q`, `side` and `back`. Every one of
+  /// those guesses missed, the frame loop ended on the first miss, and the party
+  /// had no sprites at all. The four other loaders below were empty, so entities,
+  /// props, tiles, UI and effects were never loaded either.
   Future<void> initialize() async {
-    await _loadCharacterAnimations();
-    await _loadEntityAnimations();
-    await _loadTileAnimations();
-    await _loadUIAnimations();
-    await _loadEffectAnimations();
-  }
-
-  Future<void> _loadCharacterAnimations() async {
-    // Head animations
-    await _loadCharacterAnimationsForType('head', CharacterType.head);
-    // Heels animations
-    await _loadCharacterAnimationsForType('heels', CharacterType.heels);
-    // Combined/Duo animations
-    await _loadCharacterAnimationsForType('duo', CharacterType.combined);
-  }
-
-  Future<void> _loadCharacterAnimationsForType(
-    String character,
-    CharacterType type,
-  ) async {
-    final animations = <String, List<String>>{
-      'idle': ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'],
-      'walk': ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'],
-      'run': ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'],
-      'jump': ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'],
-      'jumpRise': ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'],
-      'jumpPeak': ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'],
-      'jumpFall': ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'],
-      'land': ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'],
-      'climb': ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'],
-      'carry': ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'],
-      'fire': ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'],
-      'swop': ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'],
-      'hurt': ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'],
-      'death': ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'],
-    };
-
-    for (final entry in animations.entries) {
-      final animName = entry.key;
-      final directions = entry.value;
-
-      for (final direction in directions) {
-        final assetId = 'character.$character.$animName.$direction';
-        await _loadAnimation(assetId, character, animName, direction);
-      }
+    final manifest = await _readManifest();
+    for (final entry in manifest.assets) {
+      await _load(entry);
     }
   }
 
-  Future<void> _loadAnimation(
-    String assetId,
-    String character,
-    String animName,
-    String direction,
-  ) async {
-    // Try to load from individual frames first
-    final frames = <Sprite>[];
-    int frameIndex = 1;
+  Future<AssetManifest> _readManifest() async {
+    final source = await rootBundle.loadString(manifestKey);
+    return AssetManifest.fromYaml(source);
+  }
 
-    while (true) {
-      // The frame name is built from the character, the animation and the
-      // direction, so a missing frame ends the loop rather than throwing.
-      final frameName =
-          'assets/sprites/characters/$character/frames/${character}_${animName}_${direction}_${frameIndex.toString().padLeft(2, '0')}.png';
-
-      try {
-        final image = await Flame.images.load(frameName);
-        final sprite = Sprite(image);
-        frames.add(sprite);
-        frameIndex++;
-      } catch (e) {
-        break; // No more frames
-      }
-    }
-
-    if (frames.isNotEmpty) {
-      final animation = SpriteAnimation.spriteList(
-        frames,
-        stepTime: _getStepTime(animName),
-      );
-      _animations[assetId] = animation;
-      _animationData[assetId] = SpriteAnimationData(
-        assetId: assetId,
-        character: character,
-        animation: animName,
-        direction: direction,
-        frameCount: frames.length,
-        stepTime: _getStepTime(animName),
-        loop: _shouldLoop(animName),
+  /// Loads one manifest entry, as a sprite and, when it is an animation, as an
+  /// animation too.
+  Future<void> _load(AssetEntry entry) async {
+    final path = '$spritesRoot/${entry.file}';
+    final Image image;
+    try {
+      image = await _images.load(path);
+    } catch (error) {
+      // A file the manifest names but the bundle does not have is a real fault,
+      // and a silent one: an animation with no frames draws nothing, which looks
+      // exactly like a game that has not loaded.
+      throw StateError(
+        'The manifest names $path for ${entry.id}, and it is '
+        'not there: $error',
       );
     }
+
+    _sprites[entry.id] = Sprite(image);
+
+    final animation = entry.animation;
+    final character = entry.character;
+    if (animation == null || character == null) return;
+
+    // The manifest says how many frames an animation has. The art has one image
+    // per animation and direction, so that is what an animation is here: one
+    // frame, the file the manifest names. The frames it promises are T063.
+    final frames = <Sprite>[Sprite(image)];
+    _animations[entry.id] = SpriteAnimation.spriteList(
+      frames,
+      stepTime: _getStepTime(animation),
+    );
+    _animationData[entry.id] = SpriteAnimationData(
+      assetId: entry.id,
+      character: character,
+      animation: animation,
+      direction: entry.direction ?? '',
+      frameCount: frames.length,
+      stepTime: _getStepTime(animation),
+      loop: entry.loop ?? _shouldLoop(animation),
+    );
   }
 
   double _getStepTime(String animation) {
@@ -166,22 +153,6 @@ class SpriteRegistry {
       default:
         return true;
     }
-  }
-
-  Future<void> _loadEntityAnimations() async {
-    // TODO: Implement entity animations loading
-  }
-
-  Future<void> _loadTileAnimations() async {
-    // TODO: Implement tile animations loading
-  }
-
-  Future<void> _loadUIAnimations() async {
-    // TODO: Implement UI animations loading
-  }
-
-  Future<void> _loadEffectAnimations() async {
-    // TODO: Implement effect animations loading
   }
 
   /// Get a character animation by asset ID.

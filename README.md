@@ -13,9 +13,11 @@ tailored to a single game.
 > visual test that renders it to images and fails if a room comes out blank or
 > cropped. Head over Heels now opens its world, loads the room map, the tileset
 > and the sprites, and shows the game: five tests stand the real screen up. What
-> is not finished is the room: the game's load never completes, so a rendered
-> frame of the real screen is black apart from the HUD and the touch controls,
-> which is T062. Four of the five planets also have no tileset of their own
+> room now loads, which is T062: the patrol points in the world are lists and the
+> parser wanted a string, so the first monster in the first room threw and the
+> screen stayed black. What is still missing is the proof: no test draws a frame
+> of this game yet, because a widget test cannot finish the load and a plain one
+> has no audio plugin. Four of the five planets also have no tileset of their own
 > yet, which is T058. The board in `aes/kanban.md` is the authority on
 > what is done and what is not.
 
@@ -29,7 +31,7 @@ tailored to a single game.
 | `packages/iso_editor` | Map editor, sprite manager, world graph editor, tileset authoring. Opens either game | 60 tests |
 | `packages/iso_builder_cli` | Project scaffolding and validation | 2 tests |
 | `games/knightlore` | The second game: 15 rooms, 5 areas, the curse rules, the six ingredients, 27 synthesised sounds | 160 tests, playable |
-| `games/headoverheels` | The first game: 20 rooms, 5 planets, 65 sprite sheets, 30 synthesised sounds | 76 tests, screen up, room still loading |
+| `games/headoverheels` | The first game: 20 rooms, 5 planets, 65 sprite sheets, 30 synthesised sounds | 76 tests, room loads, no frame proven |
 
 Nothing at the top level is a package. Each game and each library is its own
 Flutter package, and every Makefile target says which directory it runs in.

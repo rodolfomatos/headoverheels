@@ -108,15 +108,34 @@ class EntityFactoryItems {
     );
   }
 
+  /// The points a monster or a guardian walks between.
+  ///
+  /// The world writes them as a list of triples, `[[10, 5, 0], [15, 5, 0]]`.
+  /// This read a string, `"(10,5,0),(15,5,0)"`, and cast: every patrol point in
+  /// the world is a list, so the cast threw for the first monster in the first
+  /// room, and the room's load never finished. The game came up black.
+  /// The string form is still accepted, because the editor writes that.
   static List<Vector3> _parsePatrolPoints(Map<String, dynamic>? properties) {
-    if (properties == null) return [];
-    final pointsStr = properties['patrolPoints'] as String?;
-    if (pointsStr == null) return [];
+    final points = <Vector3>[];
+    final raw = properties?['patrolPoints'];
+    if (raw is List) {
+      for (final point in raw) {
+        if (point is! List || point.length < 3) continue;
+        points.add(
+          Vector3(
+            (point[0] as num).toDouble(),
+            (point[1] as num).toDouble(),
+            (point[2] as num).toDouble(),
+          ),
+        );
+      }
+      return points;
+    }
+    if (raw is! String) return [];
 
     // Parse format: "(x1,y1,z1),(x2,y2,z2),..."
-    final points = <Vector3>[];
     final regex = RegExp(r'\((-?\d+),(-?\d+),(-?\d+)\)');
-    for (final match in regex.allMatches(pointsStr)) {
+    for (final match in regex.allMatches(raw)) {
       points.add(
         Vector3(
           double.parse(match.group(1)!),

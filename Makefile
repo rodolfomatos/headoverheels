@@ -1,4 +1,4 @@
-.PHONY: setup run run-headoverheels run-knightlore serve-headoverheels serve-knightlore serve-editor run-editor build-headoverheels build-knightlore build-editor test test-packages test-coverage lint format format-check check assets-check doctor help build build-release build-release-apk build-release-appbundle build-release-all build-version generate clean security-scan install
+.PHONY: setup run run-headoverheels run-knightlore serve-headoverheels serve-knightlore serve-editor run-editor build-headoverheels build-knightlore build-editor test test-packages test-coverage lint format format-check check assets-check assets-preview doctor help build build-release build-release-apk build-release-appbundle build-release-all build-version generate clean security-scan install
 
 # The repository holds two games and three libraries. Nothing at the top level is
 # a package of its own, so every command names the directory it runs in.
@@ -88,6 +88,11 @@ test-packages:
 	@cd packages/iso_editor && flutter test
 	@cd packages/iso_builder_cli && dart test
 	@cd games/knightlore && flutter test
+
+# What the games load, laid out to be looked at: every sprite sheet and every
+# sound, in a page. Not a build of anything the games use.
+assets-preview:
+	@python3 scripts/asset_inventory.py
 
 assets-check:
 	@python3 scripts/validation_pipeline.py $(GAME)

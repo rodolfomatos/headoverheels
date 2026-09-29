@@ -165,6 +165,8 @@ current_ticket: "T050"
 | T068 | The editor could not be run: no entry point, no icon font | done |
 | T069 | The editor had no project to open | done |
 | T070 | A tap missed its cell once the grid had been dragged | done |
+| T071 | The assets could only be seen in a directory listing | done |
+| T072 | Knight Lore's scrolls and ingredients are not drawn | open |
 
 ## Sprint 11 — Knight Lore Completion
 **Goal**: turn the second example game into a finished product, then migrate the
@@ -568,6 +570,30 @@ first game onto the same platform
   is why it looked right for so long. A test drives it: tap, drag, tap the same
   place on the grid, and the same cell has to come back. It fails on the old code
   with a cell one step out, and that was checked rather than assumed.
+* T071, asked for as "show me the sprites and the sounds". A person wanted to see
+  the assets and how they are laid out, and the honest answer started with a
+  correction: there is nothing real to extract. The original 1987 games are not
+  the source of any sheet or sound here. `docs/RESEARCH/Head Over Heels.tzx` is
+  in the repository because it was studied, and the sprites the games load are
+  drawn by the generators in `scripts/` and the sounds are computed by each
+  game's `tool/generate_audio.dart`. Copying assets out of the tape image would
+  be redistributing somebody else's work, which is the one thing this repository
+  has never done.
+  So `make assets-preview` shows what there is: every manifest entry with its
+  sheet, animation, direction and frame count, every sheet on disk that no
+  manifest entry points at, and every sound with a player. 117 sheets and 57
+  sounds, in a page, checked in a browser.
+  And the page immediately earned its keep. Head over Heels' two unlisted sheets
+  are the character masters, sliced into the per-direction sheets, which is what
+  they are for. Knight Lore's five are scrolls: `props/scroll_<area>.png`, drawn,
+  on disk, and loaded by nobody, because `propTypes` does not list `scroll` and
+  the runtime builds its own sprite paths instead of reading the manifest meant
+  to describe them. That is not the whole story, and it is worse: nothing in the
+  Knight Lore renderer draws world items at all, so a scroll or an ingredient
+  lying on the floor of a room is not on the screen. The game is six ingredients
+  and two scrolls, and the player cannot see either. The tests never caught it
+  because every test that mentions an item tests the item's logic — pickup,
+  casting, balance — and not one asks whether it is drawn. That is T072.
 * T064, one line, and it was worth two tests. The menu said "Remastered for
   Android": a remaster nobody made, claimed by a menu that cannot know what
   platform it is on, since the same build serves the web and an APK. It now says

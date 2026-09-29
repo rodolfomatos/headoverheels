@@ -179,6 +179,15 @@ from the published descriptions of the games.
 
 ---
 
+## Looking at the assets
+
+`make assets-preview` writes `build/preview/assets/index.html`: every sprite
+sheet the games load, with its animation, direction and frame count, every sheet
+on disk that no manifest points at, and every sound with a player. Open it in a
+browser. None of it comes from the original 1987 games: the sheets are drawn by
+the generators in `scripts/` and the sounds are computed by each game's
+`tool/generate_audio.dart`.
+
 ## Working on it
 
 The board is `aes/kanban.md`: every ticket, its state, and a note under each

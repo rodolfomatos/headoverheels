@@ -141,7 +141,8 @@ current_ticket: "T050"
 | T059 | The pixel-level visual proof of the HoH renderer | pending |
 | T061 | Nowhere to empty the bag: the world has no dispensary | pending |
 | T063 | The manifest promises 4 and 8 frames; the art has one pose | pending |
-| T062 | The game screen is black: the room never finishes loading | fixed, unproven |
+| T064 | The menu calls the game a remaster for Android | pending |
+| T062 | The game screen is black: the first frame waits for 65 sprites | cause found |
 
 ## Sprint 10 — Builder Platform
 **Goal**: Extract a reusable isometric engine and build editor/CLI foundations
@@ -189,6 +190,7 @@ first game onto the same platform
 * T061: Nowhere to empty the bag: the world has no dispensary
 * T062: The game screen is black: the room never finishes loading
 * T063: The manifest promises 4 and 8 frames; the art has one pose
+* T064: The menu calls the game a remaster for Android
 
 
 ## Notes
@@ -342,8 +344,24 @@ first game onto the same platform
   only when the test pumps, and the pumping cannot happen inside the `runAsync`
   the asset decoding needs; a plain test has a real event loop but no audio
   plugin, and the game starts the planet's music while it loads. Both were tried
-  and both are recorded here rather than left as folklore. The way out is a
-  browser check of the web build, or an audio sink that a test can substitute.
+  and both are recorded here rather than left as folklore. So the check was done
+  in a browser, on the web build, with the console read.
+  In the browser the menu draws, and it is the game's own menu: `lib/main.dart`
+  was still the Flutter counter demo, so the web build everybody had been
+  calling green was a build of a demo. The game's menu was unreachable and the
+  two routes it pushes to, `/game` and `/settings`, were not declared anywhere.
+  The entry point now starts the menu, declares both routes, and answers
+  `/settings` with a screen over the settings the game reads. Three tests stand
+  for it, including that the app does not start on a counter any more.
+  With that fixed, the browser reached the game screen. The HUD is right: three
+  lives, `0/4` crowns, the party on Head, the joystick and four buttons. The
+  room is still black, and the console says why: the room loads, all fifteen of
+  its entities, and then the load stops in the characters, where the sprite
+  registry is loading every one of the 65 sprites in the manifest, one at a
+  time, before the first frame. `GameWidget` draws nothing until the game's load
+  is finished, so a black room is the honest picture of a game that is still
+  arriving. It is not stuck: 9 sprites in 12 seconds, which is a minute for the
+  set. The room's own floor could be on screen the whole time.
 * Audit of the Sprint 09 backlog, checked against the code rather than the
   board. T025, the atlas: `scripts/pack_atlas.py` is referenced by nothing, the
   Makefile never runs it, and `assets/sprites/atlases/` is empty. The game loads

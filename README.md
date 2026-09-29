@@ -15,10 +15,10 @@ tailored to a single game.
 > and the sprites, and shows the game: five tests stand the real screen up. What
 > room now loads, which is T062: the patrol points in the world are lists and the
 > parser wanted a string, so the first monster in the first room threw and the
-> screen stayed black. What is still missing is the proof: no test draws a frame
-> of this game yet, because a widget test cannot finish the load and a plain one
-> has no audio plugin. Four of the five planets also have no tileset of their own
-> yet, which is T058. The board in `aes/kanban.md` is the authority on
+> screen stayed black. Checked in a browser, on the web build, with the console
+> read: the menu draws, the room and its fifteen entities load, and the first
+> frame waits for all 65 sprite sheets, one at a time, which is a minute. Four
+> of the five planets also have no tileset of their own yet, which is T058. The board in `aes/kanban.md` is the authority on
 > what is done and what is not.
 
 ---
@@ -31,7 +31,7 @@ tailored to a single game.
 | `packages/iso_editor` | Map editor, sprite manager, world graph editor, tileset authoring. Opens either game | 60 tests |
 | `packages/iso_builder_cli` | Project scaffolding and validation | 2 tests |
 | `games/knightlore` | The second game: 15 rooms, 5 areas, the curse rules, the six ingredients, 27 synthesised sounds | 160 tests, playable |
-| `games/headoverheels` | The first game: 20 rooms, 5 planets, 65 sprite sheets, 30 synthesised sounds | 76 tests, room loads, no frame proven |
+| `games/headoverheels` | The first game: 20 rooms, 5 planets, 65 sprite sheets, 30 synthesised sounds | 78 tests, menu and routes work, first frame slow |
 
 Nothing at the top level is a package. Each game and each library is its own
 Flutter package, and every Makefile target says which directory it runs in.
@@ -240,7 +240,7 @@ map format.
 
 | | |
 |---|---|
-| Tests | 317 across five packages, and 169 sprite checks |
+| Tests | 319 across five packages, and 169 sprite checks |
 | Knight Lore | 15 rooms, 5 areas, finished and playable |
 | Head over Heels | 20 rooms, 5 planets, opens and draws; the pixel proof is not a test yet |
 | Sprites | 65 sheets, one manifest per game |

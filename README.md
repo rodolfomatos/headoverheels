@@ -16,9 +16,10 @@ tailored to a single game.
 > room now loads, which is T062: the patrol points in the world are lists and the
 > parser wanted a string, so the first monster in the first room threw and the
 > screen stayed black. Checked in a browser, on the web build, with the console
-> read: the menu draws, the room and its fifteen entities load, and the first
-> frame waits for all 65 sprite sheets, one at a time, which is a minute. Four
-> of the five planets also have no tileset of their own yet, which is T058. The board in `aes/kanban.md` is the authority on
+> read: the room draws its isometric floor and its entities, and the minute of
+> black screen before it is the first frame waiting for every sprite in the
+> game, one at a time, which is T065. Four of the five planets also have no
+> tileset of their own yet, which is T058. The board in `aes/kanban.md` is the authority on
 > what is done and what is not.
 
 ---
@@ -31,7 +32,7 @@ tailored to a single game.
 | `packages/iso_editor` | Map editor, sprite manager, world graph editor, tileset authoring. Opens either game | 60 tests |
 | `packages/iso_builder_cli` | Project scaffolding and validation | 2 tests |
 | `games/knightlore` | The second game: 15 rooms, 5 areas, the curse rules, the six ingredients, 27 synthesised sounds | 160 tests, playable |
-| `games/headoverheels` | The first game: 20 rooms, 5 planets, 65 sprite sheets, 30 synthesised sounds | 78 tests, menu and routes work, first frame slow |
+| `games/headoverheels` | The first game: 20 rooms, 5 planets, 65 sprite sheets, 30 synthesised sounds | 78 tests, the room draws after a slow first load |
 
 Nothing at the top level is a package. Each game and each library is its own
 Flutter package, and every Makefile target says which directory it runs in.

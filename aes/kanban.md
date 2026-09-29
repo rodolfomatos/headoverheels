@@ -142,7 +142,9 @@ current_ticket: "T050"
 | T061 | Nowhere to empty the bag: the world has no dispensary | pending |
 | T063 | The manifest promises 4 and 8 frames; the art has one pose | pending |
 | T064 | The menu calls the game a remaster for Android | pending |
-| T062 | The game screen is black: the first frame waits for 65 sprites | cause found |
+| T065 | The first frame waits a minute for the whole sprite registry | pending |
+| T066 | Entities draw coloured rectangles, not the sprites the registry loaded | pending |
+| T062 | The game screen is black: the first frame waits for 65 sprites | answered: the room draws |
 
 ## Sprint 10 — Builder Platform
 **Goal**: Extract a reusable isometric engine and build editor/CLI foundations
@@ -191,6 +193,8 @@ first game onto the same platform
 * T062: The game screen is black: the room never finishes loading
 * T063: The manifest promises 4 and 8 frames; the art has one pose
 * T064: The menu calls the game a remaster for Android
+* T065: The first frame waits a minute for the whole sprite registry
+* T066: Entities draw coloured rectangles, not the sprites the registry loaded
 
 
 ## Notes
@@ -362,6 +366,17 @@ first game onto the same platform
   is finished, so a black room is the honest picture of a game that is still
   arriving. It is not stuck: 9 sprites in 12 seconds, which is a minute for the
   set. The room's own floor could be on screen the whole time.
+  Then it was measured properly, in a browser, with the sprite requests counted
+  and the screenshots looked at. The room draws: the isometric floor, its grid,
+  the room's entities. So the black screen was never a camera and never a missing
+  tile; it was a game that had not finished arriving, and `GameWidget` draws
+  nothing until it has. The count says 63 distinct sprite files, which is all of
+  them: the manifest has 65 entries and names the tileset image twice. Nothing is
+  missing and nothing hangs. What a player gets is about a minute of black screen
+  because the first frame waits for every sprite in the game, which is T065, and
+  the entities that are on that floor are still the coloured rectangles their
+  `onLoad` draws rather than the sprites the registry has been loading all this
+  time, which is T066.
 * Audit of the Sprint 09 backlog, checked against the code rather than the
   board. T025, the atlas: `scripts/pack_atlas.py` is referenced by nothing, the
   Makefile never runs it, and `assets/sprites/atlases/` is empty. The game loads

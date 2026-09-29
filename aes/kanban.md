@@ -160,7 +160,7 @@ current_ticket: "T050"
 | T049 | Replace the untracked HoH audio with synthesised cues | done |
 | T051 | Publish nested assets: a pubspec entry ships only its own files | done |
 | T050 | Clear the analyzer warnings in the HoH code | done |
-| T052 | The Palette panel squeezes its controls out of reach | pending |
+| T052 | The Palette panel squeezes its controls out of reach | done |
 
 ## Sprint 11 — Knight Lore Completion
 **Goal**: turn the second example game into a finished product, then migrate the
@@ -184,8 +184,6 @@ first game onto the same platform
   real room, but the proof still has to be made into a test that ends: see T059.
 
 ## Queued
-* T052: The Palette panel squeezes its controls out of reach, and adding a tab
-  to it breaks the shell layout
 * T054: Gameplay tests: the rules are barely covered
 * T058: Four of the five planets have no tileset
 * T059: The pixel-level visual proof of the HoH renderer
@@ -478,6 +476,25 @@ first game onto the same platform
   through a frame, and a test has no way to give it one. Drawing through the
   widget instead does render, and that test never finishes. The browser check is
   the evidence that stands, with a frame on disk.
+* T052, the panel, done the way the board said it had to be done. The work was
+  listed as three steps: make the panel resizable, make the tab bar fit, then
+  move the inspector into a tab of its own. The first two are here.
+  The panel's width was a fixed 320 pixels, which is why its controls were out of
+  reach: the width was not the window's to give. It is a number now, clamped
+  between 280 and 640 and to what the window can spare with the grid keeping its
+  320, and a person drags the edge between the grid and the panel. The tab bar
+  scrolls, because a column of 280 pixels cannot show five words, and a bar that
+  cannot fit its labels overflows by the width of the one that does not fit: that
+  was the 98822 pixels of RenderFlex the board records, twice, in two attempts
+  that were reverted.
+  Two tests, and the second is the one the board said was missing: dragging the
+  handle wider makes the panel wider and the shell does not break, and a narrow
+  window has a scrollable tab bar and no exception. Six shell tests had to learn
+  to scroll a tab into view before tapping it, which is the right way round: a tab
+  past the panel's edge is off it, not missing.
+  The third step is not done and not pretended: the inspector is still in the
+  panel's own column, and moving it into a tab of its own is now a small change
+  rather than a layout rescue.
 * T064, one line, and it was worth two tests. The menu said "Remastered for
   Android": a remaster nobody made, claimed by a menu that cannot know what
   platform it is on, since the same build serves the web and an APK. It now says

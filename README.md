@@ -250,7 +250,7 @@ map format.
 
 | | |
 |---|---|
-| Tests | 335 across five packages, and 169 sprite checks |
+| Tests | 337 across five packages, and 169 sprite checks |
 | Knight Lore | 15 rooms, 5 areas, finished and playable |
 | Head over Heels | 20 rooms, 5 planets, opens and draws; the pixel proof is not a test yet |
 | Sprites | 65 sheets, one manifest per game |

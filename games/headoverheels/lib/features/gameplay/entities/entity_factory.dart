@@ -32,6 +32,7 @@ class EntityFactory {
       case TriggerType.hushPuppy:
       case TriggerType.monster:
       case TriggerType.guardian:
+      case TriggerType.dispensary:
         return EntityFactoryItems.create(trigger, roomId);
     }
   }

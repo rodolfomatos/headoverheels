@@ -132,21 +132,26 @@
     <property name="properties" type="string" value="{itemType: doughnut}"/>
    </properties>
   </object>
+  <object id="16" name="dispensary_castle_start" type="dispensary" x="64.0" y="64.0" width="64.0" height="32.0">
+   <properties>
+    <property name="properties" type="string" value="{planetId: castle}"/>
+   </properties>
+  </object>
  </objectgroup>
  <objectgroup id="4" name="Triggers" width="16" height="16">
-  <object id="16" name="door_east_trigger" type="door" x="960.0" y="256.0" width="64.0" height="32.0">
+  <object id="17" name="door_east_trigger" type="door" x="960.0" y="256.0" width="64.0" height="32.0">
    <properties>
     <property name="targetRoom" type="string" value="castle_cell"/>
     <property name="targetEntrance" type="string" value="west"/>
    </properties>
   </object>
-  <object id="17" name="door_north_trigger" type="door" x="512.0" y="32.0" width="64.0" height="32.0">
+  <object id="18" name="door_north_trigger" type="door" x="512.0" y="32.0" width="64.0" height="32.0">
    <properties>
     <property name="targetRoom" type="string" value="castle_hall"/>
     <property name="targetEntrance" type="string" value="south"/>
    </properties>
   </object>
-  <object id="18" name="door_secret_1_trigger" type="door" x="640.0" y="320.0" width="64.0" height="32.0">
+  <object id="19" name="door_secret_1_trigger" type="door" x="640.0" y="320.0" width="64.0" height="32.0">
    <properties>
     <property name="targetRoom" type="string" value="castle_market"/>
     <property name="targetEntrance" type="string" value="south"/>

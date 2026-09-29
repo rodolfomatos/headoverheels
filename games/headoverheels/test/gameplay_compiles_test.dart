@@ -7,7 +7,9 @@ import 'package:headoverheels/features/gameplay/game.dart';
 import 'package:headoverheels/features/gameplay/room/room_graph.dart';
 import 'package:headoverheels/features/gameplay/room/world_loader.dart';
 import 'package:headoverheels/features/gameplay/state/character_notifier.dart';
+import 'package:headoverheels/features/gameplay/entities/dispensary_entity.dart';
 import 'package:headoverheels/features/gameplay/entities/guardian_entity.dart';
+import 'package:headoverheels/features/gameplay/room/room_component.dart';
 import 'package:headoverheels/features/gameplay/entities/crown_entity.dart';
 import 'package:headoverheels/features/gameplay/entities/entity_factory.dart';
 
@@ -227,6 +229,74 @@ void main() {
       expect(notifier.state.bagItems, isEmpty);
     });
 
+    test('the dispensary empties the bag onto the floor', () async {
+      // The bag fills and stays full: there was nothing in the world to empty it,
+      // and no trigger type for a place that did. The dispensary is that place.
+      final notifier = container.read(heelsProvider.notifier);
+      final heels = _character(container, CharacterType.heels);
+      game.onBagCollected(heels);
+      notifier.stow(const CarriedItem.key('key_a'));
+      notifier.stow(const CarriedItem.other('spring'));
+
+      final room = await _loadedRoom(container);
+      final dispensary = DispensaryEntity(
+        id: 'dispensary_test',
+        triggerZone: TriggerZone(
+          id: 'dispensary_test',
+          type: TriggerType.dispensary,
+          position: Vector3(1, 1, 0),
+          size: Vector2(1, 1),
+          properties: const {'planetId': 'castle'},
+        ),
+      );
+      await room.add(dispensary);
+      final before = room.entities.length;
+
+      dispensary.onInteract(heels);
+
+      expect(notifier.bagContents, isEmpty, reason: 'the bag is still full');
+      expect(notifier.wearsBag, isTrue, reason: 'the bag was taken off');
+      expect(
+        room.entities.length,
+        before + 2,
+        reason: 'the items are on the floor, not in the bag',
+      );
+    });
+
+    test('a character with no bag, or an empty one, changes nothing', () async {
+      final room = await _loadedRoom(container);
+      final dispensary = DispensaryEntity(
+        id: 'dispensary_test',
+        triggerZone: TriggerZone(
+          id: 'dispensary_test',
+          type: TriggerType.dispensary,
+          position: Vector3(1, 1, 0),
+          size: Vector2(1, 1),
+          properties: const {'planetId': 'castle'},
+        ),
+      );
+      await room.add(dispensary);
+      final before = room.entities.length;
+
+      final heels = _character(container, CharacterType.heels);
+      dispensary.onInteract(heels);
+      expect(
+        room.entities.length,
+        before,
+        reason: 'a character with no bag emptied one',
+      );
+
+      final notifier = container.read(heelsProvider.notifier);
+      game.onBagCollected(heels);
+      notifier.stow(const CarriedItem.key('key_a'));
+      dispensary.onInteract(heels);
+      expect(
+        room.entities.length,
+        before + 1,
+        reason: 'an item in a bag comes out',
+      );
+    });
+
     test('the guardian reports itself beaten', () {
       expect(game.guardianDefeated, isFalse);
       game.onGuardianDefeated();
@@ -277,6 +347,28 @@ void main() {
 
 /// A way to get hold of a [Ref] without a widget: the game wants one.
 final _refProvider = Provider<Ref>((ref) => ref);
+
+/// The world's start room, loaded on its own.
+///
+/// The room, not the game: `HeadOverHeelsGame.onLoad` starts the planet's music,
+/// and audioplayers has no implementation in a plain test, so a test about a
+/// dispensary should not be asking for one.
+Future<RoomComponent> _loadedRoom(ProviderContainer container) async {
+  final world = await loadWorldGraph();
+  // Any real room: the dispensary needs a floor to put things on, not the start
+  // room in particular. Looking the start room up by key is its own puzzle.
+  final definition = world.rooms.values.first;
+  final room = RoomComponent(roomId: definition.id, definition: definition);
+  // The game is built and never loaded: an entity that needs the game, like a
+  // dispensary, has to find one, and the game's own load starts the planet's
+  // music, which a plain test has no plugin for.
+  // The test's own container, so the game and the test read and write the same
+  // character state rather than two copies of it.
+  final game = HeadOverHeelsGame(container.read(_refProvider), world);
+  addTearDown(game.dispose);
+  await game.add(room);
+  return room;
+}
 
 /// A guardian built the way the factory builds one, so the test goes through the
 /// data rather than around it, and attached to the game: an entity that is not

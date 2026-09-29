@@ -63,6 +63,23 @@ class CharacterStateNotifier extends StateNotifier<CharacterState> {
 
   /// Puts [item] in the bag, if the bag is worn and has room.
   ///
+  /// Whether this character wears the magic bag.
+  bool get wearsBag => state.hasBag;
+
+  /// What the bag holds, as far as a caller is concerned.
+  List<CarriedItem> get bagContents =>
+      List<CarriedItem>.unmodifiable(state.bagItems);
+
+  /// Takes everything out of the bag and hands it back, for the dispensary.
+  ///
+  /// The bag fills and stays full until there is somewhere to empty it, which is
+  /// the dispensary in the room the party arrives in.
+  List<CarriedItem> emptyBag() {
+    final contents = List<CarriedItem>.of(state.bagItems);
+    if (contents.isNotEmpty) state = state.copyWith(bagItems: const []);
+    return contents;
+  }
+
   /// The magic bag carries four. With no dispensary in the world to take
   /// anything out at, the bag fills and stays full: that is T061, and this is
   /// the half that is a fact about the game rather than a guess about it.

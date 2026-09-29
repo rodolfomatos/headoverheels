@@ -110,6 +110,13 @@
           "position": { "x": 7, "y": 7, "z": 0 },
           "size": { "width": 1, "height": 1 },
           "properties": { "itemType": "doughnut" }
+        },
+        {
+          "id": "dispensary_castle_start",
+          "type": "dispensary",
+          "position": { "x": 1, "y": 2, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "planetId": "castle" }
         }
       ],
       "properties": {}
@@ -375,6 +382,13 @@
           "position": { "x": 2, "y": 2, "z": 0 },
           "size": { "width": 1, "height": 1 },
           "properties": { "patrolPoints": [[2,2,0],[14,2,0]], "waitTime": 1.0 }
+        },
+        {
+          "id": "dispensary_egyptus_entrance",
+          "type": "dispensary",
+          "position": { "x": 1, "y": 1, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "planetId": "egyptus" }
         }
       ],
       "properties": {}
@@ -611,6 +625,13 @@
           "position": { "x": 14, "y": 14, "z": 0 },
           "size": { "width": 1, "height": 1 },
           "properties": { "patrolPoints": [[14,14,0],[2,14,0]], "waitTime": 1.2 }
+        },
+        {
+          "id": "dispensary_penitentiary_entrance",
+          "type": "dispensary",
+          "position": { "x": 1, "y": 1, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "planetId": "penitentiary" }
         }
       ],
       "properties": {}
@@ -770,6 +791,13 @@
           "position": { "x": 2, "y": 2, "z": 0 },
           "size": { "width": 1, "height": 1 },
           "properties": { "patrolPoints": [[2,2,0],[2,14,0]], "waitTime": 1.0 }
+        },
+        {
+          "id": "dispensary_safari_entrance",
+          "type": "dispensary",
+          "position": { "x": 1, "y": 1, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "planetId": "safari" }
         }
       ],
       "properties": {}
@@ -937,6 +965,13 @@
           "position": { "x": 10, "y": 10, "z": 0 },
           "size": { "width": 1, "height": 1 },
           "properties": { "isAlive": true }
+        },
+        {
+          "id": "dispensary_bookworld_entrance",
+          "type": "dispensary",
+          "position": { "x": 1, "y": 1, "z": 0 },
+          "size": { "width": 1, "height": 1 },
+          "properties": { "planetId": "bookworld" }
         }
       ],
       "properties": {}

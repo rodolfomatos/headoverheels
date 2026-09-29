@@ -139,7 +139,7 @@ current_ticket: "T050"
 | T057 | The guardian trigger does not say which planet it guards | done |
 | T058 | Four of the five planets have no tileset | done |
 | T059 | The pixel-level visual proof of the HoH renderer | pending |
-| T061 | Nowhere to empty the bag: the world has no dispensary | pending |
+| T061 | Nowhere to empty the bag: the world has no dispensary | done |
 | T063 | The manifest promised frames the art did not have | done, characters still one pose |
 | T064 | The menu calls the game a remaster for Android | pending |
 | T065 | The first frame waits a minute for the whole sprite registry | done |
@@ -451,6 +451,19 @@ first game onto the same platform
   `assets/images/assets/images/castle.png`. The third time this project has found
   that class of fault by running the game, and the second time a test caught it
   before the commit rather than after.
+  T061, the dispensary. The magic bag carried four and nothing could empty it:
+  the world had no dispensary, no swop, and no trigger type for either, so a bag
+  that filled stayed full for ever. There is now a `dispensary` trigger, an
+  entity that takes everything out of the bag and puts it on the floor of the
+  room it stands in, and one dispensary in each planet's entrance: the room the
+  party arrives in. That placement is a design decision, written down so a person
+  can move it rather than discover it.
+  The entity takes the bag out where it is rather than asking the game which room
+  is current, because an entity that drops things drops them where it stands, and
+  asking the game meant a dispensary in any room but the current one would drop
+  nothing. Two tests hold the rule: a full bag comes out onto the floor with the
+  bag still worn, and a character with no bag, or with an empty one, changes
+  nothing.
 * Audit of the Sprint 09 backlog, checked against the code rather than the
   board. T025, the atlas: `scripts/pack_atlas.py` is referenced by nothing, the
   Makefile never runs it, and `assets/sprites/atlases/` is empty. The game loads

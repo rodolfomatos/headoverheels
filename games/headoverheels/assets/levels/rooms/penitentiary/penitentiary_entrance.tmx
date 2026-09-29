@@ -72,9 +72,14 @@
     <property name="properties" type="string" value="{patrolPoints: [[14, 14, 0], [2, 14, 0]], waitTime: 1.2}"/>
    </properties>
   </object>
+  <object id="6" name="dispensary_penitentiary_entrance" type="dispensary" x="64.0" y="32.0" width="64.0" height="32.0">
+   <properties>
+    <property name="properties" type="string" value="{planetId: penitentiary}"/>
+   </properties>
+  </object>
  </objectgroup>
  <objectgroup id="4" name="Triggers" width="16" height="16">
-  <object id="6" name="door_north_trigger" type="door" x="512.0" y="32.0" width="64.0" height="32.0">
+  <object id="7" name="door_north_trigger" type="door" x="512.0" y="32.0" width="64.0" height="32.0">
    <properties>
     <property name="targetRoom" type="string" value="penitentiary_cell_block"/>
     <property name="targetEntrance" type="string" value="south"/>

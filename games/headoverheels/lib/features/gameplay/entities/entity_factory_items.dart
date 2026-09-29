@@ -4,6 +4,7 @@ import 'package:headoverheels/entities/character_state.dart';
 import 'package:headoverheels/features/gameplay/entities/bag_entity.dart';
 import 'package:headoverheels/features/gameplay/entities/crown_entity.dart';
 import 'package:headoverheels/features/gameplay/entities/dropped_item_entity.dart';
+import 'package:headoverheels/features/gameplay/entities/dispensary_entity.dart';
 import 'package:headoverheels/features/gameplay/entities/guardian_entity.dart';
 import 'package:headoverheels/features/gameplay/entities/hush_puppy_entity.dart';
 import 'package:headoverheels/features/gameplay/entities/monster_entity.dart';
@@ -30,6 +31,8 @@ class EntityFactoryItems {
         return _createMonster(trigger, roomId);
       case TriggerType.guardian:
         return _createGuardian(trigger, roomId);
+      case TriggerType.dispensary:
+        return _createDispensary(trigger, roomId);
       default:
         return null;
     }
@@ -87,6 +90,10 @@ class EntityFactoryItems {
       triggerZone: trigger,
       patrolPoints: patrolPoints,
     );
+  }
+
+  static PuzzleEntity _createDispensary(TriggerZone trigger, RoomId roomId) {
+    return DispensaryEntity(id: trigger.id, triggerZone: trigger);
   }
 
   static PuzzleEntity _createGuardian(TriggerZone trigger, RoomId roomId) {

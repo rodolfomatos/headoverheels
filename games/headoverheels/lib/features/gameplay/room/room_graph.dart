@@ -95,6 +95,7 @@ enum TriggerType {
   hushPuppy,
   monster,
   guardian,
+  dispensary,
 }
 
 /// Trigger zone for room transitions.

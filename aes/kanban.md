@@ -137,7 +137,7 @@ current_ticket: "T050"
 | T055 | Show the game on the game screen: it is a placeholder | done |
 | T056 | The bag is carried but does nothing yet | done |
 | T057 | The guardian trigger does not say which planet it guards | done |
-| T058 | Four of the five planets have no tileset | pending |
+| T058 | Four of the five planets have no tileset | done |
 | T059 | The pixel-level visual proof of the HoH renderer | pending |
 | T061 | Nowhere to empty the bag: the world has no dispensary | pending |
 | T063 | The manifest promised frames the art did not have | done, characters still one pose |
@@ -430,6 +430,27 @@ first game onto the same platform
   a pose that does not change, so the party slides. The generator draws
   `idle`, `walk` and `jump` with the same drawing, and real frames are a cycle of
   leg positions that nobody has drawn.
+* T058 was not missing art either. `assets/sprites/tiles/` has a 1024x512 sheet
+  for egyptus, safari, bookworld and penitentiary, exactly as the castle has
+  one, and the four planets drew the castle because the room generator could not
+  find their tileset: it looked for
+  `games/headoverheels/assets/levels/tilesets/<theme>.tsx` from a working
+  directory of `games/headoverheels`, a path that has never existed, and fell
+  back to the castle one without saying so. Every path in that script is now
+  resolved from the script's own location, and a missing tileset is an error
+  rather than a fallback.
+  `scripts/publish_planet_tilesets.py` publishes all five: it takes the sheet,
+  masks it into diamonds, and writes the tileset with the tile count and the
+  column count *measured from the PNG's own header*, so a sheet that changes size
+  cannot leave a tileset describing something else. `--check` is in `make check`.
+  Two tests hold the result: every room draws the tileset of its own theme, and
+  every tileset a room names exists and names an image that exists.
+  The first version of that script wrote `assets/images/<theme>.png` into the
+  tileset, and the screen tests refused to let it through: flame_tiled resolves
+  a tileset's image under `assets/images/`, so it asked for
+  `assets/images/assets/images/castle.png`. The third time this project has found
+  that class of fault by running the game, and the second time a test caught it
+  before the commit rather than after.
 * Audit of the Sprint 09 backlog, checked against the code rather than the
   board. T025, the atlas: `scripts/pack_atlas.py` is referenced by nothing, the
   Makefile never runs it, and `assets/sprites/atlases/` is empty. The game loads

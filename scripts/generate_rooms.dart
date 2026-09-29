@@ -2,8 +2,22 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:vector_math/vector_math.dart';
 
+/// The game this script writes the rooms of, found from the script's own place.
+///
+/// Every path in here used to be relative to the working directory, and the
+/// script is run from inside the game: `dart run ../../scripts/generate_rooms.dart`.
+/// So the tileset lookup asked for
+/// `games/headoverheels/assets/levels/tilesets/castle.tsx` from inside
+/// `games/headoverheels`, a path that has never existed, and every room fell
+/// back to the castle one without saying so. Paths that depend on where a
+/// command was typed from are how that happened.
+final Directory gameRoot = Directory(
+  '${File.fromUri(Platform.script).parent.parent.path}/games/headoverheels',
+);
+
 void main() {
-  final worldJson = File('assets/levels/world.json').readAsStringSync();
+  final worldJson = File('${gameRoot.path}/assets/levels/world.json')
+      .readAsStringSync();
   final world = json.decode(worldJson) as Map<String, dynamic>;
   final roomsJson = world['rooms'] as Map<String, dynamic>;
 
@@ -14,12 +28,12 @@ void main() {
     final theme = roomJson['theme'] as String;
     final triggersJson = roomJson['triggers'] as List<dynamic>;
 
-    final outputDir = 'assets/levels/rooms/${theme}';
+    final outputDir = '${gameRoot.path}/assets/levels/rooms/${theme}';
     Directory(outputDir).createSync(recursive: true);
 
     final tmx = generateTMX(roomId, theme, triggersJson);
     File('$outputDir/${roomId}.tmx').writeAsStringSync(tmx);
-    print('Generated $outputDir/${roomId}.tmx');
+    print('Generated ${roomId}.tmx');
   }
 }
 
@@ -32,18 +46,19 @@ String generateTMX(String roomId, String theme, List<dynamic> triggers) {
   // The path the runtime resolves. It has to start at the bundle root, and the
   // tileset has to exist: a map pointing at art nobody drew is a room that
   // cannot load.
-  final tileset = File('games/headoverheels/assets/levels/tilesets/$theme.tsx');
+  // Every planet has a tileset of its own now, published by
+  // scripts/publish_planet_tilesets.py from the art in assets/sprites/tiles/.
+  // This used to fall back to the castle one, so all five planets drew the same
+  // stone and nothing said so.
+  final tileset = File('${gameRoot.path}/assets/levels/tilesets/$theme.tsx');
   if (!tileset.existsSync()) {
-    // The castle tileset stands in for every planet until the other four are
-    // drawn. See T058.
     stderr.writeln(
-      'No tileset for the $theme of $roomId; using the castle one. T058.',
+      'The $theme of $roomId has no tileset. Run '
+      'scripts/publish_planet_tilesets.py.',
     );
+    exit(1);
   }
-  sb.writeln(
-    ' <tileset firstgid="1" '
-    'source="assets/levels/tilesets/${tileset.existsSync() ? theme : 'castle'}.tsx"/>',
-  );
+  sb.writeln(' <tileset firstgid="1" source="assets/levels/tilesets/$theme.tsx"/>');
   // The tileset, in ids rather than gids: 0-15 are floors and 16-31 are walls,
   // and a gid of 0 is no tile at all. The floors used to be all zeros, so every
   // room drew nothing but its border, and the border used gid 2, which is tile id

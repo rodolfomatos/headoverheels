@@ -20,8 +20,9 @@ tailored to a single game.
 > before it was the first frame waiting for every sprite in the game, 65 images
 > of 316 KB decoded one at a time. A character now waits for the four images of
 > its idle pose and nothing else, which brings the room on screen in 7 seconds
-> where it took a minute. Four of the five planets also have no tileset of their
-> own yet, which is T058. The entities draw the sprites the manifest holds rather
+> where it took a minute. Every planet has a tileset of its own now, published
+> from the art in `assets/sprites/tiles/` with the tile counts measured from the
+> sheets themselves, and `make check` fails if one goes missing. The entities draw the sprites the manifest holds rather
 > than the coloured rectangles they stood in for, so what a player sees is art
 > now. The manifest's frame counts are computed from the files' own headers
 > rather than trusted, so a monster is eight frames and walks, and a key is one
@@ -247,7 +248,7 @@ map format.
 
 | | |
 |---|---|
-| Tests | 326 across five packages, and 169 sprite checks |
+| Tests | 329 across five packages, and 169 sprite checks |
 | Knight Lore | 15 rooms, 5 areas, finished and playable |
 | Head over Heels | 20 rooms, 5 planets, opens and draws; the pixel proof is not a test yet |
 | Sprites | 65 sheets, one manifest per game |

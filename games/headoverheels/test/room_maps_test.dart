@@ -51,6 +51,57 @@ void main() {
     return (firstGid: firstGid, tileCount: tileCount);
   }
 
+  test('every room draws its own planet', () async {
+    // Four of the five planets had no tileset, and the room generator fell back
+    // to the castle one for every room without saying so, so all five planets
+    // drew the same stone. The art was in assets/sprites/tiles/ the whole time.
+    final world = await loadWorldGraph();
+    for (final room in world.rooms.values) {
+      final tmx = File(room.tmxFile).readAsStringSync();
+      final source = RegExp(r'source="([^"]+)"').firstMatch(tmx)!.group(1)!;
+      expect(
+        source,
+        endsWith('/${room.theme}.tsx'),
+        reason: '${room.id} is a ${room.theme} room and draws something else',
+      );
+    }
+  });
+
+  test('every tileset a room names is one the game can load', () async {
+    // A tileset that does not exist, or an image it does not name, is a room
+    // that draws nothing: the floor tests above read the numbers, not the art.
+    final world = await loadWorldGraph();
+    final named = <String>{};
+    for (final room in world.rooms.values) {
+      named.add(
+        RegExp(
+          r'source="([^"]+)"',
+        ).firstMatch(File(room.tmxFile).readAsStringSync())!.group(1)!,
+      );
+    }
+
+    for (final path in named) {
+      final tsx = File(path);
+      expect(tsx.existsSync(), isTrue, reason: '$path is named and not there');
+      final image = RegExp(
+        r'<image[^>]*source="([^"]+)"',
+      ).firstMatch(tsx.readAsStringSync())!.group(1)!;
+      // A tileset names its image by file name: flame_tiled resolves it under
+      // `assets/images/`, so a path that already starts with that asks for
+      // `assets/images/assets/images/castle.png`.
+      expect(
+        image,
+        isNot(startsWith('assets/')),
+        reason: '${tsx.path} names $image, and the loader prefixes that',
+      );
+      expect(
+        File('assets/images/$image').existsSync(),
+        isTrue,
+        reason: '${tsx.path} names $image, and it is not there',
+      );
+    }
+  });
+
   test('every room draws a floor', () async {
     final world = await loadWorldGraph();
     expect(world.rooms, isNotEmpty, reason: 'the world has no rooms');

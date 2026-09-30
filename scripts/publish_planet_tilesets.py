@@ -29,17 +29,31 @@ from tileset_geometry import apply_diamond_mask
 
 ROOT = Path(__file__).parent.parent
 GAME = ROOT / "games" / "headoverheels"
-# The worlds' themes, and the sheet each one's art lives in. `castle` is the odd
-# one: its sheet was written straight to the published place by an older
-# generator, so there is nothing to copy for it.
+# The worlds' themes, and the sheet each one's art lives in.
+#
+# Castle used to point at `assets/images/castle.png` — the published file — with a
+# comment saying an older generator had written it straight there. Which means
+# there was nothing to copy, nothing to check, and the sheet the game draws was
+# whatever that generator left behind: 726 opaque pixels out of 524,288. The
+# castle is where a party starts, so the first room of the game had no floor, and
+# nothing said so. The art was in the repository the whole time, one directory
+# away, written by `generate_castle_tileset.py`.
 THEMES = {
-    "castle": GAME / "assets" / "images" / "castle.png",
+    "castle": GAME / "assets" / "sprites" / "tiles" / "castle" / "castle_masters.png",
     "egyptus": GAME / "assets" / "sprites" / "tiles" / "egyptus.png",
     "penitentiary": GAME / "assets" / "sprites" / "tiles" / "penitentiary.png",
     "safari": GAME / "assets" / "sprites" / "tiles" / "safari.png",
     "bookworld": GAME / "assets" / "sprites" / "tiles" / "bookworld.png",
 }
 TILE_W, TILE_H = 64, 32
+# A sheet is mostly unused: the generators draw the families they need and leave
+# the rest of the 256 cells empty, so the castle sits at 6% while every tile its
+# rooms actually reference is a full diamond. This floor is therefore only here to
+# catch a sheet that never got its art at all — the castle was 0.1% for years and
+# the check called it published. Whether the tiles a room *uses* are drawn is a
+# sharper question, and it is asked per tile in the Dart test, where the room
+# data lives.
+MIN_OPAQUE = 0.02
 COLUMNS = 16
 IMAGE_ROOT = GAME / "assets" / "images"
 TILESET_ROOT = GAME / "assets" / "levels" / "tilesets"
@@ -50,6 +64,24 @@ TSX = """<?xml version='1.0' encoding='utf-8'?>
  <image source="{theme}.png" width="{width}" height="{height}" />
 </tileset>
 """
+
+
+def already_masked(image: Image.Image) -> bool:
+    """Whether a sheet is already cut into diamonds.
+
+    A masked tile is transparent at its four corners and opaque at its middle, so
+    the first tile's corners answer the question without counting pixels.
+    """
+    alpha = image.convert("RGBA").getchannel("A")
+    corners = ((0, 0), (TILE_W - 1, 0), (0, TILE_H - 1), (TILE_W - 1, TILE_H - 1))
+    return all(alpha.getpixel(corner) == 0 for corner in corners)
+
+
+def opaque_fraction(image: Image.Image) -> float:
+    """How much of a sheet carries a pixel at all."""
+    alpha = image.convert("RGBA").getchannel("A")
+    opaque = sum(1 for value in alpha.getdata() if value > 0)
+    return opaque / float(alpha.size[0] * alpha.size[1])
 
 
 def png_size(path: Path) -> tuple:
@@ -92,6 +124,15 @@ def build(theme: str, source: Path, check: bool) -> bool:
         problems.append(
             f"{published.name} is {png_size(published)}, the art is {(width, height)}"
         )
+    elif opaque_fraction(Image.open(published)) < MIN_OPAQUE:
+        # A sheet of mostly transparent pixels is not a tileset, it is a room
+        # with no floor in it. The castle sat at 0.1% and the check called it
+        # published, because the check compared dimensions and never looked.
+        problems.append(
+            f"{published.name} is "
+            f"{opaque_fraction(Image.open(published)):.1%} opaque, which is a "
+            f"planet with no floor rather than a tileset"
+        )
     if not tileset.exists():
         problems.append(f"missing {tileset.relative_to(GAME)}")
     elif tileset.read_text().strip() != wanted_tileset:
@@ -113,7 +154,12 @@ def build(theme: str, source: Path, check: bool) -> bool:
     TILESET_ROOT.mkdir(parents=True, exist_ok=True)
     if source != published:
         image = Image.open(source).convert("RGBA")
-        apply_diamond_mask(image).save(published, optimize=True)
+        # Every sheet is written already masked, by `save_masked` in the
+        # generators. Masking one again is not the no-op the old comment claimed:
+        # on the castle it took the art from 33,760 opaque pixels to 726.
+        if not already_masked(image):
+            apply_diamond_mask(image)
+        image.save(published, optimize=True)
     tileset.write_text(wanted_tileset + "\n")
     print(f"{theme}: published {count} tiles")
     return True

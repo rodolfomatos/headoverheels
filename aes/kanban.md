@@ -170,7 +170,8 @@ current_ticket: "T050"
 | T073 | Three of the six scrolls are in no chest anywhere | done |
 | T074 | Knight Lore's web build never reaches a rendered room | done |
 | T075 | The room is drawn in the corner, unscaled, at runtime | open |
-| T076 | Head over Heels loads its tileset but never its tileset image | open |
+| T076 | Head over Heels' starting planet had no floor at all | done |
+| T077 | The Head over Heels party is not visible in the room | open |
 
 ## Sprint 11 — Knight Lore Completion
 **Goal**: turn the second example game into a finished product, then migrate the
@@ -909,30 +910,56 @@ first game onto the same platform
 * T038: Second example game, Knight Lore: rules, world, room maps, generated art, Flame loop,
   HUD, keyboard input and a working web build
 
-* T076, found by doing to the second game the check that found T074, and it is
-  the same disease. Head over Heels does render: the HUD is complete and alive,
-  the touch controls work, the keys move the party, the audio warning is the
-  autoplay policy and not the fault. What it does not render is the room. The
-  play area is black with a regular grid of one-pixel dots, and the entities are
-  flat bars a pixel or two tall. There is no floor and no visible knight.
-  The board has claimed for a while that the room, the floor and the entities
-  were observed in the web build. They are not there. That claim came from a
-  screenshot in an earlier session and was never re-checked, which is the same
-  mistake the T074 entry made and the reason this check was worth half an hour.
-  What the network says, measured in the browser and not inferred:
-  `castle_start.tmx` 200, `castle.tsx` 200, and then the tileset image is never
-  requested at all. The `.tsx` in the build is byte-identical to the one in the
-  source and says `<image source="castle.png" width="1024" height="512"/>`, and
-  the image lives at `assets/images/castle.png` while the `.tsx` sits in
-  `assets/levels/tilesets/` beside no image at all. So the chain stops between
-  "the tileset was described" and "the tileset was drawn", and it stops quietly:
-  the whole console for the load is one line of debug output, no error, no
-  warning, no failed request. `TiledComponent.load` resolves with a tileset that
-  has no image in it, and every tile in the room draws nothing.
-  The tests cannot see it, for the same reason Knight Lore's could not: they
-  build the view themselves and hand it an image. The one existing note that
-  came close is T059's, that a plain canvas loads the game "and draws one
-  colour" — that is this bug, described at the time and left as a tail.
-  Not fixed here. Working out whether the image path needs to be published next
-  to the `.tsx`, or whether the game should resolve it, is the next piece of
-  work, and the answer decides which — so it is asked for rather than guessed.
+* T076, done, and the first half of this entry was wrong. The claim that the
+  tileset image "was never requested at all" came from a network filter of mine
+  that only matched `tiles` and `sprites` in a URL, so it did not match
+  `assets/images/castle.png`, and I read a counting mistake as a missing
+  request. The image was being fetched the whole time, from the right place, and
+  it was 200. The entry is corrected rather than deleted because that is the
+  second time in two days that a measurement was reported before it was
+  understood, and both times the browser was the thing that settled it.
+  Head over Heels does render: the HUD is complete and alive, the touch
+  controls work, the keys move the party, the audio warning is the autoplay
+  policy and not the fault. What it did not draw was the floor. The play area
+  was black with a regular grid of one-pixel dots, and the entities were flat
+  bars a pixel or two tall. The board claimed for a long time that the room, the
+  floor and the entities were observed in the web build; the floor was not there.
+  The cause is a publishing script, not the renderer. `publish_planet_tilesets.py`
+  listed castle's sheet as `assets/images/castle.png` — the published file — with
+  a comment saying an older generator had written it straight there. So there was
+  nothing to copy and nothing to check, and the sheet the game drew was whatever
+  that generator left: 726 opaque pixels out of 524,288, which is 0.1% and not a
+  tileset. The real castle art was in the repository the whole time one directory
+  away, at `assets/sprites/tiles/castle/castle_masters.png`, written by
+  `generate_castle_tileset.py` and never used.
+  Two things were wrong on top of each other. The script pointed at the output
+  instead of the input, and it applied the diamond mask to a sheet that already
+  had one — the comment claimed that was a no-op, and on the castle it took the
+  art from 33,760 opaque pixels to 726. The castle sheet is 6% opaque overall and
+  stays that way, because the generator draws the families it needs and leaves
+  most of the 256 cells empty; every tile the castle rooms actually reference —
+  gids 1, 3, 4 for the floor and 17, 18, 19 for the walls — is a full diamond.
+  So the check now has two teeth, aimed at the two ways this failed:
+  `publish_planet_tilesets.py --check` refuses a published sheet that is under 2%
+  opaque, which is far below any real tileset and far above the 0.1% that was
+  called published; and a test asks the sharper question per tile, with the room
+  data in hand: for every gid a room puts on a layer, is there a pixel behind it.
+  The first guard was 25%, which failed the castle for the wrong reason — it
+  measured the whole sheet including the cells no room uses. The threshold now
+  only catches a sheet that never got its art, and the per-tile test does the
+  real work. Both were run with an emptied castle to be sure they fire, naming
+  every tile that had nothing behind it.
+  The room's test also encoded the wrong thing and had to be corrected: it worked
+  out the image key by joining the tileset's directory to the source, which is
+  what flame_tiled does when the tileset has a source — and a `.tsx` parsed on
+  its own leaves that source null, so the key is the bare file name and Flame's
+  own `assets/images/` prefix finds it. The test was describing the code as read
+  rather than as run, and it passed. It now asserts the resolved path, with the
+  reason recorded.
+  What it looks like now, in a real browser: a sixteen-by-sixteen isometric
+  castle floor filling the view, a wall border around it, moss speckling the
+  top-left corner. That is the first floor Head over Heels has ever drawn.
+  What is still missing from that frame is the party: the room renders and the
+  knight does not appear in it. That is the next thing to look at, and it is
+  filed as T077 rather than glossed over here.
+

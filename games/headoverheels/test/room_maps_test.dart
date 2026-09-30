@@ -1,7 +1,49 @@
 import 'dart:io';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:headoverheels/features/gameplay/room/world_loader.dart';
+
+/// A published tileset as raw pixels, decoded once and kept.
+class Sheet {
+  Sheet(this.rgba, this.width, this.height);
+
+  final Uint8List rgba;
+  final int width;
+  final int height;
+
+  /// How many of the 64x32 tile's pixels carry any paint at all.
+  int paintedIn(int column, int row) {
+    var painted = 0;
+    for (var y = row * 32; y < row * 32 + 32; y++) {
+      for (var x = column * 64; x < column * 64 + 64; x++) {
+        if (rgba[(y * width + x) * 4 + 3] > 0) painted++;
+      }
+    }
+    return painted;
+  }
+}
+
+final Map<String, Sheet?> _sheets = {};
+
+Future<Sheet?> _tilesetImage(String theme) async {
+  if (_sheets.containsKey(theme)) return _sheets[theme];
+  final file = File('assets/images/$theme.png');
+  if (!file.existsSync()) {
+    _sheets[theme] = null;
+    return null;
+  }
+  final codec = await ui.instantiateImageCodec(file.readAsBytesSync());
+  final frame = await codec.getNextFrame();
+  final image = frame.image;
+  final data = (await image.toByteData(format: ui.ImageByteFormat.rawRgba))!;
+  return _sheets[theme] = Sheet(
+    data.buffer.asUint8List(),
+    image.width,
+    image.height,
+  );
+}
 
 /// Checks the room maps against the room maps the generator writes.
 ///
@@ -51,6 +93,50 @@ void main() {
     return (firstGid: firstGid, tileCount: tileCount);
   }
 
+  test('every tile a room uses is actually drawn in its planet', () async {
+    // A tileset can exist, be the right size, be named by the map, and still
+    // draw nothing: the castle was 0.1% opaque — 726 pixels out of 524,288 —
+    // and the room it names is where a party starts. Every check so far asked
+    // whether the file was there and whether the numbers were right, and never
+    // whether there was any paint in it.
+    //
+    // So this asks the question per tile, with the room data: for every gid a
+    // room puts on a layer, is there a pixel behind it?
+    final world = await loadWorldGraph();
+    final blank = <String>[];
+
+    for (final room in world.rooms.values) {
+      final tmx = File(room.tmxFile).readAsStringSync();
+      final tileset = tilesetOf(tmx);
+      final image = await _tilesetImage(room.theme);
+      if (image == null) {
+        blank.add('${room.id.value}: no published tileset for ${room.theme}');
+        continue;
+      }
+      final used = <int>{};
+      for (final gids in layersOf(tmx).values) {
+        used.addAll(gids.where((gid) => gid > 0));
+      }
+      for (final gid in used) {
+        final id = gid - tileset.firstGid + 1;
+        final column = (id - 1) % 16;
+        final row = (id - 1) ~/ 16;
+        if (column < 0 || row < 0 || row * 32 + 32 > image.height) {
+          blank.add('${room.id.value}: gid $gid is outside the sheet');
+          continue;
+        }
+        final painted = image.paintedIn(column, row);
+        if (painted == 0) {
+          blank.add(
+            '${room.id.value}: gid $gid (tile $id) is not drawn at all',
+          );
+        }
+      }
+    }
+
+    expect(blank, isEmpty, reason: blank.join('\n'));
+  });
+
   test('every room draws its own planet', () async {
     // Four of the five planets had no tileset, and the room generator fell back
     // to the castle one for every room without saying so, so all five planets
@@ -86,18 +172,27 @@ void main() {
       final image = RegExp(
         r'<image[^>]*source="([^"]+)"',
       ).firstMatch(tsx.readAsStringSync())!.group(1)!;
-      // A tileset names its image by file name: flame_tiled resolves it under
-      // `assets/images/`, so a path that already starts with that asks for
-      // `assets/images/assets/images/castle.png`.
+
+      // How the image key is actually built, measured rather than guessed.
+      //
+      // Parsing a .tsx on its own leaves `Tileset.source` null, and flame_tiled
+      // uses the declared source verbatim whenever that is the case. The key is
+      // therefore the bare file name, and Flame's shared image cache puts its
+      // own prefix in front of it — so the bundle path is
+      // `assets/images/<source>`.
+      //
+      // An earlier version of this test worked out the key by joining the
+      // tileset's directory to the source, which is what flame_tiled does when
+      // the tileset *has* a source. That path has never existed, and the test
+      // asserting it passed, because the test was describing the code as it was
+      // read rather than as it runs.
+      final key = 'assets/images/$image';
       expect(
-        image,
-        isNot(startsWith('assets/')),
-        reason: '${tsx.path} names $image, and the loader prefixes that',
-      );
-      expect(
-        File('assets/images/$image').existsSync(),
+        File(key).existsSync(),
         isTrue,
-        reason: '${tsx.path} names $image, and it is not there',
+        reason:
+            '${tsx.path} names $image, which the loader asks for as $key, '
+            'and that file is not there: the room would draw no floor at all',
       );
     }
   });

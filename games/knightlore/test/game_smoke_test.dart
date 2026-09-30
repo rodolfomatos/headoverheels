@@ -40,6 +40,17 @@ void main() {
     expect(game.error, isNull, reason: '${game.error}');
     expect(game.assetsReady, isTrue);
     expect(game.session, isNotNull);
+    // A loaded game has a room in it. The room is a component: a component that
+    // was never added to the world is never drawn, and the tests that render a
+    // room all built one by hand, so nothing noticed that the real game had
+    // none.
+    expect(
+      game.roomView,
+      isNotNull,
+      reason: 'the game loaded and has nothing to draw with',
+    );
+    expect(game.roomView!.map, isNotNull,
+        reason: 'the room view has no map in it');
     expect(game.session!.roomId, KlRooms.gatehouse);
     expect(game.session!.terrain.width, 8);
     expect(game.screen, GameScreen.title,

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,6 +27,9 @@ class _KnightLoreScreenState extends State<KnightLoreScreen> {
   late final bool _ownsGame;
   final FocusNode _focus = FocusNode();
 
+  /// The delayed attempts to take the keyboard, cancelled if the screen goes.
+  final List<Timer> _focusRetries = <Timer>[];
+
   @override
   void initState() {
     super.initState();
@@ -41,10 +46,26 @@ class _KnightLoreScreenState extends State<KnightLoreScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && !_focus.hasFocus) _focus.requestFocus();
     });
+    // Asking once, in the first frame, is too early on the web: the page has
+    // not settled and the request is thrown away, and the keys then go nowhere
+    // until the player clicks. Asking again over the first few seconds costs
+    // nothing and is the difference between a game you can play by pressing
+    // keys and a game you have to click first.
+    for (final delay in const [120, 400, 1200, 2500]) {
+      _focusRetries.add(
+        Timer(Duration(milliseconds: delay), () {
+          if (mounted && !_focus.hasFocus) _focus.requestFocus();
+        }),
+      );
+    }
   }
 
   @override
   void dispose() {
+    // A screen that has gone does not get to ask for focus later.
+    for (final timer in _focusRetries) {
+      timer.cancel();
+    }
     if (_ownsGame) _game.dispose();
     _focus.dispose();
     super.dispose();
@@ -90,35 +111,62 @@ class _KnightLoreScreenState extends State<KnightLoreScreen> {
   Widget build(BuildContext context) {
     // The focus sits above the game widget: key events bubble up from the
     // primary focus, and the game widget may hold it.
-    return Focus(
-      focusNode: _focus,
-      autofocus: true,
-      onKeyEvent: _onKey,
-      child: Scaffold(
-        backgroundColor: const Color(0xFF101216),
-        body: Stack(
-          children: [
-            Positioned.fill(
-              child: GameWidget(
-                game: _game,
-              ),
+    // A page that has not been clicked yet hands the keyboard to the browser's
+    // own view, and the request made in the first frame is thrown away with it.
+    // The result is a game that has loaded and cannot be played, because the
+    // keys go nowhere. Asking again on the first pointer event is what a person
+    // means by "I am here now".
+    return Listener(
+      onPointerDown: (_) {
+        _focus.requestFocus();
+        // The click is also how the game starts. The title says "press space to
+        // begin", and in a browser the space does not arrive until the page has
+        // been clicked, so a person who believed the title would be pressing a
+        // dead key at a dead screen. Clicking is the gesture they have already
+        // made, and it is the one the platform lets through.
+        if (_game.screen == GameScreen.title) {
+          _game.handleKey(' ');
+          setState(() {});
+        }
+      },
+      child: Focus(
+        focusNode: _focus,
+        autofocus: true,
+        onKeyEvent: _onKey,
+        child: Scaffold(
+          backgroundColor: const Color(0xFF101216),
+          // The loader and the overlay depend on a flag the game sets when its
+          // asynchronous load finishes. Reading a plain bool here meant the
+          // screen kept whatever it first drew, and the only thing that ever
+          // redrew it was a keypress — so a game that loaded in half a second
+          // showed "Loading the castle" to anyone who had not pressed a key yet.
+          body: ValueListenableBuilder<LoadState>(
+            valueListenable: _game.loadState,
+            builder: (context, state, __) => Stack(
+              children: [
+                Positioned.fill(
+                  child: GameWidget(
+                    game: _game,
+                  ),
+                ),
+                Positioned.fill(child: _NightVeil(isNight: _game.isNight)),
+                Positioned.fill(
+                    child: _Hud(game: _game, onRefresh: () => setState(() {}))),
+                if (state == LoadState.ready &&
+                    _game.screen != GameScreen.playing)
+                  Positioned.fill(
+                    child: IgnorePointer(child: GameOverlay(game: _game)),
+                  ),
+                // A load that failed says so. The loader covered the error, because
+                // the error is drawn by the overlay and the overlay only appears
+                // once the assets are ready: a game whose world file was missing
+                // sat on "Loading the castle" for ever with the reason underneath
+                // it.
+                if (state == LoadState.loading) const _Loader(),
+                if (state == LoadState.failed) _LoadFailed(error: _game.error!),
+              ],
             ),
-            Positioned.fill(child: _NightVeil(isNight: _game.isNight)),
-            Positioned.fill(
-                child: _Hud(game: _game, onRefresh: () => setState(() {}))),
-            if (_game.assetsReady && _game.screen != GameScreen.playing)
-              Positioned.fill(
-                child: IgnorePointer(child: GameOverlay(game: _game)),
-              ),
-            // A load that failed says so. The loader covered the error, because
-            // the error is drawn by the overlay and the overlay only appears
-            // once the assets are ready: a game whose world file was missing
-            // sat on "Loading the castle" for ever with the reason underneath
-            // it.
-            if (!_game.assetsReady && _game.error == null) const _Loader(),
-            if (!_game.assetsReady && _game.error != null)
-              _LoadFailed(error: _game.error!),
-          ],
+          ),
         ),
       ),
     );

@@ -90,6 +90,42 @@ void main() {
     expect(game.error, contains(KnightLoreWorld.worldKey));
   });
 
+  testWidgets('the loader follows the load finishing, not a keypress', (
+    tester,
+  ) async {
+    // The screen is rebuilt when the game says its load finished. It used to be
+    // rebuilt only by a keypress, so a game that loaded in half a second sat on
+    // "Loading the castle" until somebody pressed something — and in a browser
+    // where the key never arrives at all, for ever.
+    //
+    // The flag is moved directly rather than by mounting a real load: decoding
+    // the game's eighty-five images inside a widget test takes forty-one seconds
+    // and does not finish, which is why no test here ever watched a load happen
+    // on screen. What is under test is the wiring, and the browser is what
+    // proved the wiring in the run this came from.
+    tester.view.physicalSize = const Size(1200, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    final game = gameWith(TestAssetBundle());
+    await tester.pumpWidget(MaterialApp(home: KnightLoreScreen(game: game)));
+    await tester.pump();
+
+    expect(find.textContaining('Loading the castle'), findsOneWidget,
+        reason: 'a game that has not loaded should show the loader');
+
+    // The load finishes. No key is pressed.
+    game.loadState.value = LoadState.ready;
+    await tester.pump();
+
+    expect(
+      find.textContaining('Loading the castle'),
+      findsNothing,
+      reason: 'the game said its load finished and the loader is still up: '
+          'nothing told the screen to redraw',
+    );
+  });
+
   testWidgets('a failed load shows the reason, not the loader', (tester) async {
     // The loader used to cover the error: the reason was drawn by the overlay,
     // and the overlay only appears once the assets are ready, so a game with a

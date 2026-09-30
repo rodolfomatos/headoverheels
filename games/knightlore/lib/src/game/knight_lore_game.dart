@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flame/game.dart';
+import 'package:flutter/foundation.dart' show ValueNotifier;
 import 'package:flutter/services.dart' show AssetBundle, rootBundle;
 import 'package:iso_core/iso_core.dart';
 import 'package:knightlore/knightlore.dart';
@@ -34,6 +35,13 @@ enum GameScreen { title, playing, paused, status, victory, defeat }
 
 /// The playable game. All rules live in [RoomSession]; this class only turns
 /// input into session calls, draws the room and runs the sundial.
+/// Where a load has got to.
+///
+/// `ready` and `failed` are both "finished": a screen that is told a load
+/// finished but not which way it went cannot draw the difference between the
+/// castle and the reason the castle is not there.
+enum LoadState { loading, ready, failed }
+
 class KnightLoreGame extends FlameGame {
   KnightLoreGame({
     this.config = const KnightLoreGameConfig(),
@@ -107,6 +115,19 @@ class KnightLoreGame extends FlameGame {
   /// True once the world, the maps and the art are loaded.
   bool get assetsReady => _loaded;
 
+  /// What the load is doing, or what it did.
+  ///
+  /// The load is asynchronous and nothing else announces it: a widget only
+  /// redraws when something says so, and the screen that shows the loader was
+  /// only redrawing on a keypress. So the game says it here, and a host listens
+  /// to this instead of guessing. A game that loaded in half a second used to
+  /// sit on "Loading the castle" for ever, because nobody asked it a question.
+  ///
+  /// It carries the outcome and not just the fact, because "finished" is not
+  /// enough to draw: a load that failed has to say so, and a bool cannot tell
+  /// the two apart.
+  final ValueNotifier<LoadState> loadState = ValueNotifier(LoadState.loading);
+
   double get dayProgress => _dayProgress;
 
   @override
@@ -114,9 +135,16 @@ class KnightLoreGame extends FlameGame {
     try {
       await _loadWorld();
       await _loadArt();
+      // The room is a Flame component, and a component that is never added to
+      // the world is never drawn. Nothing else in the app added it: every test
+      // that renders a room builds one by hand first, so the suite was green
+      // over a game that drew nothing at all.
+      attachView();
       _loaded = true;
     } catch (failure) {
       error = '$failure';
+    } finally {
+      loadState.value = error == null ? LoadState.ready : LoadState.failed;
     }
   }
 
@@ -167,7 +195,6 @@ class KnightLoreGame extends FlameGame {
   Future<void> _loadArt() async {
     final wanted = _artToLoad();
     final keys = wanted.keys.toList(growable: false);
-
     for (var start = 0; start < keys.length; start += artDecodeBatch) {
       final batch = keys.skip(start).take(artDecodeBatch);
       final images = await Future.wait(
@@ -208,6 +235,12 @@ class KnightLoreGame extends FlameGame {
     final map = _maps[current.roomId];
     if (map != null) view.setRoom(map, _tilesets[map.room.theme]!);
     return view;
+  }
+
+  @override
+  void dispose() {
+    loadState.dispose();
+    super.dispose();
   }
 
   /// Adds the room view once the world and the art are ready.

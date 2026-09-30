@@ -168,7 +168,8 @@ current_ticket: "T050"
 | T071 | The assets could only be seen in a directory listing | done |
 | T072 | Knight Lore's scrolls and ingredients are not drawn | done |
 | T073 | Three of the six scrolls are in no chest anywhere | done |
-| T074 | Knight Lore's web build never reaches a rendered room | open |
+| T074 | Knight Lore's web build never reaches a rendered room | done |
+| T075 | The room is drawn in the corner, unscaled, at runtime | open |
 
 ## Sprint 11 — Knight Lore Completion
 **Goal**: turn the second example game into a finished product, then migrate the
@@ -595,8 +596,18 @@ first game onto the same platform
   lying on the floor of a room is not on the screen. The game is six ingredients
   and two scrolls, and the player cannot see either. The tests never caught it
   because every test that mentions an item tests the item's logic — pickup,
-  casting, balance — and not one asks whether it is drawn. That is T072,
-  and the tests have teeth: the coverage test names every item that has no
+  casting, balance — and not one asks whether it is drawn.
+* T072, the fix for that. Items are drawn on the floor, under the party, with
+  the furniture's shadow treatment and six pixels lower so a scroll lies on a
+  tile rather than standing on it. The renderer asks the session what is on the
+  floor instead of being told, so an item cannot be added without becoming
+  visible and an item with no sheet still gets a shape and a place rather than
+  nothing. Six items had no art at all and one had art nobody asked for: the
+  generator drew scroll_<area>.png for five areas and the runtime's prop list
+  left scroll out, so five finished-looking sheets had been loaded by nobody
+  since the game existed. Thirty new sheets, and the manifest regenerated from
+  45 entries to 80.
+  The tests have teeth: the coverage test names every item that has no
   loaded sheet (twelve failures, six ingredients and six scrolls, named
   individually), and the rendering test renders the gatehouse, opens a chest
   through the real path and renders again, and demands that the second frame is
@@ -634,16 +645,56 @@ first game onto the same platform
   The flood fill found nothing this time — the tiles were checked before the
   chests went in — but the ten older chests pass through it, and a chest added
   inside a wall tomorrow will not.
-* T074, measured rather than assumed. The Knight Lore web build sits on
-  "Loading the castle…" and never draws a room. It is not T072: with the eight
-  original prop types the build fetches 50 images and still never draws within
-  150 seconds, and with the fifteen it fetches 85 and still never draws within
-  250. Both were built and measured here. The suspicion is the software
-  renderer in this environment decoding 50-85 small PNGs, which is not what a
-  browser with a GPU does, but that is a suspicion and not a measurement of a
-  real browser, so it is not written down as an excuse. What it does mean is
-  that the item drawing has no browser evidence behind it, and the claim for it
-  rests on the pixel test alone.
+* T074, done, and the note it opens with was wrong. The Knight Lore web build
+  sat on "Loading the castle…" for ever. What that was *not* is the software
+  renderer: the first thing measured was how long the art takes, and the art
+  takes 462 milliseconds for all eighty-five images in eleven batches. The load
+  was never the problem, and the entry that blamed the environment was a guess
+  written before anything had been measured. It is left standing as the
+  correction it is.
+  There were three faults, stacked, and any one of them alone was enough to
+  strand a player in front of a dead screen.
+  The first was that nothing redrew the screen when the load finished. The
+  loader is removed by a rebuild, the rebuild only ever came from a keypress,
+  and the load is asynchronous — so a game that loaded in half a second showed
+  its loader to anyone who had not pressed a key yet. The game now publishes a
+  `LoadState` and the screen listens to it. It publishes the *outcome* and not a
+  bool, because a load that failed also "finished", and a bool cannot tell a
+  player the difference between the castle and the reason the castle is not
+  there. The test drives the signal directly rather than mounting a real load,
+  because decoding eighty-five images inside a widget test takes forty-one
+  seconds and does not finish, which is why no test here ever watched a load
+  happen on screen.
+  The second was the keyboard. The game asked for focus in the first frame, the
+  browser had not settled, the request was thrown away, and the keys went
+  nowhere: measured, a keypress changed nothing on screen, with or without a
+  click, and the DOM focus was on the browser's own view. Asking again over the
+  first few seconds did not help either — the Flutter focus node only takes the
+  keyboard on a real pointer event — so the click is what the game now listens
+  for, and a click on the title starts the game. The title says "press space to
+  begin" and in a browser the space does not arrive until the page is clicked, so
+  a person who believed the title would be pressing a dead key at a dead screen.
+  The screen cancels those delayed focus requests when it goes, which the test
+  framework pointed out by complaining about a live timer.
+  The third is the one that mattered, and it had nothing to do with loading:
+  `attachView()` was never called. It is the only place that adds the room to
+  the Flame world, and a component that is not in the world is never drawn — so
+  Knight Lore has been running with nothing on screen but the HUD. The game
+  logic worked the whole time: keys moved the party, chests opened, the night
+  fell and the party split. Every test that renders a room builds one by hand
+  first, so the suite was green over a game that drew nothing. The smoke test
+  now says a loaded game has a room in it, and that test was checked to fail
+  with the call removed.
+  What it looks like now, in a real browser, at three times zoom: an isometric
+  gatehouse with its extruded wall blocks, four knights standing where a single
+  sabreman split into four at night, the black ball trap with its shadow, and —
+  the thing T072 could not show before — a golden diamond lying on the floor
+  where the chest dropped it.
+  What is still wrong is filed as T075: the room is drawn in the corner of the
+  window at its own size, because the centring and the scaling live in
+  `renderInto` and the runtime path never applies them. The tests all go through
+  `renderInto`, which is the same helper the code they test uses, so they cannot
+  see it.
 * T064, one line, and it was worth two tests. The menu said "Remastered for
   Android": a remaster nobody made, claimed by a menu that cannot know what
   platform it is on, since the same build serves the web and an APK. It now says

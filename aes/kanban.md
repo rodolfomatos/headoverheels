@@ -170,6 +170,7 @@ current_ticket: "T050"
 | T073 | Three of the six scrolls are in no chest anywhere | done |
 | T074 | Knight Lore's web build never reaches a rendered room | done |
 | T075 | The room is drawn in the corner, unscaled, at runtime | open |
+| T076 | Head over Heels loads its tileset but never its tileset image | open |
 
 ## Sprint 11 — Knight Lore Completion
 **Goal**: turn the second example game into a finished product, then migrate the
@@ -907,3 +908,31 @@ first game onto the same platform
   wizard never repeats a delivered ingredient, and a full playthrough test wins the game
 * T038: Second example game, Knight Lore: rules, world, room maps, generated art, Flame loop,
   HUD, keyboard input and a working web build
+
+* T076, found by doing to the second game the check that found T074, and it is
+  the same disease. Head over Heels does render: the HUD is complete and alive,
+  the touch controls work, the keys move the party, the audio warning is the
+  autoplay policy and not the fault. What it does not render is the room. The
+  play area is black with a regular grid of one-pixel dots, and the entities are
+  flat bars a pixel or two tall. There is no floor and no visible knight.
+  The board has claimed for a while that the room, the floor and the entities
+  were observed in the web build. They are not there. That claim came from a
+  screenshot in an earlier session and was never re-checked, which is the same
+  mistake the T074 entry made and the reason this check was worth half an hour.
+  What the network says, measured in the browser and not inferred:
+  `castle_start.tmx` 200, `castle.tsx` 200, and then the tileset image is never
+  requested at all. The `.tsx` in the build is byte-identical to the one in the
+  source and says `<image source="castle.png" width="1024" height="512"/>`, and
+  the image lives at `assets/images/castle.png` while the `.tsx` sits in
+  `assets/levels/tilesets/` beside no image at all. So the chain stops between
+  "the tileset was described" and "the tileset was drawn", and it stops quietly:
+  the whole console for the load is one line of debug output, no error, no
+  warning, no failed request. `TiledComponent.load` resolves with a tileset that
+  has no image in it, and every tile in the room draws nothing.
+  The tests cannot see it, for the same reason Knight Lore's could not: they
+  build the view themselves and hand it an image. The one existing note that
+  came close is T059's, that a plain canvas loads the game "and draws one
+  colour" — that is this bug, described at the time and left as a tail.
+  Not fixed here. Working out whether the image path needs to be published next
+  to the `.tsx`, or whether the game should resolve it, is the next piece of
+  work, and the answer decides which — so it is asked for rather than guessed.

@@ -1,7 +1,7 @@
 // Monster entity for Head over Heels.
 
 import 'package:flame/components.dart';
-import 'package:flutter/material.dart' show Color, Colors;
+import 'package:flutter/material.dart' show Color;
 import 'package:headoverheels/core/isometric.dart';
 import 'package:headoverheels/features/gameplay/entities/character_component.dart';
 import 'package:headoverheels/features/gameplay/entities/puzzle_entity.dart';
@@ -47,7 +47,10 @@ class MonsterEntity extends PuzzleEntity {
       if (_freezeTimer <= 0) {
         _isFrozen = false;
         // Back to its own colours, the way a rectangle went back to red.
-        tint(Colors.transparent);
+        // `null`, not a transparent colour: a modulate filter with an alpha of
+        // zero multiplies the sprite's own alpha by zero, so a tint meant to
+        // say "no tint" was the thing that made the monster disappear.
+        tint(null);
       }
       return;
     }

@@ -33,7 +33,7 @@
         {
           "id": "door_secret_1",
           "type": "door",
-          "position": { "x": 10, "y": 10, "z": 0 },
+          "position": { "x": 10, "y": 9, "z": 0 },
           "size": { "width": 1, "height": 1 },
           "exit": { "direction": "north", "room": "castle_market", "entrance": "south", "isLocked": true, "keyId": null, "oneWay": false },
           "properties": { "requiresSwitch": "switch_1" }
@@ -41,7 +41,7 @@
         {
           "id": "conveyor_1",
           "type": "conveyor",
-          "position": { "x": 0, "y": 160, "z": 0 },
+          "position": { "x": 0, "y": 6, "z": 0 },
           "size": { "width": 16, "height": 1 },
           "properties": { "conveyorDirection": "east", "conveyorSpeed": 2 }
         },
@@ -101,7 +101,7 @@
         {
           "id": "key_1",
           "type": "key",
-          "position": { "x": 2, "y": 14, "z": 0 },
+          "position": { "x": 3, "y": 14, "z": 0 },
           "size": { "width": 1, "height": 1 }
         },
         {
@@ -359,7 +359,7 @@
         {
           "id": "teleport_castle",
           "type": "teleport",
-          "position": { "x": 8, "y": 15, "z": 0 },
+          "position": { "x": 8, "y": 14, "z": 0 },
           "size": { "width": 2, "height": 2 },
           "properties": { "targetRoom": "castle_teleport", "targetEntrance": "up", "oneWay": false }
         },
@@ -462,7 +462,7 @@
         {
           "id": "hushpuppy_pyramid",
           "type": "hushPuppy",
-          "position": { "x": 10, "y": 10, "z": 0 },
+          "position": { "x": 10, "y": 9, "z": 0 },
           "size": { "width": 1, "height": 1 }
         }
       ],
@@ -602,7 +602,7 @@
         {
           "id": "teleport_egyptus",
           "type": "teleport",
-          "position": { "x": 8, "y": 15, "z": 0 },
+          "position": { "x": 8, "y": 14, "z": 0 },
           "size": { "width": 2, "height": 2 },
           "properties": { "targetRoom": "egyptus_tomb", "targetEntrance": "up", "oneWay": false }
         },
@@ -768,7 +768,7 @@
         {
           "id": "teleport_pen",
           "type": "teleport",
-          "position": { "x": 8, "y": 15, "z": 0 },
+          "position": { "x": 8, "y": 14, "z": 0 },
           "size": { "width": 2, "height": 2 },
           "properties": { "targetRoom": "penitentiary_the_pit", "targetEntrance": "up", "oneWay": false }
         },
@@ -942,7 +942,7 @@
         {
           "id": "teleport_safari",
           "type": "teleport",
-          "position": { "x": 8, "y": 15, "z": 0 },
+          "position": { "x": 8, "y": 14, "z": 0 },
           "size": { "width": 2, "height": 2 },
           "properties": { "targetRoom": "safari_fort", "targetEntrance": "up", "oneWay": false }
         },

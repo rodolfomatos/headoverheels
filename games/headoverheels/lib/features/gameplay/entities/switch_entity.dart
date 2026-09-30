@@ -1,7 +1,7 @@
 // Switch entity for Head over Heels.
 
 import 'package:collection/collection.dart';
-import 'package:flutter/material.dart' show Color, Colors;
+import 'package:flutter/material.dart' show Color;
 import 'package:headoverheels/entities/character_state.dart';
 import 'package:headoverheels/features/gameplay/entities/character_component.dart';
 import 'package:headoverheels/features/gameplay/entities/puzzle_entity.dart';
@@ -57,7 +57,10 @@ class SwitchEntity extends PuzzleEntity {
   }
 
   /// A thrown switch is a tint, the way a coloured rectangle used to be one.
-  void _showState() => tint(isOn ? _thrownTint : Colors.transparent);
+  /// `null` and not a transparent colour, because a modulate filter with an
+  /// alpha of zero erases the sprite: a switch that had not been thrown was
+  /// tinted to nothing, which is why an unthrown switch was not on the screen.
+  void _showState() => tint(isOn ? _thrownTint : null);
 
   /// Green for a thrown switch. The rectangle had it the other way round, which
   /// is not a thing anyone can read.

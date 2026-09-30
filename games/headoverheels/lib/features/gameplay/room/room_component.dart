@@ -1,5 +1,7 @@
 // Room component for Head over Heels.
 
+import 'dart:ui' show Rect;
+
 import 'package:flame/components.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:headoverheels/core/isometric.dart';
@@ -119,5 +121,27 @@ class RoomComponent extends PositionComponent with HasGameReference {
     final layer = _tileMap?.getLayer<TileLayer>(layerName);
     if (layer == null || layer.id == null) return null;
     return _tileMap!.getTileData(layerId: layer.id!, x: x, y: y);
+  }
+
+  /// The rectangle this room covers in world coordinates, or null before the
+  /// map has loaded.
+  ///
+  /// The room is drawn by `flame_tiled` in the game's own isometric
+  /// coordinates, so the box is the projection of the tile grid: wide and short,
+  /// and reaching into negative x, which is why a camera at the origin shows
+  /// the right half of a room and none of the left.
+  Rect? get worldBounds {
+    final map = _tileMap?.map;
+    if (map == null) return null;
+    final lastX = map.width - 1;
+    final lastY = map.height - 1;
+    final halfWidth = map.tileWidth / 2;
+    final halfHeight = map.tileHeight / 2;
+    return Rect.fromLTRB(
+      -lastY * halfWidth,
+      0,
+      lastX * halfWidth + map.tileWidth,
+      (lastX + lastY) * halfHeight + map.tileHeight,
+    );
   }
 }

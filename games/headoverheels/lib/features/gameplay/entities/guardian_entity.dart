@@ -1,6 +1,6 @@
 // Guardian entity for Head over Heels.
 
-import 'package:flutter/material.dart' show Color, Colors;
+import 'package:flutter/material.dart' show Color;
 import 'package:headoverheels/core/isometric.dart';
 import 'package:headoverheels/features/gameplay/entities/character_component.dart';
 import 'package:headoverheels/features/gameplay/entities/monster_entity.dart';
@@ -41,7 +41,9 @@ class GuardianEntity extends MonsterEntity {
     // see past. Now a tint on the sprite rather than a change of colour.
     tint(const Color(0xFFFF0000));
     Future.delayed(const Duration(milliseconds: 200), () {
-      if (!isFrozen) tint(Colors.transparent);
+      // `null`, not a transparent colour: a modulate filter with an alpha of
+      // zero erases the sprite rather than leaving it alone.
+      if (!isFrozen) tint(null);
     });
   }
 

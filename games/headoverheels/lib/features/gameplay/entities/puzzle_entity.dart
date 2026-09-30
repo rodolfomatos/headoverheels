@@ -55,10 +55,19 @@ abstract class PuzzleEntity extends PositionComponent
     final registry = SpriteRegistry();
     await registry.loadEntity(entity);
 
+    // The art is centred in this entity's box, and the box is centred on the
+    // trigger's position. Both used to be `Anchor.center` on top of each other,
+    // so every entity was drawn at `position - size`: a whole tile up and to the
+    // left of where the world says it is. Measured: 12 of the room's 16
+    // entities drew 0 pixels, and the four that drew anything were the four
+    // whose world x happened to be large enough to survive it.
+    final centre = size / 2;
+
     final animation = registry.getEntityAnimation(entity);
     if (animation != null) {
       final component = SpriteAnimationComponent(
         animation: animation,
+        position: centre,
         size: size,
         anchor: Anchor.center,
       );
@@ -71,6 +80,29 @@ abstract class PuzzleEntity extends PositionComponent
     if (sprite == null) return null;
     final component = SpriteComponent(
       sprite: sprite,
+      position: centre,
+      size: size,
+      anchor: Anchor.center,
+    );
+    add(component);
+    _art = component;
+    return component;
+  }
+
+  /// Shows the prop the manifest has for [prop], at this entity's own size.
+  ///
+  /// Props are a separate list in the manifest from entities — a crate is a prop
+  /// and a monster is an entity — and until the registry indexed them an entity
+  /// that wanted a prop got nothing at all, silently, which is how the
+  /// dispensary stood in a room as an absence.
+  Future<PositionComponent?> showManifestProp(String prop) async {
+    final registry = SpriteRegistry();
+    await registry.loadProp(prop);
+    final sprite = registry.getPropSprite(prop);
+    if (sprite == null) return null;
+    final component = SpriteComponent(
+      sprite: sprite,
+      position: size / 2,
       size: size,
       anchor: Anchor.center,
     );
@@ -85,11 +117,19 @@ abstract class PuzzleEntity extends PositionComponent
   /// Tints the sprite, which is how a state that used to be a coloured
   /// rectangle now shows: a frozen monster went red, a thrown switch went
   /// green, and a sleeping puppy woke up green.
-  void tint(Color colour) {
+  ///
+  /// A transparent colour is not "no tint", it is a filter that multiplies
+  /// everything by zero. `BlendMode.modulate` multiplies the alpha as well as
+  /// the colour, so tinting with `Colors.transparent` erased the sprite
+  /// completely: a switch that had not been thrown drew nothing at all, and
+  /// the tint was the only reason.
+  void tint(Color? colour) {
     // Both kinds of art hold a paint: a SpriteComponent has one, and a
     // SpriteAnimationComponent is a PositionComponent that does too.
-    final filter = ColorFilter.mode(colour, BlendMode.modulate);
-    if (_art is HasPaint) (_art! as HasPaint).paint.colorFilter = filter;
+    if (_art is! HasPaint) return;
+    (_art! as HasPaint).paint.colorFilter = colour == null
+        ? null
+        : ColorFilter.mode(colour, BlendMode.modulate);
   }
 
   /// Called when character interacts (presses action key while overlapping).

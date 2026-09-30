@@ -170,6 +170,7 @@ current_ticket: "T050"
 | T073 | Three of the six scrolls are in no chest anywhere | done |
 | T074 | Knight Lore's web build never reaches a rendered room | done |
 | T075 | The room is drawn in the corner, unscaled, at runtime | open |
+| T078 | The party was never under the camera, and the anchor counted twice | done |
 | T076 | Head over Heels' starting planet had no floor at all | done |
 | T077 | The Head over Heels party is not visible in the room | open |
 
@@ -963,3 +964,92 @@ first game onto the same platform
   knight does not appear in it. That is the next thing to look at, and it is
   filed as T077 rather than glossed over here.
 
+## Done
+* T078, and it is the answer to T077. Head over Heels did not have a party
+  problem. It had a coordinate problem, and two of them, stacked.
+
+  **What was measured.** The frame was rendered off-screen and taken apart one
+  object at a time. The party drew **0 pixels**: removing both characters from
+  the room changed nothing in 1 024 640 pixels. Of the room's sixteen entities,
+  **twelve drew 0 pixels** and the four that drew anything were the four whose
+  world x happened to be large enough. The party was mounted, its box was
+  51.2 x 25.6, the registry held all eight `character.*.idle.*` animations, and
+  the sprite on its own drew 211 pixels — so five of the six ways a thing can
+  vanish were ruled out by number.
+
+  **The first fault: nothing was under the camera.** `game.add(room)` and
+  `add(head)` add to the `FlameGame`, and a `FlameGame`'s camera draws
+  `game.world` and nothing else. The room and the party were children of the
+  game, so their world coordinates went straight onto the canvas with no
+  viewport and no viewfinder. A sixteen-by-sixteen isometric room spans world
+  x from -480 to 544, so the left half of every room was off the side of the
+  screen and the party, which starts at the room's top-left corner, was off it
+  entirely. Proof, in isolation: a `PositionComponent` holding a sprite renders
+  **2 048 pixels** at (100, 100) and **0 pixels** at (0, 0) with the same
+  objects, and the game version of the same pair renders 0 because the camera
+  never sees it. The room and the party are in `world` now, and the camera is
+  put on the room — its centre, and a zoom that fits the room to the window,
+  recomputed on every resize.
+
+  **The second fault: the anchor was subtracted twice.** A `PositionComponent`
+  with `Anchor.center` moves the canvas by `position - size / 2`, and a child
+  with `Anchor.center` moves it by `-size / 2` again. Every entity and both
+  characters did both, so each was drawn at `position - size`: half a sprite up
+  and to the left of where the world says it is. The art child now starts at
+  its parent's centre, so there is exactly one subtraction and the art can be
+  any size and stay centred — which matters, because five entities resize their
+  art.
+
+  **The other two entity faults, each measured rather than assumed.** Three
+  entity types never called `showManifestSprite` at all: the doors, the belt and
+  the teleport pads. The manifest has art for all three and the registry has
+  been loading it since T053. The dispensary asked the registry for `"prop"`,
+  which is a *category*; the registry indexed entities only, so a prop was
+  loaded and then unreachable and the dispensary stood in the room as an
+  absence. The registry indexes props now, and `AssetEntry` grew a `prop` field
+  so the manifest stays the one source of truth for both games. And `tint` was
+  the fourth: an unthrown switch, an unfrozen monster and an un-frozen guardian
+  all passed `Colors.transparent`, and `BlendMode.modulate` multiplies the
+  alpha as well as the colour, so the filter meant to say "no tint" multiplied
+  the sprite by zero and erased it. `tint(null)` now means no tint.
+
+  **The data, and the two guards that hold it.** One belt stood at y of 160 in
+  a sixteen-by-sixteen room, ten rooms above its own floor, and four teleport
+  pads hung a row over the edge. Three pairs of triggers shared a tile, and in
+  each the second hid the first exactly: a bag on a door, a key on a bag, a
+  hush puppy in the middle of a belt. A frame cannot tell "invisible" from
+  "hidden", so both are now named where they can be: every trigger must stand on
+  the floor of the room it is in, and no two things that both draw may share a
+  tile.
+
+  **The guard.** `test/room_render_test.dart` stands the whole game up through
+  the real `GameWidget` — real world, real room map, real tileset, real
+  sprites — and counts pixels, with the loop paused so two frames differ only
+  by what the test changed. It asks four things: the party paints something,
+  each character paints within twenty pixels of where its own grid coordinates
+  put it (0.0 px for both now), every entity paints something in the room and
+  again with the room to itself, and the party follows its state. Run against
+  `da02f9e` it fails with `party: ink=0`. 16 tests, 96 in the game.
+
+  **Two of the board's own claims were wrong, and both are corrected here
+  rather than repeated.** "A widget test never finishes, because decoding
+  eighty-five images inside one takes forty-one seconds": it finishes in about
+  a second now, because the load asks for four images a character and the rest
+  arrives without holding the first frame (T065) and the sounds go to a silent
+  sink (T059). The guard is a widget test and it takes four seconds. And
+  "rendering the screen and looking at the frame" is now a number: T074 and
+  T076 each reported what a browser showed, and one of them reported a request
+  that was never made as a request that was refused.
+
+  **What it looks like now, in a real browser, on a release build.** The room
+  fills the view with the party standing on it, and the party moves: holding
+  the virtual joystick moves a 40 x 16 sprite across the floor, and the frame
+  changes by 1 500 to 2 200 pixels every two seconds. The same measurement on
+  the build at `da02f9e` is 0 to 243, because nothing that should move is
+  within the canvas. `scripts/browser_check.js` and `scripts/browser_pixels.py`
+  are the harness, and the captures are in `build/browser/`.
+
+  **What is still open.** HoH has no keyboard at all: `InputSystem` has no key
+  handler, so FR-13 is not met and a person has to drag the joystick. The room
+  is fitted to the window, so the HUD covers its top corner, which is where the
+  party starts. The art is T063 and is a person's decision.

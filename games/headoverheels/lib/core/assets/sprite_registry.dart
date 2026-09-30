@@ -37,8 +37,18 @@ class SpriteRegistry {
   /// the way from one to the other.
   final Map<String, String> _entitySprites = {};
 
+  /// The same for the props, which the manifest keys by their own name: a
+  /// `prop.crate` is a crate and a `prop.crate_broken` is the same crate once
+  /// it has been opened. Nothing could reach these before, because only the
+  /// entities were indexed, so an entity that wanted a prop drew nothing at all
+  /// and said nothing about it.
+  final Map<String, String> _propSprites = {};
+
   /// The size each entity sprite is drawn at, as the manifest says.
   final Map<String, ({double x, double y})> _entitySizes = {};
+
+  /// The size each prop is drawn at, as the manifest says.
+  final Map<String, ({double x, double y})> _propSizes = {};
 
   /// The frames each entity has, where its art is a strip rather than one image.
   final Map<String, SpriteAnimation> _entityAnimations = {};
@@ -98,6 +108,11 @@ class SpriteRegistry {
     await _loadWhere((entry) => entry.entity == entity);
   }
 
+  /// Loads the sprites of one prop, for the same reason.
+  Future<void> loadProp(String prop) async {
+    await _loadWhere((entry) => entry.prop == prop);
+  }
+
   /// Loads every entry [wanted] accepts, skipping the ones already loaded.
   ///
   /// Loading is idempotent on purpose: the party loads its own sprites while the
@@ -152,6 +167,14 @@ class SpriteRegistry {
 
     _sprites[entry.id] = Sprite(image);
     _loaded.add(entry.id);
+    final prop = entry.prop;
+    if (prop != null) {
+      _propSprites[prop] = entry.id;
+      _propSizes[prop] = (
+        x: entry.width.toDouble(),
+        y: entry.height.toDouble(),
+      );
+    }
     final entity = entry.entity;
     if (entity != null) {
       _entitySprites[entity] = entry.id;
@@ -265,6 +288,9 @@ class SpriteRegistry {
     return _animationData[assetId];
   }
 
+  /// The prop types the manifest has a sprite for.
+  Iterable<String> get propNames => _propSprites.keys;
+
   /// Get a single sprite by ID.
   Sprite? getSprite(String assetId) {
     return _sprites[assetId];
@@ -294,6 +320,24 @@ class SpriteRegistry {
   /// it cannot. The manifest says which is which and the test checks it.
   SpriteAnimation? getEntityAnimation(String entity) =>
       _entityAnimations[entity];
+
+  /// The sprite for a prop, by the name the manifest gives it.
+  ///
+  /// Null when the manifest has none, which used to be every prop: the manifest
+  /// names ten, the registry loaded all ten, and there was no way to ask for
+  /// one, so the dispensary asked for a "prop" and drew nothing.
+  Sprite? getPropSprite(String prop) {
+    final id = _propSprites[prop];
+    return id == null ? null : _sprites[id];
+  }
+
+  /// The size the manifest says a prop is drawn at.
+  Vector2? propSpriteSize(String prop) {
+    final id = _propSprites[prop];
+    if (id == null) return null;
+    final size = _propSizes[prop];
+    return size == null ? null : Vector2(size.x, size.y);
+  }
 
   /// The entity types the manifest has a sprite for.
   Iterable<String> get entityNames => _entitySprites.keys;

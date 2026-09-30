@@ -63,7 +63,39 @@ class HeadOverHeelsGame extends FlameGame
     unawaited(SpriteRegistry().initialize());
 
     // Set up camera
-    camera.moveTo(Vector2.zero());
+    _frameRoom();
+  }
+
+  @override
+  void onGameResize(Vector2 size) {
+    super.onGameResize(size);
+    // The room is fitted to the window, so a resize has to fit it again.
+    _frameRoom();
+  }
+
+  /// Puts the whole room in the view, centred.
+  ///
+  /// The room is drawn in world coordinates that reach into negative x — a
+  /// sixteen-by-sixteen isometric room spans x from -512 to 512 — so a camera
+  /// left at the origin shows the right half of the room and none of the left,
+  /// and the party, which starts at the top-left corner of the room, is off the
+  /// side of the screen. Measured, before this: the party drew 0 pixels.
+  void _frameRoom() {
+    final bounds = _currentRoom?.worldBounds;
+    if (bounds == null || !hasLayout) return;
+    final centre = bounds.center;
+    camera.viewfinder.zoom = _zoomThatFits(
+      Vector2(bounds.width, bounds.height),
+    );
+    camera.viewfinder.position = Vector2(centre.dx, centre.dy);
+  }
+
+  /// The largest zoom at which [room] still fits the window.
+  double _zoomThatFits(Vector2 room) {
+    if (room.x <= 0 || room.y <= 0) return 1;
+    return (size.x / room.x < size.y / room.y
+        ? size.x / room.x
+        : size.y / room.y);
   }
 
   @override
@@ -100,7 +132,12 @@ class HeadOverHeelsGame extends FlameGame
 
     // Create and load new room
     final room = RoomComponent(roomId: roomId, definition: definition);
-    await add(room);
+    // Into the world, not into the game. `FlameGame`'s camera draws the world
+    // and nothing else, so a component added to the game itself never goes
+    // through the camera: its world coordinates land straight on the canvas,
+    // and the left half of every room, which is negative x, is off the side of
+    // the screen. That is where the party went.
+    await world.add(room);
     _currentRoom = room;
     _currentRoomId = roomId;
     ref.read(crownsProvider.notifier).arriveOn(definition.theme);
@@ -110,6 +147,7 @@ class HeadOverHeelsGame extends FlameGame
 
     // Add characters to new room
     _moveCharactersToRoom(room);
+    _frameRoom();
   }
 
   /// Play background music appropriate for the room theme.
@@ -140,7 +178,12 @@ class HeadOverHeelsGame extends FlameGame
     CharacterComponent? head;
     CharacterComponent? heels;
 
-    for (final character in children.whereType<CharacterComponent>()) {
+    // In the world, because that is where the game put them: looking in the
+    // game's own children found nothing and the party was never moved into a
+    // room at all.
+    final found = <CharacterComponent>[];
+    world.children.query<CharacterComponent>().forEach(found.add);
+    for (final character in found) {
       if (character.type == CharacterType.head) {
         head = character;
       } else if (character.type == CharacterType.heels) {
@@ -227,12 +270,12 @@ class HeadOverHeelsGame extends FlameGame
   Future<void> _addCharacters() async {
     // Head character
     final head = CharacterComponent(type: CharacterType.head, ref: ref);
-    await add(head);
+    await world.add(head);
     _interactionSystem.registerCharacter(head);
 
     // Heels character
     final heels = CharacterComponent(type: CharacterType.heels, ref: ref);
-    await add(heels);
+    await world.add(heels);
     _interactionSystem.registerCharacter(heels);
   }
 

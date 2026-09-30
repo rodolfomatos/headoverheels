@@ -1,5 +1,6 @@
 // Entity factory for Head over Heels - creates puzzle entities from TMX triggers.
 
+import 'package:flutter/material.dart' show Color;
 import 'package:headoverheels/core/isometric.dart';
 import 'package:headoverheels/features/gameplay/entities/character_component.dart';
 import 'package:headoverheels/features/gameplay/entities/puzzle_entity.dart';
@@ -123,6 +124,20 @@ class _DoorEntity extends PuzzleEntity {
   });
 
   @override
+  void onLoad() async {
+    super.onLoad();
+    // The manifest has a door, a conveyor and a teleport, and the registry has
+    // been loading all three into memory since T053. Nothing asked for them:
+    // these three were the only entity types that never called
+    // `showManifestSprite`, so a room's doors, its belt and its teleport pads
+    // were holes in the floor. Measured, before this: 0 pixels each.
+    await showManifestSprite('door');
+    // A locked door is the same door in another colour, which is what the tint
+    // is for, rather than a shape of its own nobody has drawn.
+    if (isLocked) tint(const Color(0xFFFF6666));
+  }
+
+  @override
   void onInteract(CharacterComponent character) {
     if (isLocked) {
       // Check if character has key
@@ -161,6 +176,13 @@ class _TeleportEntity extends PuzzleEntity {
     required this.targetEntrance,
     required this.oneWay,
   });
+
+  @override
+  void onLoad() async {
+    super.onLoad();
+    // The art exists and was never asked for: see the door above.
+    await showManifestSprite('teleport');
+  }
 
   @override
   void onEnter(CharacterComponent character) {
@@ -220,6 +242,13 @@ class ConveyorEntity extends PuzzleEntity {
     required this.direction,
     required this.speed,
   });
+
+  @override
+  void onLoad() async {
+    super.onLoad();
+    // The art exists and was never asked for: see the door above.
+    await showManifestSprite('conveyor');
+  }
 
   @override
   void onEnter(CharacterComponent character) {

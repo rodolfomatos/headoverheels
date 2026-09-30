@@ -269,4 +269,86 @@ void main() {
       }
     }
   });
+
+  test('every trigger stands on the floor of its own room', () async {
+    // Two of them did not. The castle's conveyor was at y of 160 in a
+    // sixteen-by-sixteen room, ten rooms above its own floor, and the four
+    // teleports sat at y of 15 with a height of 2, so their second row was
+    // outside the room. Neither could ever be reached or seen, and the data
+    // said nothing about it: the rooms themselves had no such test.
+    //
+    // The room's own size is read from its TMX, so a room that changes shape
+    // changes what "inside" means.
+    final world = await loadWorldGraph();
+    for (final room in world.rooms.values) {
+      final map = RegExp(
+        r'<map\b[^>]*?\bwidth="(\d+)"[^>]*?\bheight="(\d+)"',
+      ).firstMatch(File(room.tmxFile).readAsStringSync());
+      expect(
+        map,
+        isNotNull,
+        reason: '${room.id} has no <map> to read a size from',
+      );
+      final width = int.parse(map!.group(1)!);
+      final height = int.parse(map.group(2)!);
+
+      for (final trigger in room.triggers) {
+        final label =
+            '${room.id} ${trigger.id} (${trigger.type.name}) '
+            'at ${trigger.position.x},${trigger.position.y} '
+            'size ${trigger.size.x}x${trigger.size.y}';
+        expect(trigger.position.x, greaterThanOrEqualTo(0), reason: label);
+        expect(trigger.position.y, greaterThanOrEqualTo(0), reason: label);
+        expect(
+          trigger.position.x + trigger.size.x,
+          lessThanOrEqualTo(width.toDouble()),
+          reason: '$label, and the room is $width wide',
+        );
+        expect(
+          trigger.position.y + trigger.size.y,
+          lessThanOrEqualTo(height.toDouble()),
+          reason: '$label, and the room is $height tall',
+        );
+      }
+    }
+  });
+
+  test('two things that both draw never stand on the same tile', () async {
+    // Three pairs did, and in each case the second one hid the first exactly:
+    // a bag on the tile of a door, a key on the tile of a bag, a hush puppy in
+    // the middle of a belt. The renderer is not at fault — it drew both, one
+    // over the other — and a test that counts the room's pixels cannot tell
+    // that from a bug, which is why the world is checked here instead.
+    //
+    // A belt spans the floor by design and is drawn under whatever stands on
+    // it, and a ladder is part of the room rather than a thing with a sprite, so
+    // neither counts. Everything else draws, and two of them on one tile means
+    // one of them is invisible.
+    const notDrawn = {'conveyor', 'ladderUp', 'ladderDown'};
+    final world = await loadWorldGraph();
+    for (final room in world.rooms.values) {
+      final drawn = room.triggers
+          .where((t) => !notDrawn.contains(t.type.name))
+          .toList();
+      for (final a in drawn) {
+        for (final b in drawn) {
+          if (identical(a, b)) continue;
+          final overlaps =
+              a.position.x < b.position.x + b.size.x &&
+              b.position.x < a.position.x + a.size.x &&
+              a.position.y < b.position.y + b.size.y &&
+              b.position.y < a.position.y + a.size.y;
+          expect(
+            overlaps,
+            isFalse,
+            reason:
+                '${room.id}: ${a.id} (${a.type.name}) and ${b.id} '
+                '(${b.type.name}) are on the same tile, at '
+                '${a.position.x},${a.position.y} and '
+                '${b.position.x},${b.position.y}. One of them is invisible.',
+          );
+        }
+      }
+    }
+  });
 }

@@ -31,8 +31,24 @@ class CharacterComponent extends PositionComponent with CollisionCallbacks {
     // Add hitbox for collision
     add(RectangleHitbox()..collisionType = CollisionType.passive);
 
-    // Initialize sprite animation component with real sprites from registry
-    _animation = SpriteAnimationComponent(size: size, anchor: Anchor.center);
+    // The art, centred in this component's box.
+    //
+    // A `PositionComponent` with `Anchor.center` moves the canvas by
+    // `position - size / 2`, and a child with `Anchor.center` moves it by
+    // `-size / 2` again. Both did, so the sprite was drawn at
+    // `position - size`: a whole box up and to the left of where the character
+    // stands. The character's world x is negative over the left half of a room,
+    // so half a room put the party off the side of the screen. Measured: the
+    // party drew 0 pixels, and 12 of the room's 16 entities with it.
+    //
+    // The art starts at this component's centre, so between the two of them
+    // there is exactly one subtraction, and the art can be any size and stay
+    // centred on the character.
+    _animation = SpriteAnimationComponent(
+      position: size / 2,
+      size: size,
+      anchor: Anchor.center,
+    );
     add(_animation);
 
     final provider = type == CharacterType.head ? headProvider : heelsProvider;

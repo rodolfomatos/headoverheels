@@ -140,6 +140,7 @@ class AssetEntry {
     this.animation,
     this.direction,
     this.entity,
+    this.prop,
     this.theme,
     this.family,
     this.variant,
@@ -161,6 +162,7 @@ class AssetEntry {
       animation: yaml['animation']?.toString(),
       direction: yaml['direction']?.toString(),
       entity: yaml['entity']?.toString(),
+      prop: yaml['prop']?.toString(),
       theme: yaml['theme']?.toString(),
       family: yaml['family']?.toString(),
       variant: yaml['variant']?.toString(),
@@ -188,6 +190,14 @@ class AssetEntry {
   final String? animation;
   final String? direction;
   final String? entity;
+
+  /// The name a prop is known by, the way [entity] is the name an entity is.
+  ///
+  /// The manifest keys props by a name of their own — `prop.crate` and
+  /// `prop.crate_broken` are the same crate and the crate once it is open — and
+  /// without this there was no way to ask for one by name: a prop was loaded
+  /// and then unreachable.
+  final String? prop;
   final String? theme;
   final String? family;
   final String? variant;
@@ -227,6 +237,7 @@ class AssetEntry {
       if (animation != null) 'animation': animation,
       if (direction != null) 'direction': direction,
       if (entity != null) 'entity': entity,
+      if (prop != null) 'prop': prop,
       if (theme != null) 'theme': theme,
       if (family != null) 'family': family,
       if (variant != null) 'variant': variant,
@@ -250,6 +261,7 @@ class AssetEntry {
     String? category,
     String? character,
     String? entity,
+    String? prop,
     String? animation,
     String? direction,
     String? theme,
@@ -274,6 +286,7 @@ class AssetEntry {
       category: category ?? this.category,
       character: character ?? this.character,
       entity: entity ?? this.entity,
+      prop: prop ?? this.prop,
       animation: animation ?? this.animation,
       direction: direction ?? this.direction,
       theme: theme ?? this.theme,

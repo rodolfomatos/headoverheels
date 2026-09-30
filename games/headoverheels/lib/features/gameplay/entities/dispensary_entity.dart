@@ -1,5 +1,7 @@
 // The place the magic bag is emptied.
 
+import 'dart:async' show unawaited;
+
 import 'package:flame/components.dart' show Component;
 import 'package:vector_math/vector_math.dart' show Vector2, Vector3;
 import 'package:headoverheels/features/gameplay/entities/character_component.dart';
@@ -25,10 +27,24 @@ class DispensaryEntity extends PuzzleEntity {
   @override
   void onLoad() async {
     super.onLoad();
-    // The manifest has no dispensary of its own, so this shows a prop rather
-    // than nothing: a chest stands in for a place that empties a bag.
-    final sprite = await showManifestSprite('prop');
-    sprite?.size = size;
+    // A crate, and the same crate open once the bag has been emptied. The
+    // manifest has both — `prop.crate` and `prop.crate_broken` — and neither was
+    // reachable: the registry indexed entities only, so asking for a "prop" (a
+    // category, not a name) found nothing and the dispensary stood in the room
+    // as an absence. The choice of crate is a stand-in for art nobody has drawn
+    // for a dispensary, and it is one line to change when there is some.
+    await showManifestProp(_fullArt);
+  }
+
+  /// The prop this shows: a full crate, or the same crate emptied.
+  static const String _fullArt = 'crate';
+  static const String _emptiedArt = 'crate_broken';
+
+  /// Shows the open crate, which is what the place looks like once the bag has
+  /// been emptied into it.
+  Future<void> _showEmptied() async {
+    spriteComponent?.removeFromParent();
+    await showManifestProp(_emptiedArt);
   }
 
   @override
@@ -60,6 +76,11 @@ class DispensaryEntity extends PuzzleEntity {
       room.entities.add(dropped);
       room.add(dropped);
     }
+
+    // The crate opens, at the end and not in the middle of the above: this
+    // method is synchronous, because what it does to the room is what a caller
+    // can see the moment it returns.
+    unawaited(_showEmptied());
   }
 
   /// The room this dispensary is in, found by walking up the tree.

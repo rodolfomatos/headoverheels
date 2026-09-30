@@ -169,8 +169,9 @@ current_ticket: "T050"
 | T072 | Knight Lore's scrolls and ingredients are not drawn | done |
 | T073 | Three of the six scrolls are in no chest anywhere | done |
 | T074 | Knight Lore's web build never reaches a rendered room | done |
-| T075 | The room is drawn in the corner, unscaled, at runtime | open |
+| T075 | The room is drawn in the corner, unscaled, at runtime | done |
 | T078 | The party was never under the camera, and the anchor counted twice | done |
+| T079 | No test renders the way the game renders | done |
 | T076 | Head over Heels' starting planet had no floor at all | done |
 | T077 | The Head over Heels party is not visible in the room | open |
 
@@ -1053,3 +1054,152 @@ first game onto the same platform
   handler, so FR-13 is not met and a person has to drag the joystick. The room
   is fitted to the window, so the HUD covers its top corner, which is where the
   party starts. The art is T063 and is a person's decision.
+
+## Notes on the two questions the board could not answer for itself
+* T075, the room in the corner, and why every test said it was fine. The
+  centring and the scale lived in `RoomView.renderInto`, and every rendering
+  test calls `renderInto` — the tests are the code they test, so they could
+  never see the runtime path. There were two faults and only one of them was
+  where the board said. The centring was in the wrong method; the *canvas size*
+  was also in the wrong place, and that one the board did not know about: the
+  game set `view.canvasSize` inside its frame loop and only while a room was
+  fading, so a room that was not changing had a canvas size of zero, fitted
+  nothing, and the room-change fade was a rectangle of no size and invisible.
+  Both are fixed by one move: `render()` fits the room itself, `renderInto` is
+  two lines that set the size and call it, and the game tells the view the size
+  in `onGameResize`, which is the only place that runs when the window changes
+  and the only one that runs before the first frame. A canvas whose size is not
+  known is drawn one for one, so the headless path still works.
+
+  **Measured, before and after.** On `da02f9e` the runtime draw gives
+  `scale=1.000 offset=(0,0)`, the room's box is `x[0..514] y[0..274]` in a
+  1280x800 window — margins of 0 left, 766 right, 0 top, 526 bottom — and the
+  view's `canvasSize` is `Size(0,0)`. After: `scale=2.400 offset=(25.6, 73.6)`,
+  the room's box is `x[20..1260] y[68..732]`, margins 20 and 20 and 68 and 68.
+  All 173 Knight Lore tests pass unchanged, which is the point: they went
+  through `renderInto` before and go through `render` now, and the numbers they
+  assert are the same ones.
+
+  **The two options, with what each cost.** Moving the transform into `render`
+  is a diff in one method plus three lines in the game; it touches no test
+  because `renderInto` keeps its signature, and the 173 tests that call it did
+  not move. A camera is the architecturally nicer answer — the room would live
+  in true world coordinates and `origin()` would stop being an `Offset` added
+  to every draw call — and it is what Head over Heels now does, so the two games
+  would end up alike. Its cost, measured by reading every use: `origin()`,
+  `bounds`, `screenOf`, `renderInto`, `canvasOf`, `previewScale` and
+  `previewOffset` are all built on the same assumption that the room's top left
+  is the canvas's top left, and `polish_test` and `visual_preview_test` read
+  `canvasOf(screenOf(...))` to place figures in a measured frame. A camera
+  means re-deriving all of those from the viewfinder and re-measuring every
+  pixel assertion in two test files. That is a day's work for a shape that buys
+  a future the game does not have yet: Knight Lore's rooms are 10x10 and all fit
+  on one screen, so there is nothing to scroll and nothing to follow. The
+  transform moved; the camera is not wanted until a room is bigger than the
+  window.
+
+* T079, the guard, and the two questions the board could not settle for
+  itself. "Which test would have caught 'the application draws nothing' in both
+  games", given that a Knight Lore widget test takes 41 seconds and does not
+  finish. The 41 seconds is not what happens any more, and what does happen is
+  worse than slow: **a widget test that boots a real `GameWidget` of Knight
+  Lore never loads the game and never says so.** Measured: 4 seconds of pumping,
+  `assetsReady=false`, `error=null`, `isMounted=false`, the game loop never
+  stepped once, and the test passes in 775 ms of test time. The load is driven
+  from inside the widget's future, which resolves in the fake clock and
+  therefore never completes; `game.mount()` sits after it and is never reached.
+  A green test that proved nothing is the T028 fault again, in a new place.
+
+  Head over Heels does not have that fault, because the world is read before
+  the widget goes up and the load has only a map, a tileset and eight sprite
+  files left to fetch. Measured: the whole game, through a real `GameWidget`
+  over the real world, loads in about a second and the pixel guard runs in **4
+  seconds of test time, 15 seconds of wall clock**. So the answer is not one
+  guard for both games, it is one *shape* for both games: **do not mount the
+  widget; drive the game directly and render it off-screen through the very
+  method the runtime calls.** Knight Lore's version costs **0.9 seconds of test
+  time** because its load runs outside any fake clock and its runtime draw is a
+  component with no widget above it. The three options weighed:
+
+  - (a) render off-screen through the mounted app with a limited asset set:
+    **4 s** for HoH, and impossible for Knight Lore, which is a fact about the
+    framework rather than about the assets. This is what the HoH guard does.
+  - (b) "this draws itself" per object with the real loader: cheapest per
+    object, and it would have caught three of the four entity faults — the three
+    types that never asked for art, the dispensary that asked for a category,
+    and the transparent tint. It cannot see the two that made the party
+    invisible, because both are about *where* a thing is drawn and a per-object
+    test draws each object on its own. It is a good second guard, not the
+    first.
+  - (c) a browser check that counts lit pixels: see below. It cannot answer
+    "where is it drawn" in this environment, and it is the most expensive of
+    the three.
+
+* The browser, and what a check of it is worth. `scripts/browser_check.js` and
+  `scripts/browser_pixels.py` serve a release build, click into the game,
+  capture a frame every two seconds and count the pixels. The counting part is
+  exact: a plain HTML page with a known rectangle, through the same harness,
+  lands at `x[0..400] y[0..300]` for a 400x300 rectangle at the origin and
+  `x[1000..1200] y[600..800]` for one at (1000,600). So the harness does not
+  distort anything.
+
+  **Flutter's web build does, and this was measured rather than assumed.** A
+  rectangle drawn by the game at canvas (0,0) with size 400x300 appears in the
+  page at `x[666..1280] y[474..800]` — a scale of 1.535 in x and 1.087 in y.
+  The same numbers under four different GL configurations
+  (`--use-gl=angle --use-angle=swiftshader`, `--use-gl=swiftshader`,
+  `--enable-unsafe-swiftshader`, `--disable-gpu`) and at three window sizes, and
+  the DOM reports one canvas of 1280x800 at the origin with a device pixel
+  ratio of 1. The page is therefore not a faithful picture of the canvas, and a
+  screenshot of a web build in this environment cannot say *where* the game
+  draws. The off-screen render in `flutter test` can, because it is the same
+  engine with no browser: same code, same numbers, room centred with equal
+  margins.
+
+  So a browser check is worth its cost for one question — *does anything on the
+  screen change* — and it is worth exactly that today. Measured on the build at
+  `da02f9e`: 0 to 243 pixels change every two seconds, because nothing that
+  should move is within the canvas. Measured now, with the same click and the
+  same drag on the virtual joystick: 2 200 to 2 300, and a 40x16 sprite that
+  moves across the floor. That is the number that would have caught the party.
+  The cost of one run is about 40 seconds of wall clock for a game that has to
+  be built first, so it belongs in its own target and not in `make check`,
+  which does not build.
+
+## Notes on the art, which is a person's decision and not this board's
+* Measured, so the decision has numbers. Knight Lore's five knight classes are
+  **one silhouette**: `achinda_walk`, `celist_walk`, `jinx_walk`,
+  `joronie_walk` and `sabreman_idle` have byte-identical alpha masks, 80x32,
+  28.3% opaque, four colours each. The five classes differ in hue and in
+  nothing else. The seventy-five prop sheets are two to four colours apiece.
+
+  Head over Heels is worse in a way that is worth naming precisely. The head has
+  **twelve images and two silhouettes**: `idle`, `walk` and `jump` share the
+  same shape, and the "back" direction is the same shape as the three-quarter
+  view and the "front" is the same shape as the side. So the manifest promises
+  a walk cycle and the art has none — the generator draws one figure and
+  relabels it twelve times. The heels is **twenty images and one silhouette**.
+  Every entity is one or two colours: a door, a conveyor, a fish, a bag and a
+  puppy are each a single flat colour over 12.5% of their sheet.
+
+  What follows from that, as inventory rather than as a decision:
+  - 12 head frames and 20 heels frames are 3 silhouettes between them. A walk
+    cycle is 4 directions x 4 phases; drawing the two characters properly is
+    48 frames, of which 32 exist in name only. This is one generator, not 32
+    images: `scripts/generate_character_masters.py` and
+    `generate_entity_masters.py` are what produce them, so the shape is a
+    function and a phase offset, not an artist's time.
+  - Knight Lore's five classes are one shape, so the difference between a
+    knight and a wizard is a hue and nothing else. The generator is
+    `scripts/generate_knightlore_assets.py`.
+  - The entity sheets are single-colour silhouettes, so they read as bars at any
+    size, which is exactly what T076 saw in the browser before the floor was
+    found. This is the same debt the board called T063.
+
+  What a person has to decide, and this board does not: what a knight should
+  look like, whether the five Knight Lore classes should differ in shape or only
+  in colour, how many phases a walk has, and whether the entities need outlines
+  or shading. Those are four questions about the game's look. The mechanical
+  part — a phase parameter in the generators, and a test that the frame count a
+  sheet really has matches the count the manifest claims — is the same shape as
+  the per-tile guard in T076 and costs about the same.

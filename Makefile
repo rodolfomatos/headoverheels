@@ -1,4 +1,4 @@
-.PHONY: setup run run-headoverheels run-knightlore serve-headoverheels serve-knightlore serve-editor run-editor build-headoverheels build-knightlore build-editor test test-packages test-coverage lint format format-check check assets-check assets-preview doctor help build build-release build-release-apk build-release-appbundle build-release-all build-version generate clean security-scan install
+.PHONY: setup run run-headoverheels run-knightlore serve-headoverheels serve-knightlore serve-editor run-editor build-headoverheels build-knightlore build-editor test test-packages test-coverage lint format format-check check assets-check assets-preview doctor help build build-release build-release-apk build-release-appbundle build-release-all build-version generate clean security-scan install verify-browser
 
 # The repository holds two games and three libraries. Nothing at the top level is
 # a package of its own, so every command names the directory it runs in.
@@ -94,6 +94,54 @@ test-packages:
 assets-preview:
 	@python3 scripts/asset_inventory.py
 
+# What a browser is for, and what it is not for.
+#
+# It answers one question: does anything on the screen change. A build that
+# draws a room with no party in it looks the same as one that draws a room with
+# a party in it, and only a difference between two frames tells the two apart.
+# The counts are in build/browser/*.png, read by scripts/browser_motion.py.
+#
+# It does NOT answer "where is the room drawn". Measured: a rectangle the game
+# draws at canvas (0,0) lands in the page at x[666..1280] y[474..800], a scale
+# of 1.535 in x and 1.087 in y, and the same numbers under four GL
+# configurations and three window sizes, while the harness itself puts a plain
+# canvas rectangle at exactly the right pixel. The page is not a faithful
+# picture of the canvas here, so a screenshot cannot place anything. The
+# off-screen render in `flutter test` can, and is what the render guards use.
+#
+# The gate is on Head over Heels only, and only because there is something there
+# to move: its party is animated and its entities walk, so a still frame is a
+# real fault. Knight Lore's room stands perfectly still while the party is
+# standing still — the knight sprites have one frame and no idle cycle — so
+# "nothing changed" there is the correct answer and failing on it would be
+# failing on the game's own design. Its numbers are printed either way.
+#
+# Not part of `make check`, which does not build: this target builds two release
+# web builds first, which is most of the cost. One run is about 40 seconds of
+# driving plus the builds.
+verify-browser:
+	@echo "Building the release web builds a player would load..."
+	@$(MAKE) build-headoverheels build-knightlore
+	@mkdir -p build/browser
+	@echo ""
+	@echo "Head over Heels: click into the game, then hold the virtual joystick."
+	@DRAG=86,714,55,0 DRAG_AFTER=8000 node scripts/browser_check.js \
+		games/headoverheels/build/web hoh 638,363 24000 8105 >/dev/null
+	@echo "Knight Lore: click the title."
+	@node scripts/browser_check.js games/knightlore/build/web kl 640,400 12000 8106 >/dev/null
+	@echo ""
+	@python3 scripts/browser_motion.py --fail-under 200 build/browser/hoh_*.png
+	@echo ""
+	@python3 scripts/browser_motion.py --report-only build/browser/kl_*.png
+	@echo ""
+	@python3 scripts/browser_motion.py --fail-under 200 build/browser/hoh_*.png >/dev/null \
+		&& echo "Head over Heels: the frame changes, so the game is alive." \
+		|| (echo "Head over Heels: NOTHING ON THE SCREEN CHANGED. The game drew" \
+		    "a frame and nothing in it is moving."; exit 1)
+	@echo ""
+	@echo "Captures and numbers in build/browser/."
+
+
 assets-check:
 	@python3 scripts/validation_pipeline.py $(GAME)
 	@python3 scripts/validate_sprites.py $(GAME)
@@ -171,4 +219,5 @@ help:
 	@echo "  make format-check    - Verify Dart formatting"
 	@echo "  make test-packages   - Test builder packages"
 	@echo "  make assets-check    - Validate sprite assets"
+	@echo "  make verify-browser  - Release web builds in a real browser, counting pixels"
 	@echo "  make check           - Run all checks"

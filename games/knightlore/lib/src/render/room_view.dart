@@ -90,28 +90,22 @@ class RoomView extends Component {
   RoomMap? get map => _map;
 
   /// Draws the room centred in a canvas of [size], scaled up to fill it.
+  ///
+  /// This is a thin wrapper over [render], and that is the whole point of it:
+  /// the centring and the scale used to live here, and the running game never
+  /// came through here, so the game drew a room in the corner of the window at
+  /// its own size while every test drew a room that filled the canvas. The
+  /// tests could not see the fault because they are the code they test.
   void renderInto(ui.Canvas canvas, Size size) {
     canvasSize = size;
-    final previous = canvas.getSaveCount();
-    final scale = _scaleFor(size);
-    final room = roomSize;
-    final offset = Offset(
-      (size.width - room.width * scale) / 2,
-      (size.height - room.height * scale) / 2,
-    );
-    canvas.translate(offset.dx, offset.dy);
-    canvas.scale(scale);
     render(canvas);
-    canvas.restoreToCount(previous);
-    _previewScale = scale;
-    _previewOffset = offset;
   }
 
-  /// The scale and offset of the last [renderInto] call.
+  /// The scale and offset of the last render, at one for a canvas the size is
+  /// not known for.
   ///
-  /// The game draws with no extra transform, so this is one for a running game.
-  /// It exists so a test, or anything else that renders off screen, can turn a
-  /// room position into a canvas position instead of guessing the transform.
+  /// A test, or anything else that renders off screen, can turn a room position
+  /// into a canvas position with [canvasOf] instead of guessing the transform.
   double get previewScale => _previewScale;
   Offset get previewOffset => _previewOffset;
   double _previewScale = 1;
@@ -158,6 +152,33 @@ class RoomView extends Component {
     final sheet = tileset;
     if (map == null || sheet == null) return;
 
+    // Fit the room to the canvas, here, in the one method every path goes
+    // through. A canvas the size is not known for is drawn one for one, which
+    // is what happened to the running game for as long as the centring lived
+    // in `renderInto`: the room sat in the top left corner at its own size, and
+    // no test could see it because every test called `renderInto`.
+    final area = canvasSize;
+    final known = area.width > 0 && area.height > 0;
+    final previous = canvas.getSaveCount();
+    var scale = 1.0;
+    var offset = Offset.zero;
+    if (known) {
+      scale = _scaleFor(area);
+      final room = roomSize;
+      offset = Offset(
+        (area.width - room.width * scale) / 2,
+        (area.height - room.height * scale) / 2,
+      );
+      canvas.translate(offset.dx, offset.dy);
+      canvas.scale(scale);
+    }
+    _drawRoom(canvas, map, sheet);
+    if (known) canvas.restoreToCount(previous);
+    _previewScale = scale;
+    _previewOffset = offset;
+  }
+
+  void _drawRoom(ui.Canvas canvas, RoomMap map, ui.Image sheet) {
     final frame = (_animationTick ~/ 6) % 2;
 
     for (var y = 0; y < map.height; y++) {

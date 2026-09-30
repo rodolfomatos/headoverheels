@@ -456,13 +456,20 @@ class KnightLoreGame extends FlameGame {
     // The wash comes back as the fade clears. Driving both from the same value
     // is what stops a room staying unlit forever after a change.
     view.ambienceStrength = 1 - transition;
-    // The canvas size is only known once the game is on screen. Reading it
-    // before layout asserts, and the game does update before the widget puts it
-    // on the display.
-    if (transition > 0 && hasLayout) {
-      final canvas = camera.viewport.size;
-      view.canvasSize = ui.Size(canvas.x, canvas.y);
-    }
+  }
+
+  @override
+  void onGameResize(Vector2 size) {
+    super.onGameResize(size);
+    // The room view is told how big the canvas is here and nowhere else.
+    //
+    // It used to be told in the frame loop, and only while a room was fading,
+    // which was enough for the fade and nothing else: a room that was not
+    // changing had a canvas size of zero, so it fitted nothing and sat in the
+    // corner of the window at its own size — T075. The resize hook is the only
+    // place that is right, because it is the only one that runs when the window
+    // changes and the only one that runs before the first frame is drawn.
+    roomView?.canvasSize = ui.Size(size.x, size.y);
   }
 
   /// Starts the fade for a room change. Public because a screen that swaps

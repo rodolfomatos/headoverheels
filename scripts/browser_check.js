@@ -48,9 +48,11 @@ function serve() {
 (async () => {
   const server = await serve();
   const browser = await chromium.launch({
-    args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
+    args: (process.env.GL_ARGS ||
+      '--use-gl=angle --use-angle=swiftshader --enable-unsafe-swiftshader').split(' '),
   });
-  const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+  const viewport = (process.env.VIEWPORT || '1280x800').split('x').map(Number);
+  const page = await browser.newPage({ viewport: { width: viewport[0], height: viewport[1] } });
   const log = [];
   page.on('console', (m) => log.push(m.type() + ': ' + m.text().slice(0, 200)));
   page.on('pageerror', (e) => log.push('pageerror: ' + e.message.slice(0, 200)));
@@ -128,6 +130,29 @@ function serve() {
     }
     report.steps.push(`captured ${shots.length} frames over ${settleMs}ms`);
     report.frames = shots;
+    // Where the canvases are and how big they are, in CSS pixels and in their
+    // own pixels. Flutter web sizes a canvas by the device pixel ratio, and a
+    // screenshot is taken in device pixels, so this is the difference between
+    // "the game drew it here" and "the game drew it there and the page scaled".
+    report.canvases = await page.evaluate(`(() => {
+      const found = [];
+      const walk = (root) => {
+        for (const el of root.querySelectorAll('*')) {
+          if (el.tagName === 'CANVAS') {
+            const r = el.getBoundingClientRect();
+            found.push({
+              attr: el.width + 'x' + el.height,
+              rect: [Math.round(r.x), Math.round(r.y), Math.round(r.width), Math.round(r.height)],
+              dpr: window.devicePixelRatio,
+              win: [window.innerWidth, window.innerHeight],
+            });
+          }
+          if (el.shadowRoot) walk(el.shadowRoot);
+        }
+      };
+      walk(document);
+      return found;
+    })()`).catch((e) => ['canvas walk failed: ' + e]);
     report.notFound = requests.filter(([s]) => s >= 400);
     report.assetCount = requests.length;
     report.urls = requests.map(([, u]) => u.replace(/^http:\/\/[^/]+/, '')).slice(0, 80);

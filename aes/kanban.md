@@ -169,7 +169,7 @@ current_ticket: "T050"
 | T072 | Knight Lore's scrolls and ingredients are not drawn | done |
 | T073 | Three of the six scrolls are in no chest anywhere | done |
 | T074 | Knight Lore's web build never reaches a rendered room | done |
-| T075 | The room is drawn in the corner, unscaled, at runtime | done |
+| T075 | The room is drawn in the corner, unscaled, at runtime | open |
 | T078 | The party was never under the camera, and the anchor counted twice | done |
 | T079 | No test renders the way the game renders | done |
 | T076 | Head over Heels' starting planet had no floor at all | done |
@@ -1150,11 +1150,32 @@ first game onto the same platform
   (`--use-gl=angle --use-angle=swiftshader`, `--use-gl=swiftshader`,
   `--enable-unsafe-swiftshader`, `--disable-gpu`) and at three window sizes, and
   the DOM reports one canvas of 1280x800 at the origin with a device pixel
-  ratio of 1. The page is therefore not a faithful picture of the canvas, and a
-  screenshot of a web build in this environment cannot say *where* the game
-  draws. The off-screen render in `flutter test` can, because it is the same
-  engine with no browser: same code, same numbers, room centred with equal
-  margins.
+  ratio of 1.
+  **Correction, and the reason T075 is open again.** That reading is stated with
+  more confidence than the evidence carries, and the blame is on the wrong party.
+  Instrumenting the room view in a release build, the game reports
+  `canvasSize=Size(1280, 800)`, `scale=2.4`, `offset=(25.6, 73.6)` — the same
+  numbers the off-screen test measures and asserts — while the page shows the
+  room's corner at (660, 470) at roughly half the size the test measures. Both
+  are true at once, and a fresh browser context against a freshly built and
+  served build reproduces it. The DOM says `flutter-view` is at (0,0), 1280x800,
+  device pixel ratio 1, so nothing in the page is offset or scaled. What
+  introduces a half-size and a half-canvas offset has not been named.
+  So two things are unsettled. The off-screen render measures the game's own
+  transform and cannot see this, which is the blind spot the guard it recommends
+  inherits — so "the room is centred and fitted" is established for the render
+  path and not for the player's. And a screenshot here does say *whether* the
+  screen changes, which is what the browser check is for; the reason given for
+  why it cannot say *where* is not established, because the evidence shows an
+  unexplained transform rather than a page that lies.
+  What would settle it: a minimal Flutter web page that draws a rectangle at
+  canvas (0,0) and reports where the page shows it. At (0,0), the page is
+  faithful and the game applies a second transform at runtime. At (666, 474),
+  the page is not faithful and the original reading was right. Ten files, three
+  minutes, and it is the next thing to do before anything more is claimed about
+  where either game draws. The off-screen render still cannot see it: same code,
+  same numbers, room centred with equal margins, and a player looking at a
+  different picture.
 
   So a browser check is worth its cost for one question — *does anything on the
   screen change* — and it is worth exactly that today. Measured on the build at

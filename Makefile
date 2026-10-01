@@ -81,7 +81,7 @@ format:
 format-check:
 	@dart format --output=none --set-exit-if-changed games packages
 
-check: format-check lint test test-packages assets-check
+check: format-check lint test test-packages assets-check test-ai
 
 test-packages:
 	@cd packages/iso_core && flutter test
@@ -149,6 +149,11 @@ verify-browser:
 	@echo ""
 	@echo "Captures and numbers in build/browser/."
 
+
+# The deterministic half of the art pipeline: trim, anchor, palette snap. These
+# are the steps that decide pixels, so they are the steps with tests.
+test-ai:
+	python3 -m pytest scripts/tests -q
 
 assets-check:
 	@python3 scripts/validation_pipeline.py $(GAME)

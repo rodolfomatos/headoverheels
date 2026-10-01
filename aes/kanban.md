@@ -169,12 +169,13 @@ current_ticket: "T050"
 | T072 | Knight Lore's scrolls and ingredients are not drawn | done |
 | T073 | Three of the six scrolls are in no chest anywhere | done |
 | T074 | Knight Lore's web build never reaches a rendered room | done |
-| T075 | The room is drawn in the corner, unscaled, at runtime | open |
+| T075 | The room is drawn in the corner, unscaled, at runtime | done |
 | T078 | The party was never under the camera, and the anchor counted twice | done |
 | T079 | No test renders the way the game renders | done |
 | T076 | Head over Heels' starting planet had no floor at all | done |
 | T077 | The Head over Heels party is not visible in the room | open |
 | T080 | Correction: the page was blamed for the game's own transform | finding |
+| T081 | The render guard skips the camera, so it cannot see placement | open |
 
 ## Sprint 11 — Knight Lore Completion
 **Goal**: turn the second example game into a finished product, then migrate the
@@ -1225,3 +1226,20 @@ first game onto the same platform
   part — a phase parameter in the generators, and a test that the frame count a
   sheet really has matches the count the manifest claims — is the same shape as
   the per-tile guard in T076 and costs about the same.
+
+
+* T081, and it is the finding under T075 rather than a new symptom. The
+  off-screen render test is a real improvement — it draws through the component's
+  own `render` rather than through the helper the code under test also used — and
+  it is still one layer below the player. `FlameGame` draws `world` through its
+  camera; a direct call to `view.render(canvas)` skips that. So the guard
+  measured the view correctly and the game wrongly, agreed with the view, and
+  reported 20/20 and 68/68 margins while the player's room sat in the corner of
+  the window. It passed with the fault present.
+  The fix is not to add an assertion. It is to make the guard render the way the
+  game renders, camera included, and then assert on that. Until then it is a
+  guard over a layer nobody plays on, and the next transform of this kind gets
+  through it. The same shape as the castle, where a check compared dimensions and
+  never looked at the paint, and as the party, where a test built the view it
+  measured. Three today, the same rule: a test that builds what it tests is a
+  test of its own construction.

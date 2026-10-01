@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
+import 'package:flame/components.dart' show Anchor;
 import 'package:flame/game.dart';
 import 'package:flutter/foundation.dart' show ValueNotifier;
 import 'package:flutter/services.dart' show AssetBundle, rootBundle;
@@ -113,6 +114,24 @@ class KnightLoreGame extends FlameGame {
   }
 
   /// True once the world, the maps and the art are loaded.
+  /// The camera must not move the world, because the room view fits itself.
+  ///
+  /// Flame's viewfinder anchors at the centre of the viewport, so every child of
+  /// `world` is drawn half a window down and to the right of where it asked to
+  /// be. `RoomView.render` fits the room to the canvas and centres it, and the
+  /// camera then added half a window on top of that: the room's top-left corner
+  /// landed at (660, 470) in a 1280x800 window instead of at (20, 68), which is
+  /// arithmetically impossible from the view's own centring — the maximum it
+  /// can produce is half the canvas, 640.
+  ///
+  /// No test could see it, because every test renders the view by calling
+  /// `view.render(canvas)` directly and so skips the camera, which is the one
+  /// transform that composes with it. The camera is now pinned to the top left,
+  /// where the view's own centring is the only centring.
+  void _pinTheCamera() {
+    camera.viewfinder.anchor = Anchor.topLeft;
+  }
+
   bool get assetsReady => _loaded;
 
   /// What the load is doing, or what it did.
@@ -461,6 +480,9 @@ class KnightLoreGame extends FlameGame {
   @override
   void onGameResize(Vector2 size) {
     super.onGameResize(size);
+    // Here and not in `onLoad`: the camera's viewfinder reaches for the game's
+    // size, which does not exist until the game has been laid out.
+    _pinTheCamera();
     // The room view is told how big the canvas is here and nowhere else.
     //
     // It used to be told in the frame loop, and only while a room was fading,

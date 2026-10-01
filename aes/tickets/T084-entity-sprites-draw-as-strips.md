@@ -70,6 +70,37 @@ and that has not been traced.
 `SwitchEntity` is not special-cased: it calls the same `showManifestSprite('switch')`
 as the fish and the monster, and tints only when it has been thrown.
 
+## Root cause of the switch regression, found by instrumenting the draw
+
+Rendering the room and reading every entity's art component:
+
+```
+switch_1  SpriteAnimationComponent artSize=[64.0,32.0] pos=[32.0,16.0] frames=8 f0=[0,0]/[48,48] filter=null
+fish_1    SpriteAnimationComponent artSize=[64.0,32.0] pos=[32.0,16.0] frames=8 f0=[0,0]/[32,32] filter=null
+monster_1 SpriteAnimationComponent artSize=[64.0,32.0] pos=[32.0,16.0] frames=8 f0=[0,0]/[64,64] filter=null
+key_1     SpriteAnimationComponent artSize=[32.0,16.0] pos=[32.0,16.0] frames=8 f0=[0,0]/[24,24] filter=null
+```
+
+No colour filter on any of them, so the tint in `SwitchEntity._showState` is not
+the cause. Then the sheets:
+
+```
+fish     cell 64x32 cols filled [0,1,2,3]  (manifest frames=8)
+monster  cell 64x64 cols filled [0,1,2,3]  (manifest frames=8)
+switch   cell 48x48 cols filled [0,1,2,3]  (manifest frames=8)
+key      cell 24x24 cols filled [0,1,2,3]  (manifest frames=8)
+```
+
+**Every** entity declares eight frames and has four filled cells. With `srcSize`
+cutting real cells, an eight-frame animation spends half its life on blank
+cells, so whether an entity is on screen depends on where its ticker happened to
+be when the frame was taken. Before `srcSize`, every frame drew the whole sheet,
+so every entity was always visible and the blank cells could not hide anything --
+which is why the strip bug masked this.
+
+The switch is not special. It was simply the entity whose ticker was past the
+fourth cell when the measurement ran.
+
 ## Why nothing was committed
 
 A fix that makes two entities legible and one invisible is not a fix. The whole

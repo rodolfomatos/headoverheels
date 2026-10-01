@@ -174,6 +174,7 @@ current_ticket: "T050"
 | T079 | No test renders the way the game renders | done |
 | T076 | Head over Heels' starting planet had no floor at all | done |
 | T077 | The Head over Heels party is not visible in the room | open |
+| T080 | Correction: the page was blamed for the game's own transform | finding |
 
 ## Sprint 11 — Knight Lore Completion
 **Goal**: turn the second example game into a finished product, then migrate the

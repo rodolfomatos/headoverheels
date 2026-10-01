@@ -104,10 +104,18 @@ assets-preview:
 # It does NOT answer "where is the room drawn". Measured: a rectangle the game
 # draws at canvas (0,0) lands in the page at x[666..1280] y[474..800], a scale
 # of 1.535 in x and 1.087 in y, and the same numbers under four GL
-# configurations and three window sizes, while the harness itself puts a plain
-# canvas rectangle at exactly the right pixel. The page is not a faithful
-# picture of the canvas here, so a screenshot cannot place anything. The
-# off-screen render in `flutter test` can, and is what the render guards use.
+# configurations and three window sizes. That factor is not distortion and it
+# never was: it is the canvas letterboxed inside a wider, shorter page, with the
+# margin in black. The mapping is a fixed affine, so
+# `scripts/browser_canvas_geometry.js` inverts it and the harness's own plain
+# canvas rectangle lands on the expected page pixel every time. An earlier
+# version of this comment called the page unfaithful and pointed at the browser
+# as the culprit; that was wrong, and it cost a day of browser-side geometry
+# work before the browser was cleared. See aes/decisions/D001.md.
+#
+# What the browser still cannot do is read game state: pixel evidence says
+# whether something was drawn, not what it is. Identity and composition come from
+# the off-screen render in `flutter test`, which is what the render guards use.
 #
 # The gate is on Head over Heels only, and only because there is something there
 # to move: its party is animated and its entities walk, so a still frame is a

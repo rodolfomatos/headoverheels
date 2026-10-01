@@ -16,7 +16,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flame/components.dart';
-import 'package:headoverheels/features/gameplay/game.dart';
 
 import 'support/hoh_frame.dart';
 

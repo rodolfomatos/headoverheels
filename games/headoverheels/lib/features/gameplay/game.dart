@@ -127,7 +127,7 @@ class HeadOverHeelsGame extends FlameGame
 
     // Remove current room if exists
     if (_currentRoom != null) {
-      _unloadCurrentRoom();
+      await _unloadCurrentRoom();
     }
 
     // Create and load new room
@@ -213,20 +213,30 @@ class HeadOverHeelsGame extends FlameGame
   }
 
   /// Unload the current room.
-  void _unloadCurrentRoom() {
+  ///
+  /// The party goes back to the world, and that is the whole invariant: between
+  /// rooms the party lives in `world`, and inside a room it is a child of that
+  /// room. It used to be detached here instead, and that was two faults at once.
+  /// The loop removed each character from the very list it was iterating, which
+  /// throws `ConcurrentModificationError` and stops the room change dead — the
+  /// door a player walks through does nothing. And `removeCharacter` detaches,
+  /// so with the room as the character's only parent, both characters ended up in
+  /// no tree at all, and a `FlameGame` draws no tree but its own: the party
+  /// vanished on the first door rather than moving rooms.
+  Future<void> _unloadCurrentRoom() async {
     if (_currentRoom == null) return;
+    final room = _currentRoom!;
 
-    // Remove characters from room (they stay in game)
-    for (final character in _currentRoom!.characters) {
-      _currentRoom!.removeCharacter(character);
+    for (final character in room.characters.toList()) {
+      room.removeCharacter(character);
+      await world.add(character);
     }
 
-    // Remove room entities
-    for (final entity in _currentRoom!.entities) {
+    for (final entity in room.entities.toList()) {
       entity.removeFromParent();
     }
 
-    _currentRoom?.removeFromParent();
+    room.removeFromParent();
     _currentRoom = null;
   }
 

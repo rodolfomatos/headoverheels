@@ -146,12 +146,18 @@ void main() {
             greaterThan(0),
             reason: '\$entry.id says its frames are \$frameWidth wide',
           );
+          // The declared frames have to fit inside the sheet, not tile it. The
+          // sheets are eight cells wide and hold four frames per animation, so a
+          // count of eight was not "wrong width": it was four blank cells at the
+          // end of every row. Asserting equality is what let that in -- it
+          // passed, because eight frames of eight cells does tile the sheet.
           expect(
             declared,
-            equals(width ~/ frameWidth),
+            lessThanOrEqualTo(width ~/ frameWidth),
             reason:
-                '\${entry.id} says \$declared frames of \${frameWidth}px, and '
-                '${file.path} is ${width}px wide',
+                '\${entry.id} says \$declared frames of \${frameWidth}px, but '
+                '${file.path} is ${width}px wide and holds '
+                '\${width ~/ frameWidth}',
           );
         }
       },

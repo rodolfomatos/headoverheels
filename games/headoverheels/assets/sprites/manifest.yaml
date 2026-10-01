@@ -666,7 +666,7 @@ assets:
   category: entity
   entity: fish
   animation: swim
-  frames: 8
+  frames: 4
   frame_duration: 100
   loop: true
   master: fish_swim_master
@@ -686,7 +686,7 @@ assets:
   category: entity
   entity: rabbit
   animation: hop
-  frames: 8
+  frames: 4
   frame_duration: 200
   loop: true
   master: rabbit_hop_master
@@ -706,7 +706,7 @@ assets:
   category: entity
   entity: crown
   animation: rotate
-  frames: 8
+  frames: 4
   frame_duration: 150
   loop: true
   master: crown_rotate_master
@@ -726,7 +726,7 @@ assets:
   category: entity
   entity: spring
   animation: idle
-  frames: 8
+  frames: 4
   frame_duration: 200
   loop: true
   master: spring_master
@@ -746,7 +746,7 @@ assets:
   category: entity
   entity: switch
   animation: 'off'
-  frames: 8
+  frames: 4
   frame_duration: 0
   loop: false
   master: switch_off_master
@@ -766,7 +766,7 @@ assets:
   category: entity
   entity: conveyor
   animation: belt
-  frames: 8
+  frames: 4
   frame_duration: 100
   loop: true
   master: conveyor_belt_master
@@ -786,7 +786,7 @@ assets:
   category: entity
   entity: teleport
   animation: swirl
-  frames: 8
+  frames: 4
   frame_duration: 150
   loop: true
   master: teleport_swirl_master
@@ -806,7 +806,7 @@ assets:
   category: entity
   entity: door
   animation: closed
-  frames: 8
+  frames: 4
   frame_duration: 0
   loop: false
   master: door_closed_master
@@ -826,7 +826,7 @@ assets:
   category: entity
   entity: monster
   animation: walk
-  frames: 8
+  frames: 4
   frame_duration: 100
   loop: true
   master: monster_walk_master
@@ -846,7 +846,7 @@ assets:
   category: entity
   entity: guardian
   animation: patrol
-  frames: 8
+  frames: 4
   frame_duration: 100
   loop: true
   master: guardian_patrol_master
@@ -866,7 +866,7 @@ assets:
   category: entity
   entity: hush_puppy
   animation: sleep
-  frames: 8
+  frames: 4
   frame_duration: 200
   loop: true
   master: hush_puppy_sleep_master
@@ -886,7 +886,7 @@ assets:
   category: entity
   entity: bag
   animation: idle
-  frames: 8
+  frames: 4
   frame_duration: 0
   loop: false
   master: bag_idle_master
@@ -906,7 +906,7 @@ assets:
   category: entity
   entity: key
   animation: idle
-  frames: 8
+  frames: 4
   frame_duration: 0
   loop: false
   master: key_idle_master
@@ -926,7 +926,7 @@ assets:
   category: entity
   entity: doughnut
   animation: idle
-  frames: 8
+  frames: 4
   frame_duration: 0
   loop: false
   master: doughnut_idle_master

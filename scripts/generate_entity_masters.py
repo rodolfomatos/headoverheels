@@ -68,8 +68,13 @@ def create_entity_masters():
         
         for i, anim in enumerate(animations):
             for frame in range(4):  # 4 frames per animation
+                # The sheet is 8 columns by 4 rows and each animation gets one
+                # row. `i * 4 + frame // 8` put animation two at row 4, which is
+                # past the bottom of a four-row sheet: PIL pasted it nowhere and
+                # rows 1 to 3 stayed empty, so an entity's second animation was
+                # absent from the very file it was generated into.
                 col = frame % 8
-                row = i * 4 + frame // 8
+                row = i
                 x = col * size[0]
                 y = row * size[1]
                 

@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'dart:math' as math;
 import 'dart:ui' show Offset, Rect;
 
+import 'package:flame/components.dart';
 import 'package:headoverheels/core/isometric.dart';
 import 'package:headoverheels/features/gameplay/entities/puzzle_entity.dart';
 import 'package:headoverheels/features/gameplay/state/character_notifier.dart';
@@ -161,6 +162,14 @@ void main() {
       );
 
       // --- every entity draws something --------------------------------------
+      // Each entity's art is held on its first frame first. Without that, this
+      // measures the animation as well as the sprite: an entity is invisible for
+      // as long as its ticker sits on a frame the sheet never filled, so the
+      // count depended on which entity had been mounted for how long. Measured
+      // that way, `switch_1` came out at 800px with the strip bug and 0px
+      // without it, which reads as "the fix erased a switch" and is really "the
+      // fix stopped hiding the blank frames".
+      await pinArtToFirstFrame(game.room.entities);
       final drawn = <String, int>{};
       final entities = game.room.entities;
       final takenOut = <PuzzleEntity>[];
@@ -228,4 +237,22 @@ void main() {
     },
     timeout: const Timeout(Duration(minutes: 5)),
   );
+}
+
+/// Holds every entity's art on its first frame.
+///
+/// An entity's sprite is a strip, and the manifest may claim more frames than
+/// the sheet has cells filled. A playing animation therefore alternates between
+/// drawing and drawing nothing, and any pixel count taken from it is a
+/// measurement of the clock rather than of the art. Frame zero is the frame the
+/// art is drawn from and the frame a player sees standing still.
+Future<void> pinArtToFirstFrame(Iterable<PuzzleEntity> entities) async {
+  for (final entity in entities) {
+    for (final child in entity.children) {
+      if (child is SpriteAnimationComponent) {
+        child.playing = false;
+        child.animationTicker?.reset();
+      }
+    }
+  }
 }

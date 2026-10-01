@@ -10,7 +10,8 @@ import math
 import random
 
 # Output directories
-OUTPUT_DIR = Path(__file__).parent.parent / "assets" / "sprites" / "entities"
+GAME = Path(__file__).parent.parent / "games" / "headoverheels"
+OUTPUT_DIR = GAME / "assets" / "sprites" / "entities"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # Color palette - Spectrum+ (2026) - Entity colors
@@ -49,9 +50,6 @@ ENTITIES = {
     "key": {"size": (24, 24), "color": "entity_key", "animations": ["idle", "collected"]},
     "doughnut": {"size": (16, 16), "color": "entity_doughnut", "animations": ["idle", "thrown"]},
 }
-
-OUTPUT_DIR = Path(__file__).parent.parent / "assets" / "sprites" / "entities"
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def create_entity_masters():
@@ -97,7 +95,7 @@ def create_entity_masters():
                 
                 sheet.paste(frame_img, (x, y))
         
-        entity_dir = Path(__file__).parent.parent / "assets" / "sprites" / "entities" / entity_name
+        entity_dir = OUTPUT_DIR / entity_name
         entity_dir.mkdir(parents=True, exist_ok=True)
         sheet.save(entity_dir / f"{entity_name}_master.png")
         print(f"Created {entity_name}_master.png")

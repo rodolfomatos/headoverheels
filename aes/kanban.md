@@ -176,6 +176,7 @@ current_ticket: "T050"
 | T077 | The Head over Heels party is not visible in the room | open |
 | T082 | HoH drew the room in a different coordinate space | done |
 | T084 | HoH entities are drawn as bars, not sprites | open |
+| T086 | The entity generator wrote to the repository root, not the game | done |
 | T085 | HoH rendered an empty room after a joystick drag, once | open |
 | T083 | Head over Heels has no keyboard at all | open |
 | T080 | Correction: the page was blamed for the game's own transform | finding |
@@ -1328,3 +1329,44 @@ first game onto the same platform
   more than it looks: a room that empties itself is a state the game has no way
   to describe, and it would be found by the same guard that caught T082 if the
   guard also asserted that what was there is still there.
+
+
+* T086, found while working T084, and it is the reason a directory called
+  `assets/` kept appearing at the root of the repository. `generate_entity_masters.py`
+  defined its output path three times and the one that was actually read when
+  saving was `Path(__file__).parent.parent / "assets" / "sprites" / "entities"`,
+  which is the repository root. The two `OUTPUT_DIR` constants beside it pointed
+  at the same wrong place and were read by nothing. So the script has been
+  writing a whole tree of entity sheets somewhere the game does not look, and
+  the sheets the game uses came from somewhere else entirely. There is now one
+  definition, it names the game, and the save reads it. Running it produces
+  byte-identical files to the ones committed, which is the check that it is now
+  writing where it always meant to.
+* T084 stays open, and this is what is known. Three things were measured.
+  First: the registry builds each animation frame without a `srcSize`, and
+  Flame takes the whole sheet as the source rectangle when that is absent, so a
+  512-wide strip was squeezed into a 64x32 tile and what reached the screen was
+  the thin slice of art that survived — every entity in the game was a coloured
+  bar. Giving each frame its own `srcSize` doubles the ink the room's contents
+  paint, from 8,656 to 19,052 pixels. That fix is real and it is *not* landed,
+  because it makes one entity that was accidentally visible go invisible, and a
+  red gate is not a commit.
+  Second: the entity generator draws four frames into a grid of eight columns,
+  and all fourteen entity strips have four empty trailing frames out of the eight
+  their manifest declares. Half of every animation's cycle is nothing. The
+  generator's own variation code says it was meant to draw eight: `angle = frame
+  * 45` is a complete turn over frames zero to seven. Changing it to eight fills
+  every column — measured, zero empty frames across all fourteen — and it is
+  *not* landed either, because it is what makes the switch stop painting, and
+  the switch's failure is not yet understood.
+  Third: the switch's sheet is four rows tall and only the first is used, because
+  the loop writes animation `i` to row `i * 4` and the second animation lands on
+  row 4 of a four-row sheet, where PIL crops it silently. The registry reads
+  `srcPosition` on row 0 for every animation, so it can only ever draw the first
+  animation of any entity, and nothing checks that the row an animation names is
+  a row that exists.
+  So the two changes that are known to be right cannot land until the switch's
+  row is resolved, and the two faults are coupled: the missing `srcSize` was
+  hiding the empty frames, and the empty frames were hiding a row that does not
+  exist. Both were caught by the same sentence in a test that was written to
+  catch something else.

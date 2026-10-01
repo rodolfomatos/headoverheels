@@ -61,7 +61,7 @@ void main() {
     // The game's own draw: the component's `render`, on a canvas of the same
     // shape as the window, with no helper and no size argument. This is the
     // path a player gets and the one no test took.
-    final frame = await _shoot(view, window);
+    final frame = await _shoot(game, view, window);
     await _writePng(frame, 'knightlore_runtime');
     // ignore: avoid_print
     print(
@@ -152,10 +152,35 @@ class _Frame {
   static const int background = 0x101216;
 }
 
-Future<_Frame> _shoot(RoomView view, Size size) async {
+/// Renders the way the game renders, which is not the same as rendering the
+/// view.
+///
+/// A `FlameGame` draws `world` through its camera, so a call to
+/// `view.render(canvas)` skips a transform the player never skips. That is not
+/// hypothetical: the camera's viewfinder anchors at the centre of the viewport
+/// and adds half a window to everything, the view was centring the room as
+/// well, and the two composed into a room in the corner of the screen. This
+/// test called `view.render` and reported 20/20 and 68/68 margins while the
+/// player saw the corner. It called the right method one layer too low.
+Future<_Frame> _shoot(KnightLoreGame game, RoomView view, Size size) async {
   final recorder = ui.PictureRecorder();
   final canvas = Canvas(recorder, Rect.fromLTWH(0, 0, size.width, size.height));
   canvas.drawColor(const Color(0xFF101216), BlendMode.src);
+  // The camera's own transform, applied the way the camera applies it, and then
+  // the view's render. Those two compose, and only the composition is what a
+  // player sees.
+  //
+  // Calling `game.render` instead would be more faithful still and is not
+  // available here: a `CameraComponent` renders the world only once the world
+  // is mounted, and a `GameWidget` is what mounts it — and the widget's own
+  // load never returns in a widget test, so the loop never steps and the world
+  // never mounts (measured). So the guard composes the two transforms by hand,
+  // which is the part that was missing. The camera's transform is read from the
+  // camera, not hard-coded, so pinning the viewfinder changes what this sees.
+  canvas.transform(
+    Float64List.fromList(
+        game.camera.viewfinder.transform.transformMatrix.storage),
+  );
   view.render(canvas);
   final image = await recorder
       .endRecording()

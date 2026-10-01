@@ -175,7 +175,7 @@ current_ticket: "T050"
 | T076 | Head over Heels' starting planet had no floor at all | done |
 | T077 | The Head over Heels party is not visible in the room | open |
 | T080 | Correction: the page was blamed for the game's own transform | finding |
-| T081 | The render guard skips the camera, so it cannot see placement | open |
+| T081 | The render guard skips the camera, so it cannot see placement | done |
 
 ## Sprint 11 — Knight Lore Completion
 **Goal**: turn the second example game into a finished product, then migrate the
@@ -1243,3 +1243,20 @@ first game onto the same platform
   never looked at the paint, and as the party, where a test built the view it
   measured. Three today, the same rule: a test that builds what it tests is a
   test of its own construction.
+
+
+* T081, closed by making the guard render what the player renders. It applies
+  the camera's own transform, read from the camera, before the view's — so
+  pinning the viewfinder changes what the guard sees. Run with the anchor put
+  back to `center`, it reports `box=[660, 468, 1280, 800]` and margins 660/0,
+  and fails; that 660,468 is the corner the ruler measured in a browser and the
+  corner the arithmetic predicted, three routes to one number. The same line also
+  prints the view's own `offset=Offset(25.6, 73.6)`: one run, two answers to
+  where the room is, and only one of them is the player's. That gap is the whole
+  finding, printed.
+  `game.render` would be more faithful and is not reachable: `CameraComponent`
+  renders the world only once it is mounted, a `GameWidget` mounts it, and the
+  widget's load never returns in a widget test, so an unmounted `game.render`
+  gives a blank frame. The limit is recorded in D003 rather than glossed — the
+  guard composes the viewfinder and not the viewport, so a change to the
+  viewport's anchor would still pass it.

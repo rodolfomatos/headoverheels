@@ -174,7 +174,9 @@ current_ticket: "T050"
 | T079 | No test renders the way the game renders | done |
 | T076 | Head over Heels' starting planet had no floor at all | done |
 | T077 | The Head over Heels party is not visible in the room | open |
-| T082 | HoH draws the room and its entities in different places | open |
+| T082 | HoH drew the room in a different coordinate space | done |
+| T084 | HoH entities are drawn as bars, not sprites | open |
+| T085 | HoH rendered an empty room after a joystick drag, once | open |
 | T083 | Head over Heels has no keyboard at all | open |
 | T080 | Correction: the page was blamed for the game's own transform | finding |
 | T081 | The render guard skips the camera, so it cannot see placement | done |
@@ -1295,3 +1297,34 @@ first game onto the same platform
   third time today an instrument acted on something other than the thing I was
   measuring, and the third time the screenshot was the evidence and the
   interpretation was the guess.
+
+
+* T082, closed, and it was one line of placement. `worldBounds` is the isometric
+  projection, the space `gridToScreen` puts every entity in and the space the
+  camera frames. `flame_tiled` puts a right-down isometric map at its own local
+  origin, the top corner of its bounding box. Same room, two systems, a
+  room-width apart, and the camera was framing the space none of it was in. The
+  map now goes to `worldBounds.topLeft`, read from the map rather than written
+  down.
+  The guard removes every entity and both characters, renders what is left as the
+  room, and requires the contents to be inside it. Before: room at
+  `x[571, 1280]`, contents at `x[0, 1160]`, fail. After: room at `x[0, 1280]`,
+  contents unchanged at `x[0, 1160]`, pass — and the room's ink rose from 232,584
+  to 410,289 because it had been half off the frame. The contents never moved.
+  They were always in the right space; only the map was in the wrong one.
+  Checked in a browser too, because an off-screen test is what misled this
+  project twice today: the room is centred, fills the frame, carries its wall
+  border and its moss.
+* T084, the second fault in D004, and the one the guard above does not catch: it
+  asks whether the entities are in the room, not whether they look like
+  anything. They are short coloured bars. The off-screen harness reports each
+  entity painting 1,943 to 4,866 pixels, which is consistent with a bar and not
+  with a crown, a chest or a monster. That is the day-one observation about
+  `runtime_size`, never followed up because everything else was more urgent.
+* T085, recorded because it was seen and not because it is understood. Holding
+  the virtual joystick for two and a half seconds produced a room with no
+  entities and no party on it, while the HUD still said `castle gatehouse`. One
+  observation, not reproduced, so it is a question and not a finding. It matters
+  more than it looks: a room that empties itself is a state the game has no way
+  to describe, and it would be found by the same guard that caught T082 if the
+  guard also asserted that what was there is still there.

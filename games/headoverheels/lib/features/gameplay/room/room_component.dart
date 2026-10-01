@@ -38,6 +38,20 @@ class RoomComponent extends PositionComponent with HasGameReference {
       prefix: '',
     );
     _tileMap = _tiledComponent!.tileMap;
+    // Put the map at the origin of the space everything else is drawn in.
+    //
+    // `flame_tiled` places a right-down isometric map at its own local origin,
+    // which is the top corner of its bounding box, and this game's positions
+    // come from `gridToScreen`, where a room spans x from -(height-1)*32 to
+    // (width-1)*32 + tileWidth. Those are the same room in two coordinate
+    // systems, a room-width apart, so the map was drawn to the right of every
+    // entity standing on it and the camera framed the space none of it was in.
+    // The offset is the map's own extent and nothing else, so it is read from
+    // the map rather than written down.
+    final bounds = worldBounds;
+    if (bounds != null) {
+      _tiledComponent!.position = Vector2(bounds.left, bounds.top);
+    }
     add(_tiledComponent!);
 
     // Spawn entities from triggers

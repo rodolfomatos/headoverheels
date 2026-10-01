@@ -174,6 +174,8 @@ current_ticket: "T050"
 | T079 | No test renders the way the game renders | done |
 | T076 | Head over Heels' starting planet had no floor at all | done |
 | T077 | The Head over Heels party is not visible in the room | open |
+| T082 | HoH draws the room and its entities in different places | open |
+| T083 | Head over Heels has no keyboard at all | open |
 | T080 | Correction: the page was blamed for the game's own transform | finding |
 | T081 | The render guard skips the camera, so it cannot see placement | done |
 
@@ -1260,3 +1262,36 @@ first game onto the same platform
   gives a blank frame. The limit is recorded in D003 rather than glossed — the
   guard composes the viewfinder and not the viewport, so a change to the
   viewport's anchor would still pass it.
+
+
+* T082, found by looking at the Head over Heels build again, and it is not the
+  party. The room is drawn and it is in the wrong place, and the entities are
+  drawn and they are somewhere else again: in a 1000x720 window the room occupies
+  roughly x 470 to the right edge and runs off it, while sixteen entities appear
+  as six-pixel squares between x 60 and x 660. Whatever the party is doing, it is
+  in the middle of a room that is not there and a scatter of squares that are.
+  The page is not at fault: `scripts/browser_canvas_geometry.js` reports one
+  canvas, intrinsic 1280x800, CSS 1280x800, at the origin, dpr 1 — the same
+  measurement that cleared the Knight Lore page in D001. So the game is drawing
+  two things in two coordinate systems, and an off-screen test cannot see it,
+  which is the same blind spot as T075 and T081 and now on the other game: T078
+  reports the party painting 3,635 pixels, and painting is not being in the
+  room.
+  Two candidate causes, read but not discriminated. `gridToScreen` puts an
+  entity at `((x-y)*32, (x+y)*16)`, which for a sixteen-by-sixteen room spans
+  x -512 to 512; the camera is framed on `worldBounds`. If `worldBounds` is in
+  that same space the two agree, and if the tilemap is placed in map-pixel space
+  instead, it is drawn a whole room-width to the right. Which one it is, is one
+  read of `worldBounds` and one of where the tilemap is added.
+* T083, and this one is a requirement rather than a fault. `InputSystem` has
+  `onJoystickDirection`, `onJump`, `onCarry`, `onFire` and `onSwop`, and no key
+  handler of any kind: on a desktop browser the arrows and WASD do nothing, and
+  the only input is the on-screen joystick and four buttons drawn for a phone.
+  It also corrects something I said earlier today and got wrong by inference: I
+  reported that "the keys move the party". The page did not scroll — measured,
+  scrollX and scrollY unchanged — so the keypress changed the frame without
+  scrolling, and with no key handler in the input system it was not the party
+  moving either. I read a changed screenshot as a moved character. That is the
+  third time today an instrument acted on something other than the thing I was
+  measuring, and the third time the screenshot was the evidence and the
+  interpretation was the guess.

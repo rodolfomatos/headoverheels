@@ -125,12 +125,16 @@ class HeadOverHeelsGame extends FlameGame
       throw StateError('Room not found: $roomId');
     }
 
-    // Remove current room if exists
-    if (_currentRoom != null) {
-      await _unloadCurrentRoom();
-    }
+    final previous = _currentRoom;
 
-    // Create and load new room
+    // Create and load the new room while the old one is still standing.
+    //
+    // The order here is the whole fix. This used to unload first, and unloading
+    // detached each character and then awaited `world.add` to re-attach it -- so
+    // across that await the character had no parent at all, and a `FlameGame`
+    // draws no tree but its own. The party blinked out for a frame on every
+    // door. The original bug was the same shape with no window: it detached and
+    // never re-attached, so the party was gone rather than blinking.
     final room = RoomComponent(roomId: roomId, definition: definition);
     // Into the world, not into the game. `FlameGame`'s camera draws the world
     // and nothing else, so a component added to the game itself never goes
@@ -138,6 +142,38 @@ class HeadOverHeelsGame extends FlameGame
     // and the left half of every room, which is negative x, is off the side of
     // the screen. That is where the party went.
     await world.add(room);
+
+    // Move the party across in one synchronous step. `removeCharacter` detaches
+    // and `addCharacter` attaches, and there is no `await` between them, so the
+    // party is parented before the step and parented after it and never
+    // unattached in between. A copy of the list, because the first call removes
+    // from the very list being walked -- which is the `ConcurrentModificationError`
+    // this whole sequence was written to avoid.
+    if (previous != null) {
+      // The component tree is the truth, not `characters`. The list and the tree
+      // disagree: a room loaded with a party in it reports an empty `characters`
+      // while the party is a child of the room, so iterating the list moved
+      // nobody and the party stayed in the room that was about to be torn down.
+      final carried = previous.children
+          .whereType<CharacterComponent>()
+          .toList();
+      for (final character in carried) {
+        previous.removeCharacter(character);
+        room.addCharacter(character);
+      }
+      // And if the room never held them, they are in the world, as they are
+      // before the first room loads.
+      if (carried.isEmpty) _moveCharactersToRoom(room);
+    }
+
+    // Only now is the old room torn down, with nobody in it.
+    if (previous != null) {
+      for (final entity in previous.entities.toList()) {
+        entity.removeFromParent();
+      }
+      previous.removeFromParent();
+    }
+
     _currentRoom = room;
     _currentRoomId = roomId;
     ref.read(crownsProvider.notifier).arriveOn(definition.theme);
@@ -145,8 +181,9 @@ class HeadOverHeelsGame extends FlameGame
     // Play music for the room's planet/theme
     _playRoomMusic(definition.theme);
 
-    // Add characters to new room
-    _moveCharactersToRoom(room);
+    // Only the first room needs the characters found, because after this they
+    // are always in a room and never in the world.
+    if (previous == null) _moveCharactersToRoom(room);
     _frameRoom();
   }
 
@@ -181,8 +218,11 @@ class HeadOverHeelsGame extends FlameGame
     // In the world, because that is where the game put them: looking in the
     // game's own children found nothing and the party was never moved into a
     // room at all.
+    // Over the whole subtree, not `world.children`. The party is a child of a
+    // room, which is a child of the world, so a search of the world's direct
+    // children finds nobody and this method has never moved anyone.
     final found = <CharacterComponent>[];
-    world.children.query<CharacterComponent>().forEach(found.add);
+    world.descendants().whereType<CharacterComponent>().forEach(found.add);
     for (final character in found) {
       if (character.type == CharacterType.head) {
         head = character;
@@ -210,34 +250,6 @@ class HeadOverHeelsGame extends FlameGame
     // For now, use spawn point
     final definition = _worldGraph.getRoom(_currentRoomId);
     return definition?.spawnPoint;
-  }
-
-  /// Unload the current room.
-  ///
-  /// The party goes back to the world, and that is the whole invariant: between
-  /// rooms the party lives in `world`, and inside a room it is a child of that
-  /// room. It used to be detached here instead, and that was two faults at once.
-  /// The loop removed each character from the very list it was iterating, which
-  /// throws `ConcurrentModificationError` and stops the room change dead — the
-  /// door a player walks through does nothing. And `removeCharacter` detaches,
-  /// so with the room as the character's only parent, both characters ended up in
-  /// no tree at all, and a `FlameGame` draws no tree but its own: the party
-  /// vanished on the first door rather than moving rooms.
-  Future<void> _unloadCurrentRoom() async {
-    if (_currentRoom == null) return;
-    final room = _currentRoom!;
-
-    for (final character in room.characters.toList()) {
-      room.removeCharacter(character);
-      await world.add(character);
-    }
-
-    for (final entity in room.entities.toList()) {
-      entity.removeFromParent();
-    }
-
-    room.removeFromParent();
-    _currentRoom = null;
   }
 
   /// The notifier behind a character, so a pickup can reach its state: the hand

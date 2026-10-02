@@ -1,6 +1,6 @@
 ---
 id: T087
-status: open
+status: done
 severity: major
 found_by: aes-peer-review/2026-09-30-render-fidelity (pragmatic)
 decision: D006
@@ -20,6 +20,60 @@ cannot be driven from `testWidgets`. Reasoning and measurements in
 Either an `integration_test` that walks through a door, or a seam that lets a
 test unload a room without loading one. Not a test that hangs.
 
+
+## Closed, in the order the ticket specified
+
+Build the new room while the old one stands; move the party across in one
+synchronous step; tear the old one down with nobody in it; assert the invariant at
+every step.
+
+```dart
+final previous = _currentRoom;
+final room = RoomComponent(roomId: roomId, definition: definition);
+await world.add(room);                       // the old room is still standing
+
+if (previous != null) {
+  final carried = previous.children.whereType<CharacterComponent>().toList();
+  for (final character in carried) {         // no await in this loop
+    previous.removeCharacter(character);
+    room.addCharacter(character);
+  }
+  if (carried.isEmpty) _moveCharactersToRoom(room);
+}
+
+if (previous != null) {                      // nobody is in it now
+  for (final entity in previous.entities.toList()) entity.removeFromParent();
+  previous.removeFromParent();
+}
+```
+
+`_unloadCurrentRoom` is gone: it had one caller and the sequence above replaces it.
+
+## Two faults the test found in the refactor itself
+
+**`previous.characters` was the wrong source.** The list and the component tree
+disagree: a room loaded with a party in it reports an empty `characters` while the
+party is a child of the room. Iterating the list moved nobody and the party stayed
+in the room that was about to be torn down. The tree is the truth.
+
+**`_moveCharactersToRoom` had never moved anyone.** It searched
+`world.children.query<CharacterComponent>()` — the world's *direct* children. The
+party is a child of a room, which is a child of the world, so the search stopped
+one level too high and found nothing, every time, since the method was written. It
+now walks `world.descendants()`.
+
+The test's own helper made the same mistake first: it searched the game's
+children and the world's children and returned 4 for 2 characters, because the
+world is itself a descendant of the game.
+
+## Result
+
+`room_transition_test.dart` is in `test/`. It starts a transition without awaiting
+it — the only way a widget test gets that far — and asserts at every step that both
+characters are in a tree the game draws, that the transition does not throw, that
+the room changed, and that the party is in the room afterwards. 117 tests pass.
+
+## The original gap, recorded
 
 ## The fix for the party has a one-frame gap, found by the test this ticket asked for
 

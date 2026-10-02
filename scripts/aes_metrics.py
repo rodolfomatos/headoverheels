@@ -298,6 +298,21 @@ def conflict(today: datetime.date) -> dict:
                 "severity": "blocker",
             })
 
+    # 1c. A decision that governs nothing. Either a decision in general, or a
+    #     record that missed its ticket -- and the second is invisible, because
+    #     the record reads as authoritative and nothing joins it to the board.
+    ungoverned = [r["id_name"] for r in records if not r["ticket"]]
+    if ungoverned:
+        findings.append({
+            "class": "decision with no ticket",
+            "where": ", ".join(ungoverned),
+            "detail": "these decisions name no ticket. Either they are "
+                      "decisions in general, which is worth saying out loud, "
+                      "or a record missed its ticket and cannot be found from "
+                      "the board.",
+            "severity": "minor",
+        })
+
     # 2. Epistemic contradictions: two records answering the same question with
     #    different verdicts, where one retracts the other and the retracted one
     #    is still standing in the directory.

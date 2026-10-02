@@ -681,3 +681,32 @@ def test_the_projects_index_agrees_with_its_scores():
         assert report["metrics"]["defined"]["index_matches_scores"] is True, (
             "aes/shadow/INDEX.md is not in descending score order; it is what "
             "the next session reads first")
+
+
+def test_a_decision_naming_no_ticket_is_a_finding(tmp_path, monkeypatch):
+    """A decision that governs nothing, or a record that missed its ticket.
+
+    The second is invisible: the record reads as authoritative, and nothing joins
+    it to the board, so a decision about T082 that forgot to say T082 is
+    findable only by reading every file in the directory.
+    """
+    monkeypatch.setattr(aes, "DECISIONS", tmp_path / "decisions")
+    monkeypatch.setattr(aes, "TICKETS", tmp_path / "tickets")
+    monkeypatch.setattr(aes, "SHADOW", tmp_path / "shadow")
+    write(tmp_path / "decisions" / "D001.md",
+          "---\nid: D001\ndate: 2026-09-30\nquestion: why\n"
+          "verdict: SUPORTADA\n---\n\nmeasured\n")
+    write(tmp_path / "shadow" / "access.log", "D001 2026-09-30 a x\n")
+
+    report = aes.conflict(TODAY)
+
+    assert any(f["class"] == "decision with no ticket"
+               for f in report["findings"])
+
+
+def test_every_decision_in_this_project_names_its_ticket():
+    ungoverned = [f["where"] for f in aes.conflict(TODAY)["findings"]
+                  if f["class"] == "decision with no ticket"]
+
+    assert ungoverned == [], (
+        f"decisions with no ticket: {ungoverned}")

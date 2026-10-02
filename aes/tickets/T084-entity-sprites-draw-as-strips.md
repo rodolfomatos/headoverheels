@@ -1,6 +1,6 @@
 ---
 id: T084
-status: open
+status: done
 severity: major
 supersedes: the "bars" symptom previously noted as T084
 ---
@@ -113,3 +113,25 @@ Instrument `SpriteAnimationComponent`'s render for `switch_1` alone and compare
 the draw call against `fish_1`. The suspect is size: a 48x48 cell is square,
 and a square cell is the only shape here where the sprite is as large as the
 box the caller gives it.
+
+
+## Closed, in three commits that could not be separated
+
+`f248ce1` — the manifest declared eight frames of sheets holding four, and the
+generator wrote animations two to four at rows 4, 8 and 12 of a four-row sheet,
+where PIL pasted them nowhere. Every sheet had exactly one filled row. The test
+that should have caught it asserted the frames *tiled* the sheet, and eight frames
+of eight cells does tile it.
+
+`fe27b6a` — `SpriteRegistry` built `Sprite(image)` with no `srcSize`, so an
+entity's frame was the whole 384x192 master sheet squeezed into a 64x32 box. Fish
+and monster quadrupled. `switch_1` went to 0px, which looked like the fix erasing
+a switch and was not: the switch is under a 1024-wide conveyor sharing its row,
+and the strip bug had been spilling ink onto uncovered tiles.
+
+`8e27a07` — `PuzzleEntity.renderPriority` and the room's sort by it. The belt is
+floor treatment and is drawn first.
+
+The three had to land together. `srcSize` alone cut real cells and so exposed four
+blank frames per row; the frame count alone changed nothing visible; the
+generator fix alone filled rows nobody read.

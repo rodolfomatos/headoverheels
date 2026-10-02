@@ -176,12 +176,13 @@ current_ticket: "T050"
 | T077 | The Head over Heels party is not visible in the room | open |
 | T082 | HoH drew the room in a different coordinate space | done |
 | T084 | HoH entities are drawn as bars, not sprites | done |
+| T090 | The party does not stop when the control is released | open |
 | T087 | Room change is untestable in a widget test; needs an integration test | open |
 | T089 | The render guard measured a room the test had rearranged | done |
 | T088 | `switch_1` is drawn under the ConveyorEntity at the same y | done |
 | T086 | The entity generator wrote to the repository root, not the game | done |
 | T085 | HoH rendered an empty room after a joystick drag, once | open |
-| T083 | Head over Heels has no keyboard at all | open |
+| T083 | Head over Heels has no keyboard at all | done |
 | T080 | Correction: the page was blamed for the game's own transform | finding |
 | T081 | The render guard skips the camera, so it cannot see placement | done |
 

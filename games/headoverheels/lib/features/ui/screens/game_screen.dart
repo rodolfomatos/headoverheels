@@ -2,6 +2,7 @@
 
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:headoverheels/features/gameplay/game.dart';
 import 'package:headoverheels/features/ui/theme/app_theme.dart';
@@ -110,64 +111,66 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         }
       },
       child: Scaffold(
-        body: Stack(
-          children: [
-            // The game itself. The world arrives asynchronously, so until it
-            // does there is nothing to put in here.
-            _buildGameCanvas(),
+        body: _KeyboardControls(
+          child: Stack(
+            children: [
+              // The game itself. The world arrives asynchronously, so until it
+              // does there is nothing to put in here.
+              _buildGameCanvas(),
 
-            // HUD
-            const Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: SafeArea(child: HUD()),
-            ),
-
-            // Touch controls
-            Positioned(
-              bottom: AppSpacing.lg,
-              left: AppSpacing.md,
-              child: VirtualJoystick(
-                radius: 70,
-                onDirectionChanged: (direction) {
-                  inputSystem.onJoystickDirection(direction);
-                },
-                onTap: () {
-                  // Handle tap (could be jump)
-                  inputSystem.onJump();
-                },
+              // HUD
+              const Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: SafeArea(child: HUD()),
               ),
-            ),
 
-            Positioned(
-              bottom: AppSpacing.lg,
-              right: AppSpacing.md,
-              child: ActionButtons(
-                onJump: () => inputSystem.onJump(),
-                onCarry: () => inputSystem.onCarry(),
-                onFire: () => inputSystem.onFire(),
-                onSwop: () => inputSystem.onSwop(),
-                canJump: true,
-                canCarry: true,
-                canFire: true,
-                canSwop: true,
-                doughnutCount: 3,
+              // Touch controls
+              Positioned(
+                bottom: AppSpacing.lg,
+                left: AppSpacing.md,
+                child: VirtualJoystick(
+                  radius: 70,
+                  onDirectionChanged: (direction) {
+                    inputSystem.onJoystickDirection(direction);
+                  },
+                  onTap: () {
+                    // Handle tap (could be jump)
+                    inputSystem.onJump();
+                  },
+                ),
               ),
-            ),
 
-            // Pause button
-            Positioned(
-              top: AppSpacing.md,
-              right: AppSpacing.md,
-              child: PauseButton(
-                onPressed: () => setState(() => _showPauseMenu = true),
+              Positioned(
+                bottom: AppSpacing.lg,
+                right: AppSpacing.md,
+                child: ActionButtons(
+                  onJump: () => inputSystem.onJump(),
+                  onCarry: () => inputSystem.onCarry(),
+                  onFire: () => inputSystem.onFire(),
+                  onSwop: () => inputSystem.onSwop(),
+                  canJump: true,
+                  canCarry: true,
+                  canFire: true,
+                  canSwop: true,
+                  doughnutCount: 3,
+                ),
               ),
-            ),
 
-            // Pause menu overlay
-            pauseOverlay,
-          ],
+              // Pause button
+              Positioned(
+                top: AppSpacing.md,
+                right: AppSpacing.md,
+                child: PauseButton(
+                  onPressed: () => setState(() => _showPauseMenu = true),
+                ),
+              ),
+
+              // Pause menu overlay
+              pauseOverlay,
+            ],
+          ),
         ),
       ),
     );
@@ -261,6 +264,99 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               label: Text(label),
               onPressed: onPressed,
             ),
+    );
+  }
+}
+
+/// Turns key presses into the same calls the joystick makes.
+///
+/// Without this the game had no keyboard at all: the joystick and the on-screen
+/// buttons moved the party and no key did anything, so a player who reached for
+/// the arrow keys stood still in a room that was otherwise alive.
+///
+/// Direction is accumulated from the held keys and normalised, because a joystick
+/// cannot be pushed past its radius and an unnormalised diagonal would move at
+/// sqrt(2) times the speed. `InputSystem.directionFromKeys` owns that arithmetic
+/// and is testable without a keyboard, which this widget is not.
+class _KeyboardControls extends ConsumerStatefulWidget {
+  const _KeyboardControls({required this.child});
+
+  final Widget child;
+
+  @override
+  ConsumerState<_KeyboardControls> createState() => _KeyboardControlsState();
+}
+
+class _KeyboardControlsState extends ConsumerState<_KeyboardControls> {
+  final Set<LogicalKeyboardKey> _held = {};
+  final FocusNode _focus = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    // The keys only arrive if something holds focus, and nothing in this screen
+    // does by default: it is a Stack of a canvas and some buttons.
+    _focus.requestFocus();
+  }
+
+  @override
+  void dispose() {
+    _focus.dispose();
+    super.dispose();
+  }
+
+  void _applyDirection() {
+    final input = ref.read(inputSystemProvider);
+    input.onJoystickDirection(
+      InputSystem.directionFromKeys(_held) ?? Offset.zero,
+    );
+  }
+
+  void _act(String action) {
+    final input = ref.read(inputSystemProvider);
+    switch (action) {
+      case 'jump':
+        input.onJump();
+      case 'carry':
+        input.onCarry();
+      case 'fire':
+        input.onFire();
+      case 'swop':
+        input.onSwop();
+    }
+  }
+
+  KeyEventResult _onKey(KeyEvent event) {
+    if (event is! KeyDownEvent && event is! KeyUpEvent) {
+      // A repeat is the OS saying "still held", and the direction already says
+      // so. Acting on it would re-fire every action key at the key-repeat rate.
+      return KeyEventResult.ignored;
+    }
+    final key = event.logicalKey;
+    final action = InputSystem.actionForKey(key);
+
+    if (event is KeyDownEvent && action != null) {
+      _act(action);
+      return KeyEventResult.handled;
+    }
+    if (!InputSystem.isDirectionKey(key)) return KeyEventResult.ignored;
+
+    if (event is KeyDownEvent) {
+      _held.add(key);
+    } else {
+      _held.remove(key);
+    }
+    _applyDirection();
+    return KeyEventResult.handled;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Focus(
+      focusNode: _focus,
+      autofocus: true,
+      onKeyEvent: (node, event) => _onKey(event),
+      child: widget.child,
     );
   }
 }

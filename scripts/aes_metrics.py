@@ -543,6 +543,38 @@ def narrative(today: datetime.date) -> dict:
                 "severity": "minor",
             })
 
+        # 1b. The index must agree with the scores it claims to rank by.
+        #     `INDEX.md` says it is sorted by score. If it is not, the next
+        #     session reads the wrong lesson first, and nothing downstream looks
+        #     at the index again.
+        order_in_index = [
+            line.split("|")[2].strip()
+            for line in index_text.splitlines()
+            if line.startswith("|") and line.count("|") >= 3
+            and "---" not in line and "score" not in line.lower()
+        ]
+        by_score = sorted(
+            (d for d in docs if d["score"] is not None),
+            key=lambda d: -d["score"])
+        # In the index's order, not the score order. Building the list from the
+        # scores and filtering by membership makes the comparison trivially true,
+        # which is a gate that cannot fail wearing a gate's clothes.
+        scores = {d["id"]: d["score"] for d in by_score}
+        listed_ids = [i for i in order_in_index if i in scores]
+        if len(listed_ids) > 1:
+            sorted_ok = all(
+                scores[a] >= scores[b] for a, b in zip(listed_ids, listed_ids[1:]))
+            metrics["defined"]["index_matches_scores"] = sorted_ok
+            if not sorted_ok:
+                findings.append({
+                    "class": "index drifts from its scores",
+                    "detail": f"aes/shadow/INDEX.md claims to be sorted by "
+                              f"score and lists {listed_ids}, which is not "
+                              f"descending. The index is what the next session "
+                              f"reads first.",
+                    "severity": "minor",
+                })
+
         # 2. Pinning bias: how much of the index is hand-placed rather than
         #    selected by score. A hand-written index is a curated one, which is
         #    not a fault -- but an index that claims to be sorted by score and

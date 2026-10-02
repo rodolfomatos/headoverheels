@@ -24,6 +24,11 @@ import 'package:headoverheels/features/gameplay/entities/character_component.dar
 
 import 'support/hoh_frame.dart';
 
+/// How many steps a transition is watched for. Long enough that the second half
+/// of `_loadRoom` -- the entrance position and the framing -- is inside the
+/// window, which is the half the old early exit skipped.
+const int steps = 30;
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -77,10 +82,10 @@ void main() {
     // because "the party is in a tree" and "the room is drawn" are different
     // claims and a transition can satisfy one while failing the other.
     var blank = 0;
-    for (var step = 0; step < 40; step++) {
+    var sawNewRoom = false;
+    for (var step = 0; step < steps; step++) {
       await withLoop(tester, game.game, () async {});
-      final frame = await renderFrame(tester, game);
-      if (frame.inkCount == 0) blank++;
+      if (game.game.currentRoomId == door.targetRoom) sawNewRoom = true;
       final found = findable();
       expect(
         found,
@@ -91,7 +96,22 @@ void main() {
             'game draws. A character detached from every parent is not drawn at '
             'all, which is what this test exists to catch.',
       );
-      if (game.game.currentRoomId == door.targetRoom) break;
+    }
+
+    // The room, measured on its own loop and with no `break` anywhere near it.
+    //
+    // The party invariant and the room invariant used to be sampled in one loop
+    // that exited as soon as the room id changed. That is the window where the
+    // invariant is least likely to be violated, and it truncated the blank count
+    // as a side effect, so one failure reported both claims.
+    //
+    // Zero, not two. The budget was "two frames" and the measurement is zero;
+    // a number nobody derived is a number that gets raised the first time a slow
+    // machine is called unreasonable.
+    for (var step = 0; step < steps; step++) {
+      await withLoop(tester, game.game, () async {});
+      final frame = await renderFrame(tester, game);
+      if (frame.inkCount == 0) blank++;
     }
 
     // The old bug threw on the first step, before anything moved. If it threw,
@@ -132,15 +152,24 @@ void main() {
     // registry is a singleton and the teardown has to take the widget down
     // before it disposes.
     // ignore: avoid_print
-    print('blank frames across the transition: $blank of 40');
+    print('blank frames across the transition: $blank of $steps');
     expect(
       blank,
-      lessThanOrEqualTo(2),
+      0,
       reason:
-          'the room was blank for $blank frames of a door transition. The '
-          'game is interactive from the first frame and the tileset is not '
-          'decoded yet, so a player walks out of a door into an empty room. Two '
-          'frames is the ceiling; more than that is a blank room, not a slow one.',
+          'the room was blank for $blank of $steps frames of a door '
+          'transition. The game is interactive from the first frame and the '
+          'tileset is not decoded yet, so a player walks out of a door into an '
+          'empty room. The measured value has always been zero, so zero is the '
+          'budget; a number nobody derived gets raised the first time a slow '
+          'machine is called unreasonable.',
+    );
+    expect(
+      sawNewRoom,
+      isTrue,
+      reason:
+          '$steps steps and the room never changed, so the invariant was '
+          'sampled over a transition that never happened',
     );
   });
 }

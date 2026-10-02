@@ -642,3 +642,42 @@ def test_every_decision_this_project_made_about_the_move_has_a_record():
                              ("rebuild the scene exactly", "D009"),
                              ("cannot wait for a room change", "D010")]:
         assert marker in bodies, f"{decision} is missing or was renamed"
+
+
+def test_an_index_that_disagrees_with_its_own_scores_is_a_finding(
+        tmp_path, monkeypatch):
+    """`INDEX.md` says it is sorted by score. If it is not, the next session
+    reads the wrong lesson first — and nothing downstream looks at the index
+    again, so the drift is invisible by construction."""
+    monkeypatch.setattr(aes, "SHADOW", tmp_path / "shadow")
+    monkeypatch.setattr(aes, "DECISIONS", tmp_path / "decisions")
+    shadow = tmp_path / "shadow"
+    shadow.mkdir(parents=True)
+    for name, fields in {
+        "a": {"id": "SD-A", "score": 0.5, "epistemic_state": "SUPPORTED",
+              "access_count": 1, "provenance": "T", "last_verified": "x"},
+        "b": {"id": "SD-B", "score": 0.9, "epistemic_state": "SUPPORTED",
+              "access_count": 1, "provenance": "T", "last_verified": "x"},
+    }.items():
+        write(shadow / f"{name}.md",
+              f"---\n{chr(10).join(f'{k}: {v}' for k, v in fields.items())}\n"
+              f"---\n\n# {name}\n\nThe rule.\n")
+    # Low score first: the opposite of descending.
+    write(shadow / "INDEX.md",
+          "# index\n\n| score | id |\n|---|---|\n| 0.5 | SD-A |\n| 0.9 | SD-B |\n")
+    write(shadow / "access.log", "SD-A 2026-10-02 a x\nSD-B 2026-10-02 b x\n")
+
+    report = aes.narrative(TODAY)
+
+    assert report["metrics"]["defined"]["index_matches_scores"] is False
+    assert any(f["class"] == "index drifts from its scores"
+               for f in report["findings"])
+
+
+def test_the_projects_index_agrees_with_its_scores():
+    report = aes.narrative(TODAY)
+
+    if "index_matches_scores" in report["metrics"]["defined"]:
+        assert report["metrics"]["defined"]["index_matches_scores"] is True, (
+            "aes/shadow/INDEX.md is not in descending score order; it is what "
+            "the next session reads first")

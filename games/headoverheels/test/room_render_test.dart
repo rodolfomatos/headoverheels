@@ -4,7 +4,6 @@ import 'dart:ui' show Offset, Rect;
 
 import 'package:flame/components.dart';
 import 'package:headoverheels/core/isometric.dart';
-import 'package:headoverheels/features/gameplay/entities/puzzle_entity.dart';
 import 'package:headoverheels/features/gameplay/state/character_notifier.dart';
 
 import 'support/hoh_frame.dart';

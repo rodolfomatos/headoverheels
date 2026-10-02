@@ -28,6 +28,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -35,6 +36,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:headoverheels/features/audio/audio_system.dart';
 import 'package:headoverheels/features/gameplay/entities/character_component.dart';
 import 'package:headoverheels/features/gameplay/game.dart';
+import 'package:headoverheels/features/gameplay/entities/puzzle_entity.dart';
 import 'package:headoverheels/features/gameplay/room/room_component.dart';
 import 'package:headoverheels/features/gameplay/room/world_loader.dart';
 
@@ -280,3 +282,24 @@ Future<void> withLoop(
 /// and the difference is the entity. The state a character listens to still
 /// moves it: that is a provider, not a frame.
 void freeze(HeadOverHeelsGame game) => game.pauseEngine();
+
+/// Holds every entity's art on its first frame.
+///
+/// An entity's sprite is a strip, and the manifest may claim more frames than the
+/// sheet has cells filled. A playing animation therefore alternates between
+/// drawing and drawing nothing, and any pixel count or bounding box taken from it
+/// is a measurement of the clock rather than of the art. Frame zero is the frame
+/// the art is drawn from and the frame a player sees standing still.
+///
+/// This lives in the harness rather than in one test because two tests needed it
+/// and a second copy would drift from the first.
+Future<void> pinArtToFirstFrame(Iterable<PuzzleEntity> entities) async {
+  for (final entity in entities) {
+    for (final child in entity.children) {
+      if (child is SpriteAnimationComponent) {
+        child.playing = false;
+        child.animationTicker?.reset();
+      }
+    }
+  }
+}

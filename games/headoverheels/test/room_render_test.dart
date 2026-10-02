@@ -267,21 +267,3 @@ void main() {
     timeout: const Timeout(Duration(minutes: 5)),
   );
 }
-
-/// Holds every entity's art on its first frame.
-///
-/// An entity's sprite is a strip, and the manifest may claim more frames than
-/// the sheet has cells filled. A playing animation therefore alternates between
-/// drawing and drawing nothing, and any pixel count taken from it is a
-/// measurement of the clock rather than of the art. Frame zero is the frame the
-/// art is drawn from and the frame a player sees standing still.
-Future<void> pinArtToFirstFrame(Iterable<PuzzleEntity> entities) async {
-  for (final entity in entities) {
-    for (final child in entity.children) {
-      if (child is SpriteAnimationComponent) {
-        child.playing = false;
-        child.animationTicker?.reset();
-      }
-    }
-  }
-}

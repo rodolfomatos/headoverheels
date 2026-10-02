@@ -155,6 +155,13 @@ verify-browser:
 test-ai:
 	python3 -m pytest scripts/tests -q
 
+# Five of the six AES skills ship as prose with no thresholds and no way to fail,
+# so a phase that "passed" them proved nothing. These are the numbers they name.
+# Exits non-zero on FAIL, and WARN does not fail the build on purpose: an absent
+# knowledge base is a fact to record, not a fault to hide.
+aes-check:
+	python3 scripts/aes_metrics.py all
+
 assets-check:
 	@python3 scripts/validation_pipeline.py $(GAME)
 	@python3 scripts/validate_sprites.py $(GAME)

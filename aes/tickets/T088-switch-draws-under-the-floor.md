@@ -91,3 +91,24 @@ not about the renderer, and this commit does not answer it. The assertion pins
 the covered set to `['switch_1']` so a second covered entity fails, and
 `sprite_registry.dart`'s `srcSize` now ships: every entity draws its own cell,
 and the switch draws 3200px the moment it is not covered.
+
+## Confirmed by the solver, not by a reader
+
+`aes/graph/render-invariants.yaml` states the project's intent and the
+measurement that refutes it, and asks Z3 whether both can hold.
+
+```
+$ make gmif-check
+[!!] render-invariants: UNSAT -- these claims cannot all be true
+       unsat core: (a_every_entity_visible a_intent_is_false)
+```
+
+The core names the two claims and nothing else, which is the point of the
+exercise: the intent "a room with a bag nobody can see is a room with no bag" and
+the measurement "switch_1 draws 0 pixels" are not in tension because of a subtlety
+in the renderer. The intent is simply false, and the switch is the entity that
+makes it false.
+
+This gate is deliberately not in `make check`, and that is a judgement worth
+stating: it fails, and it should fail while T088 is open. Adding a permanently
+red gate to `check` trains everyone to ignore red.

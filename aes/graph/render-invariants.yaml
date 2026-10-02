@@ -1,0 +1,125 @@
+# GMIF island: the render pipeline's claims about Head over Heels.
+#
+# Each node is a claim this project asserts. `logical_form` is an SMT-LIB
+# fragment over the other node ids; a base fact asserts its own name, which is
+# how a fact is stated here. Edges are the implications between them.
+#
+# This island is not a summary of the design. It is the set of things that cannot
+# all be true at once, so that Z3 is asked the question instead of a reader
+# carrying it in their head. The unsat core it produced is what turned T088 from
+# "the switch looks wrong" into "the project's own intent is false".
+island: render-invariants
+version: 2
+nodes:
+  # --- intent, stated by the project -------------------------------------
+  # room_render_test.dart: "A room with a bag nobody can see is a room with no
+  # bag." This is the standard the renderer is held to.
+  - id: every_entity_visible
+    validation_type: logical
+    validation_confidence: 0.95
+    extraction_confidence: 0.95
+    epistemic_state: INFERRED
+    state: INFERRED
+    logical_form: every_entity_visible
+    source: games/headoverheels/test/room_render_test.dart
+    note: >
+      The project's stated intent: every entity present in a room draws something
+      on screen. Asserted as true because that is what the test says.
+
+  # --- measurements, all taken in the real renderer ------------------------
+  - id: switch_not_visible_in_room
+    validation_type: logical
+    validation_confidence: 0.99
+    extraction_confidence: 0.99
+    epistemic_state: SUPPORTED
+    state: SUPPORTED
+    logical_form: switch_not_visible_in_room
+    source: room_render_test.dart
+    note: >
+      Measured 0px. Taking switch_1 out of the room changes no sampled pixel, so
+      it draws nothing where it stands. Same run, with the frame pinned to 0.
+
+  - id: switch_visible_alone
+    validation_type: logical
+    validation_confidence: 0.99
+    extraction_confidence: 0.99
+    epistemic_state: SUPPORTED
+    state: SUPPORTED
+    logical_form: switch_visible_alone
+    source: room_render_test.dart
+    note: >
+      Measured 3200px, identical to fish_1, with the room to itself. So the
+      switch is not absent and its art is not blank.
+
+  - id: switch_covered_by_conveyor
+    validation_type: logical
+    validation_confidence: 0.98
+    extraction_confidence: 0.95
+    epistemic_state: SUPPORTED
+    state: SUPPORTED
+    logical_form: switch_covered_by_conveyor
+    source: room_render_test.dart
+    note: >
+      Room child order, read at runtime: the floor is child 0, SwitchEntity is
+      child 2 at y=96, ConveyorEntity is child 5 at y=96 with width 1024. The
+      belt is added after the switch and covers it for its whole length.
+
+  - id: strip_bug_gone
+    validation_type: logical
+    validation_confidence: 0.99
+    extraction_confidence: 0.99
+    epistemic_state: SUPPORTED
+    state: SUPPORTED
+    logical_form: strip_bug_gone
+    source: games/headoverheels/lib/core/assets/sprite_registry.dart
+    note: >
+      SpriteRegistry now cuts each frame with an explicit srcSize, so an entity
+      draws its own cell rather than the whole 384x192 master sheet.
+
+  # --- the consequences, which are what the island is for -------------------
+  - id: switch_absent_or_covered
+    validation_type: logical
+    validation_confidence: 0.99
+    extraction_confidence: 0.9
+    epistemic_state: INFERRED
+    state: INFERRED
+    logical_form: switch_not_visible_in_room and switch_covered_by_conveyor
+    source: T088
+    note: >
+      The switch's absence from the screen has a cause: it is covered. This is
+      the discriminator the old test could not make, because the strip bug used
+      to spill ink onto uncovered neighbours and make it look present.
+
+  - id: intent_is_false
+    validation_type: logical
+    validation_confidence: 0.99
+    extraction_confidence: 0.9
+    epistemic_state: INFERRED
+    state: INFERRED
+    logical_form: not every_entity_visible
+    source: T088
+    note: >
+      The measurement refutes the intent. This is asserted so the unsat core
+      names the intent as the thing that is false, rather than leaving the
+      contradiction as something a reader has to notice.
+
+  # --- invariants that do hold, so the island is not all alarm --------------
+  - id: every_entity_draws_own_cell
+    validation_type: logical
+    validation_confidence: 0.98
+    extraction_confidence: 0.95
+    epistemic_state: SUPPORTED
+    state: SUPPORTED
+    logical_form: strip_bug_gone
+    source: games/headoverheels/test/sprite_load_test.dart
+    note: >
+      Every frame is one runtime cell, asserted against the manifest rather than
+      trusted, and the declared frame count fits inside the sheet.
+
+edges:
+  - from: [switch_visible_alone, switch_not_visible_in_room]
+    to: switch_absent_or_covered
+    type: implies
+  - from: [switch_covered_by_conveyor, strip_bug_gone]
+    to: switch_absent_or_covered
+    type: implies

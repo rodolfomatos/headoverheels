@@ -162,6 +162,13 @@ test-ai:
 aes-check:
 	python3 scripts/aes_metrics.py all
 
+# The satisfiability gate for aes/graph/*.yaml. The skill's own gmif-check.sh
+# reports SAT on islands Z3 rejected, so this one fails on anything that is not a
+# clean sat or unsat. It is not in `check`: it is expected to fail while T088 is
+# open, and a gate that fails for a known reason is information, not breakage.
+gmif-check:
+	python3 scripts/gmif_check.py
+
 assets-check:
 	@python3 scripts/validation_pipeline.py $(GAME)
 	@python3 scripts/validate_sprites.py $(GAME)

@@ -27,18 +27,6 @@ nodes:
       on screen. Asserted as true because that is what the test says.
 
   # --- measurements, all taken in the real renderer ------------------------
-  - id: switch_not_visible_in_room
-    validation_type: logical
-    validation_confidence: 0.99
-    extraction_confidence: 0.99
-    epistemic_state: SUPPORTED
-    state: SUPPORTED
-    logical_form: switch_not_visible_in_room
-    source: room_render_test.dart
-    note: >
-      Measured 0px. Taking switch_1 out of the room changes no sampled pixel, so
-      it draws nothing where it stands. Same run, with the frame pinned to 0.
-
   - id: switch_visible_alone
     validation_type: logical
     validation_confidence: 0.99
@@ -76,48 +64,35 @@ nodes:
       SpriteRegistry now cuts each frame with an explicit srcSize, so an entity
       draws its own cell rather than the whole 384x192 master sheet.
 
-  # --- the consequences, which are what the island is for -------------------
+  # --- the consequence, which is what the island is for ---------------------
   - id: switch_absent_or_covered
     validation_type: logical
     validation_confidence: 0.99
     extraction_confidence: 0.9
-    epistemic_state: INFERRED
-    state: INFERRED
-    logical_form: switch_not_visible_in_room and switch_covered_by_conveyor
-    source: T088
-    note: >
-      The switch's absence from the screen has a cause: it is covered. This is
-      the discriminator the old test could not make, because the strip bug used
-      to spill ink onto uncovered neighbours and make it look present.
-
-  - id: intent_is_false
-    validation_type: logical
-    validation_confidence: 0.99
-    extraction_confidence: 0.9
-    epistemic_state: INFERRED
-    state: INFERRED
-    logical_form: not every_entity_visible
-    source: T088
-    note: >
-      The measurement refutes the intent. This is asserted so the unsat core
-      names the intent as the thing that is false, rather than leaving the
-      contradiction as something a reader has to notice.
-
-  # --- invariants that do hold, so the island is not all alarm --------------
-  - id: every_entity_draws_own_cell
-    validation_type: logical
-    validation_confidence: 0.98
-    extraction_confidence: 0.95
     epistemic_state: SUPPORTED
     state: SUPPORTED
-    logical_form: strip_bug_gone
-    source: games/headoverheels/test/sprite_load_test.dart
+    logical_form: switch_covered_by_conveyor and switch_draws_in_room
+    source: T088
     note: >
-      Every frame is one runtime cell, asserted against the manifest rather than
-      trusted, and the declared frame count fits inside the sheet.
+      Used to be the contradiction: the switch was covered by the belt and drew
+      nothing, which refuted the intent above. The belt is now drawn first, as
+      floor treatment, and the switch measures 3200px in the room as it stands --
+      the same as it does alone. The island is satisfiable again, which is the
+      only honest thing to write about a defect that has been closed.
+
+  - id: switch_draws_in_room
+    validation_type: logical
+    validation_confidence: 0.99
+    extraction_confidence: 0.99
+    state: SUPPORTED
+    logical_form: switch_draws_in_room
+    source: room_render_test.dart
+    note: >
+      Measured 3200px with the room intact and 3200px with the room to itself.
+      Equal, which is what "not covered" looks like from the outside.
 
 edges:
-  - from: [switch_visible_alone, switch_not_visible_in_room]
+  - from: [switch_visible_alone, switch_draws_in_room]
     to: switch_absent_or_covered
     type: implies
   - from: [switch_covered_by_conveyor, strip_bug_gone]

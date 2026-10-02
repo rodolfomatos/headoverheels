@@ -243,6 +243,13 @@ class ConveyorEntity extends PuzzleEntity {
     required this.speed,
   });
 
+  /// The belt is the floor treatment, not an object standing on it.
+  ///
+  /// It spans the room, so anything else sharing its row is drawn underneath it
+  /// unless the belt goes first.
+  @override
+  int get renderPriority => 0;
+
   @override
   void onLoad() async {
     super.onLoad();

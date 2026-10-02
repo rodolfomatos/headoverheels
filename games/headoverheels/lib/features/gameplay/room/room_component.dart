@@ -61,12 +61,26 @@ class RoomComponent extends PositionComponent with HasGameReference {
   }
 
   Future<void> _spawnEntities() async {
+    final spawned = <PuzzleEntity>[];
     for (final trigger in definition.triggers) {
       final entity = EntityFactory.create(trigger, roomId);
-      if (entity != null) {
-        entities.add(entity);
-        add(entity);
-      }
+      if (entity != null) spawned.add(entity);
+    }
+
+    // Draw order is by renderPriority, not by trigger order. The map index is
+    // carried along and compared second, so two entities of the same priority
+    // keep the order the map declared and a room stays reproducible.
+    final ordered = spawned.asMap().entries.toList()
+      ..sort((a, b) {
+        final byPriority = a.value.renderPriority.compareTo(
+          b.value.renderPriority,
+        );
+        return byPriority != 0 ? byPriority : a.key.compareTo(b.key);
+      });
+
+    for (final entry in ordered) {
+      entities.add(entry.value);
+      add(entry.value);
     }
   }
 

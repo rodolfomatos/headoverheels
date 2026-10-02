@@ -242,21 +242,19 @@ void main() {
       );
 
       // An entity drawn under a later sibling is a z-order question, not a
-      // rendering one, and this is the only one known. It is pinned rather than
-      // tolerated: a second covered entity fails here.
+      // rendering one. There are none: `switch_1` used to be one, covered by a
+      // 1024-wide ConveyorEntity sharing its row, and the fix was a draw order
+      // rather than a bigger sprite. The list stays pinned and empty so a second
+      // covered entity fails here rather than being noticed by a player.
       //
-      // switch_1 sits at y=96, and the ConveyorEntity at the same y is 1024 wide
-      // and added after it, so the belt covers the switch for its whole length.
       // See aes/tickets/T088.
       expect(
         notDrawn.map((e) => e.key).toList(),
-        ['switch_1'],
+        isEmpty,
         reason:
-            'newly covered entities: '
-            '${notDrawn.map((e) => e.key).toList()}. '
-            'An entity that draws ${alone['switch_1']}px alone and 0px in '
-            'company is drawn under a later sibling. switch_1 is known and '
-            'recorded in T088; anything else is new.',
+            'covered entities: ${notDrawn.map((e) => '${e.key}=${alone[e.key]}px').toList()}. '
+            'Each draws ${notDrawn.map((e) => alone[e.key]).toList()} alone and '
+            'nothing in the room, so it is drawn under a later sibling.',
       );
       expect(
         alone.values.where((n) => n < 10).toList(),

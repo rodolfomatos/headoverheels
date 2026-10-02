@@ -244,12 +244,15 @@ def test_parenthesised_grouping_is_accepted():
 
 # --- the project's own island ----------------------------------------------
 
-def test_the_projects_render_island_is_checked_and_its_conflict_is_real():
+def test_the_projects_render_island_is_consistent():
     """Run against the real island, not a fixture.
 
-    The island asserts the project's stated intent and the measurement that
-    refutes it. If that ever stops being contradictory, either the intent changed
-    or the measurement did, and both are worth knowing.
+    It asserted the project's stated intent and the measurement that refuted it,
+    and Z3 returned an unsat core naming both. The switch was fixed by drawing the
+    belt before it, the refuting claim was removed because it stopped being true,
+    and the island is satisfiable again. This test is here so that a future
+    contradiction in the same island cannot be introduced quietly: it has to be
+    written as an assertion, which is the only way anyone finds out.
     """
     path = ROOT / "aes" / "graph" / "render-invariants.yaml"
     if not path.exists():
@@ -257,8 +260,24 @@ def test_the_projects_render_island_is_checked_and_its_conflict_is_real():
 
     result = gmif.check(path)
 
-    assert result["result"] == "UNSAT", (
-        "the render island is expected to be contradictory: the intent that "
-        "every entity draws and the measurement that the switch does not")
-    assert "every_entity_visible" in " ".join(result["core"])
-    assert "intent_is_false" in " ".join(result["core"])
+    assert result["result"] == "SAT", (
+        f"the render island is expected to be consistent: {result['detail']}")
+    assert result["verdict"] == "PASS"
+
+
+def test_the_island_carries_no_claim_the_gate_could_not_read():
+    """Every claim in the real island must be one the solver actually saw.
+
+    A node the filter drops or the parser refuses is a claim the gate did not
+    check, and an island that silently loses claims is the failure this project
+    has now hit twice.
+    """
+    path = ROOT / "aes" / "graph" / "render-invariants.yaml"
+    if not path.exists():
+        pytest.skip("no island yet")
+    island = yaml.safe_load(path.read_text()) or {}
+
+    uncheckable = [n["id"] for n in island.get("nodes", [])
+                   if n.get("validation_type") == "logical"
+                   and (gmif.is_validated(n)[0] is False)]
+    assert uncheckable == [], f"claims the gate would skip: {uncheckable}"

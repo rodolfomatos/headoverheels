@@ -16,6 +16,18 @@ import 'package:headoverheels/features/gameplay/game.dart';
 /// and the pickup notifiers, instead of the untyped `game` it gets by default.
 abstract class PuzzleEntity extends PositionComponent
     with CollisionCallbacks, HasGameReference<HeadOverHeelsGame> {
+  /// Where this entity sits in the draw order among its room's entities.
+  ///
+  /// Two kinds of thing share a tile in these rooms: the floor treatment and the
+  /// objects standing on it. A conveyor belt is 1024 wide and covers an entire
+  /// row; a switch is 64 wide and covers one tile. Added in trigger order, the
+  /// belt came second and covered the switch, and the switch measured 0 pixels
+  /// while measuring 3200 the moment the room was to itself.
+  ///
+  /// So this is not "who was declared first". An object that stands on the floor
+  /// is drawn after the floor treatment, whatever order the triggers are in.
+  int get renderPriority => 10;
+
   final String id;
   final TriggerZone triggerZone;
 

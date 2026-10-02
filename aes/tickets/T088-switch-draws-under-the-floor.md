@@ -1,6 +1,6 @@
 ---
 id: T088
-status: open
+status: done
 severity: major
 found_by: aes-peer-review/2026-09-30-render-fidelity
 related: T084
@@ -112,3 +112,31 @@ makes it false.
 This gate is deliberately not in `make check`, and that is a judgement worth
 stating: it fails, and it should fail while T088 is open. Adding a permanently
 red gate to `check` trains everyone to ignore red.
+
+
+## Closed: the belt is the floor, so it is drawn first
+
+`PuzzleEntity.renderPriority`, default 10, and `ConveyorEntity.renderPriority` 0.
+`RoomComponent._spawnEntities` sorts by it, carrying the map index as a tiebreak so
+two entities of the same priority keep the order the map declared and a room stays
+reproducible.
+
+The reasoning, rather than the rule: two kinds of thing share a tile in these
+rooms. There is the floor treatment and there are the objects standing on it. A
+conveyor belt spans the room; a switch is one tile wide. Drawn in trigger order,
+the belt went second and the switch went underneath it. An object standing on the
+floor is drawn after the floor treatment whatever order the triggers are in.
+
+Measured after: `entity switch_1: 3200px` with the room intact, against 3200px
+with the room to itself. Equal, which is what "not covered" looks like from the
+outside. `conveyor_1` drops from 40000px to 36800px because the switch now draws
+over the strip of it that used to be hidden.
+
+The pinned list of covered entities in `room_render_test.dart` is now empty and
+stays pinned, so a second covered entity fails the build rather than being
+noticed by a player.
+
+`aes/graph/render-invariants.yaml` had asserted the intent and its refutation, and
+Z3 returned `(a_every_entity_visible a_intent_is_false)`. The refuting claim was
+removed because it stopped being true, and the island is satisfiable again. That
+is the only honest thing to write about a closed defect.

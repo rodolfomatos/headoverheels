@@ -96,7 +96,7 @@ def test_a_strip_is_cropped_to_one_frame(manifest):
     # Four frames side by side. Feeding the strip to img2img gets a contact sheet
     # back, which is the sprite drawn three times.
     strip = solid((64, 16), TEAL)
-    asset = entry(manifest, runtime_size=[16, 16])
+    asset = entry(manifest, runtime_size={"width": 16, "height": 16})
 
     assert ai.first_frame(strip, 16).size == (16, 16)
 
@@ -109,16 +109,37 @@ def test_a_single_frame_is_left_alone(manifest):
 
 # --- fit -------------------------------------------------------------------
 
+def test_the_manifest_stores_runtime_size_as_a_map_not_a_pair(manifest):
+    """`fit` unpacked `runtime_size` directly and got the *keys*.
+
+    Every test of `fit` used a list of two ints, which the manifest has never
+    contained, so the function this pipeline is named after had never run against
+    a real entry. A fixture that disagrees with reality is worse than no fixture:
+    it is a test that passes about a thing that does not exist.
+    """
+    assert isinstance(manifest[0]["runtime_size"], dict), \
+        "the manifest shape changed; the tests above are now testing a fiction"
+    assert fit_runs_on_the_first_real_entry(manifest)
+
+
+def fit_runs_on_the_first_real_entry(manifest):
+    try:
+        ai.fit(solid((8, 8), TEAL), manifest[0])
+        return True
+    except Exception as error:  # noqa: BLE001 - the point is that it raised
+        pytest.fail(f"fit() does not run on a real manifest entry: {error}")
+
+
 def test_fit_reaches_the_manifest_runtime_size(manifest):
     image = solid((32, 40), TEAL)
-    asset = entry(manifest, runtime_size=[24, 24], scale=1)
+    asset = entry(manifest, runtime_size={"width": 24, "height": 24}, scale=1)
 
     assert ai.fit(image, asset).size == (24, 24)
 
 
 def test_fit_applies_the_manifest_scale(manifest):
     image = solid((32, 40), TEAL)
-    asset = entry(manifest, runtime_size=[24, 24], scale=2)
+    asset = entry(manifest, runtime_size={"width": 24, "height": 24}, scale=2)
 
     assert ai.fit(image, asset).size == (48, 48)
 
@@ -129,7 +150,7 @@ def test_fit_centres_a_tileset_that_has_no_anchor(manifest):
     `fit` read `a["anchor"]["x"]` unconditionally, so the first tileset in the
     manifest raised `KeyError` and nothing was ever generated for a tile.
     """
-    tileset = entry(manifest, runtime_size=[32, 32], scale=1)
+    tileset = entry(manifest, runtime_size={"width": 32, "height": 32}, scale=1)
     tileset.pop("anchor", None)
 
     image = solid((16, 16), TEAL)
@@ -142,7 +163,7 @@ def test_fit_centres_a_tileset_that_has_no_anchor(manifest):
 
 
 def test_fit_uses_the_anchor_when_the_manifest_has_one(manifest):
-    asset = entry(manifest, runtime_size=[32, 32], scale=1,
+    asset = entry(manifest, runtime_size={"width": 32, "height": 32}, scale=1,
                   anchor={"x": 0, "y": 0})
 
     # Anchor at the top-left: the subject's own top-left stays in the cell's.
@@ -153,7 +174,7 @@ def test_fit_uses_the_anchor_when_the_manifest_has_one(manifest):
 
 
 def test_fit_is_deterministic(manifest):
-    asset = entry(manifest, runtime_size=[24, 24], scale=1)
+    asset = entry(manifest, runtime_size={"width": 24, "height": 24}, scale=1)
 
     first = ai.fit(solid((32, 40), TEAL), asset).tobytes()
     second = ai.fit(solid((32, 40), TEAL), asset).tobytes()
@@ -336,3 +357,165 @@ def test_a_missing_workflow_says_which_file_and_offers_the_other_backend(tmp_pat
         ai.WORKFLOW = ROOT / "prompts" / "comfyui_workflow_api.json"
 
     assert "folder" in str(exit_info.value)
+
+# --- the CLI, which is where the pipeline's actual rule lives ---------------
+#
+# Everything above tests arithmetic. These run the command line, because the rule
+# the whole pipeline exists for is not arithmetic: nothing a model produces may
+# reach `assets/sprites/` unless a person accepted that exact file, one at a time.
+#
+# That rule is currently enforced by a directory choice -- candidates go to
+# `build/ai/` -- and a directory choice is not a guarantee. It is a habit.
+
+@pytest.fixture
+def tree(tmp_path, monkeypatch):
+    """A throwaway copy of the paths the CLI writes to."""
+    game = tmp_path / "games" / "headoverheels"
+    (game / "assets" / "sprites").mkdir(parents=True)
+    (tmp_path / "build" / "ai").mkdir(parents=True)
+    (tmp_path / "prompts" / "specs").mkdir(parents=True)
+
+    sprites = game / "assets" / "sprites" / "manifest.yaml"
+    sprites.write_text(
+        "version: 1\n"
+        "assets:\n"
+        "  - id: character.head.idle.n\n"
+        "    file: characters/head/frames/head_idle_front_01.png\n"
+        "    character: head\n"
+        "    animation: idle\n"
+        "    frames: 1\n"
+        "    runtime_size: {width: 48, height: 48}\n"
+        "    anchor: {x: 24, y: 43}\n"
+        "    alpha: opaque\n"
+        "    palette: extended\n"
+        "    scale: 1\n")
+
+    (game / "style").mkdir()
+    (game / "style" / "palette.json").write_text(
+        '{"base": {"black": "#000000"}, "themes": {"shared": {"red": "#FF0000"}}}')
+
+    paths = {
+        "PROJECT_ROOT": ".",
+        "GAME_ROOT": "games/headoverheels",
+        "ASSETS": "games/headoverheels/assets",
+        "STYLE": "games/headoverheels/style",
+        "BUILD": "build/ai",
+        "PROMPTS": "prompts",
+        "STATE": "games/headoverheels/ai/state.json",
+        "WORKFLOW": "prompts/comfyui_workflow_api.json",
+    }
+    for attr, relative in paths.items():
+        monkeypatch.setattr(ai, attr, tmp_path / relative)
+    return tmp_path
+
+
+def run_cli(argv):
+    """The command line, with SystemExit turned into an outcome and its message
+    kept.
+
+    `sys.exit("a message")` is how this script refuses, and the interpreter is
+    what prints it. Catching SystemExit here and returning only the code threw
+    the message away, which is the one thing a refusal test needs.
+    """
+    old = sys.argv
+    sys.argv = ["ai_sprites.py"] + argv
+    try:
+        ai.main()
+        return 0, ""
+    except SystemExit as exit_info:
+        code = exit_info.code
+        if isinstance(code, str):
+            return 1, code
+        return (code or 0), ""
+    finally:
+        sys.argv = old
+
+
+def test_a_run_writes_a_prompt_and_nothing_else(tree):
+    assert run_cli(["--kind", "character", "--id", "character.head.idle.n"])[0] == 0
+
+    runs = list((tree / "build" / "ai").iterdir())
+    assert len(runs) == 1, f"expected one run directory, got {runs}"
+    assert (runs[0] / "prompt.txt").exists()
+    assert (runs[0] / "negative.txt").exists()
+
+
+def test_a_run_never_writes_into_the_sprites_directory(tree):
+    """The rule the pipeline exists for, asserted rather than assumed.
+
+    A generated image reaching `assets/sprites/` is the one failure that cannot be
+    undone by fixing the generator, because the art is already in the game.
+    """
+    before = sorted(p.name for p in (tree / "games/headoverheels/assets/sprites").iterdir())
+
+    assert run_cli(["--kind", "character", "--id", "character.head.idle.n"])[0] == 0
+
+    after = sorted(p.name for p in (tree / "games/headoverheels/assets/sprites").iterdir())
+    assert before == after, f"a run touched the sprites directory: {after}"
+
+
+def test_an_unknown_id_says_so_and_names_what_it_searched(tree):
+    code, message = run_cli(["--kind", "character", "--id", "no.such.sprite"])
+    assert code != 0, "an unknown id must be a refusal, not a silent no-op"
+    assert "no.such.sprite" in message, (
+        f"the refusal does not name what it refused: {message!r}")
+
+
+def test_accepting_a_run_with_no_image_refuses(tree):
+    run_cli(["--kind", "character", "--id", "character.head.idle.n"])
+    run = next((tree / "build" / "ai").iterdir())
+
+    assert run_cli(["--accept", run.name])[0] == 0
+    # It returns zero and does nothing, because there is no raw.png. The accepted
+    # directory must not exist afterwards.
+    accepted = tree / "games/headoverheels/assets/ai/accepted"
+    assert not accepted.exists() or not list(accepted.iterdir()), \
+        "a run with no raw.png must not produce an accepted sprite"
+
+
+def test_a_missing_palette_is_refused_rather_than_skipped(tree):
+    """A sprite that skipped the palette would not match the art around it."""
+    (tree / "games/headoverheels/style/palette.json").unlink()
+
+    code, message = run_cli(
+        ["--kind", "character", "--id", "character.head.idle.n"])
+    assert code != 0
+    assert "palette.json" in message, (
+        f"the refusal does not name the file it is missing: {message!r}")
+
+
+def test_the_lock_refuses_to_replace_an_accepted_sprite(tree, monkeypatch):
+    from PIL import Image
+
+    run_cli(["--kind", "character", "--id", "character.head.idle.n"])
+    run = next((tree / "build" / "ai").iterdir())
+    Image.new("RGBA", (48, 48), (255, 0, 0, 255)).save(run / "raw.png")
+
+    assert run_cli(["--accept", run.name, "--lock"])[0] == 0
+    accepted = tree / "games/headoverheels/assets/ai/accepted/character.head.idle.n.png"
+    assert accepted.exists()
+    locked_bytes = accepted.read_bytes()
+
+    # A later run, with a different image, must not replace it.
+    run2 = next((tree / "build" / "ai").iterdir())
+    Image.new("RGBA", (48, 48), (0, 255, 0, 255)).save(run2 / "raw.png")
+    run_cli(["--accept", run2.name])
+
+    assert accepted.read_bytes() == locked_bytes, \
+        "a locked sprite was replaced by a later run"
+
+
+def test_acceptance_records_where_it_came_from(tree):
+    from PIL import Image
+
+    run_cli(["--kind", "character", "--id", "character.head.idle.n"])
+    run = next((tree / "build" / "ai").iterdir())
+    Image.new("RGBA", (48, 48), (255, 0, 0, 255)).save(run / "raw.png")
+
+    run_cli(["--accept", run.name])
+
+    state = ai.load_json(tree / "games/headoverheels/ai/state.json")
+    record = state["character.head.idle.n"]
+    assert record["run"] == run.name
+    assert record["accepted"].endswith("character.head.idle.n.png")
+    assert record["at"], "an acceptance with no timestamp is not a record"

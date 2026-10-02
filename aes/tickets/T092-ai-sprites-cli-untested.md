@@ -1,6 +1,6 @@
 ---
 id: T092
-status: open
+status: done
 severity: major
 found_by: aes-peer-review/2026-10-02-input-and-model (purista)
 ---
@@ -28,9 +28,41 @@ kept.
 - The lock. `--lock` refuses to replace an accepted sprite, and the refusal is
   the only thing standing between a regeneration and signed-off art.
 
-## What closing it needs
+## Closed: the CLI had never run, and three things in it had never worked
 
-Run the CLI in a temporary tree and assert four things: a run directory appears
-with a prompt and a control; `--accept` with no `raw.png` refuses and says so; a
-locked asset is not replaced; and nothing under `assets/sprites/` changed. The last
-one is the rule, and it is worth a test on its own.
+Ten tests run the command line in a throwaway tree. Two of them are the rule the
+pipeline exists for, and both passed immediately: a run writes into `build/ai/`
+and never touches `assets/sprites/`, and `--lock` refuses to replace an accepted
+sprite.
+
+The other eight found three bugs in code that had never executed.
+
+**`--accept` could not work at all.** The flag is documented as taking a run
+directory, and a run directory is named `<timestamp>-<id>`, but the code matched
+the flag against a manifest id exactly. No run directory has ever been a manifest
+id, so the one step that moves a candidate into the project never ran. It accepts
+either form now and says both in the message when neither matches.
+
+**`fit()` unpacked `runtime_size` and got its keys.** The manifest stores
+`{width, height}`; unpacking a map yields `('width', 'height')`. Every test of
+`fit` used a list of two ints, which the manifest has never contained. **The
+function this pipeline is named after had never been run against a real entry**,
+and the fixture agreed with the bug rather than with reality. The fixture now uses
+the manifest's own shape, and one test asserts the shape, so a future change to it
+breaks a test instead of silently making the fixtures fictional.
+
+**`finish()` returned a path and the caller saved it as an image.** `image.save()`
+on a `pathlib.Path`. The third fault on the same code path, and none of them would
+have been found by reading it.
+
+## What this says about the other 27 tests
+
+They cover arithmetic, and arithmetic was correct. Every fault was at the seam
+between the script and the real project: a manifest key that is `assets` and not
+`sprites`, a manifest value that is a map and not a pair, a flag whose documented
+argument is not the one the code reads. **Twenty-seven tests on pure functions
+passed while the thing that used them had never worked.**
+
+That is not an argument for fewer unit tests. It is the argument T091 makes from
+the other end: a test that cannot reach the real thing it is about will pass while
+the real thing is broken.

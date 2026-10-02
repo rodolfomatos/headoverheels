@@ -172,7 +172,13 @@ def fit(image: Image.Image, asset: dict) -> Image.Image:
     if bbox:
         image = image.crop(bbox)
 
-    runtime_w, runtime_h = asset["runtime_size"]
+    # The manifest stores runtime_size as `{width, height}`. Unpacking it directly
+    # yields the *keys* -- `('width', 'height')` -- and every test of `fit` used a
+    # list of two ints, which the manifest has never contained. So the function
+    # this pipeline is named after had never been run against a real entry.
+    runtime = asset["runtime_size"]
+    runtime_w = runtime["width"] if isinstance(runtime, dict) else runtime[0]
+    runtime_h = runtime["height"] if isinstance(runtime, dict) else runtime[1]
     scale = SCALE * asset.get("scale", 1)
 
     # The anchor is expressed in runtime-cell coordinates, so the point of the
@@ -397,15 +403,22 @@ def folder_backend(prompt: str, negative: str, seed: int, control: pathlib.Path 
 def finish(raw: pathlib.Path, asset: dict, out_dir: pathlib.Path,
            palette: dict) -> Image.Image:
     """The deterministic half: trim, snap, place. Same input, same pixels."""
-    image = first_frame(Image.open(raw), asset["runtime_size"][0])
+    # `runtime_size` is a map, `{width, height}`, in the manifest. Indexing it
+    # with `[0]` raises KeyError, so `--accept` had never run end to end: the only
+    # time the CLI was exercised was a smoke test that stopped before this line.
+    runtime = asset["runtime_size"]
+    image = first_frame(Image.open(raw), runtime["width"])
     image = cut_out(image)
     image = fit(image, asset)
     image = fit_palette(image, palette, asset)
 
     out_dir.mkdir(parents=True, exist_ok=True)
-    finished = out_dir / "finished.png"
-    image.save(finished)
-    return finished
+    # Written out so a person can look at it, which is the whole point of a
+    # candidate. Returned as the image, because the caller saves it under the
+    # asset's own name -- it used to return this path, and the caller called
+    # `.save` on it, so `--accept` died on a pathlib.Path.
+    image.save(out_dir / "finished.png")
+    return image
 
 
 def accept(run: pathlib.Path, asset: dict, palette: dict, *, lock: bool) -> pathlib.Path | None:
@@ -481,11 +494,21 @@ def main() -> None:
     entries = manifest()["assets"]
 
     if args.accept:
+        # The flag is documented as taking a run directory, and a run directory is
+        # named `<timestamp>-<asset id>`, so matching the flag against a manifest
+        # id exactly as it did means `--accept` never worked: every run directory
+        # has a timestamp on the front and none of them is a manifest id. Either
+        # form is accepted now, and a run that matches neither says so with both
+        # forms in the message.
+        wanted = args.accept
         for asset in entries:
-            if asset["id"] == args.accept:
-                accept(pathlib.Path(args.accept), asset, palette, lock=args.lock)
+            if wanted in (asset["id"],) or wanted.endswith(f"-{asset['id']}"):
+                accept(BUILD / wanted, asset, palette, lock=args.lock)
                 return
-        sys.exit(f"no sprite with id {args.accept!r} in the manifest")
+        sys.exit(
+            f"{wanted!r} is neither a run directory nor a sprite id in the "
+            f"manifest. Run directories are named <timestamp>-<id> and are in "
+            f"{BUILD}.")
 
     if not args.kind or not args.asset_id:
         sys.exit("give --kind and --id, or --accept RUN")

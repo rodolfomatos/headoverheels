@@ -177,6 +177,8 @@ current_ticket: "T050"
 | T082 | HoH drew the room in a different coordinate space | done |
 | T084 | HoH entities are drawn as bars, not sprites | done |
 | T090 | The party does not stop when the control is released | done |
+| T092 | The art pipeline CLI had never been run | done |
+| T094 | The keyboard depends on focus, and nothing says the keys exist | done |
 | T087 | Room change is untestable in a widget test; needs an integration test | done |
 | T089 | The render guard measured a room the test had rearranged | done |
 | T088 | `switch_1` is drawn under the ConveyorEntity at the same y | done |

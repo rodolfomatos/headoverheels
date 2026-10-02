@@ -12,6 +12,19 @@ import 'package:headoverheels/features/gameplay/entities/guardian_entity.dart';
 class HUD extends ConsumerWidget {
   const HUD({super.key});
 
+  /// The keys, said out loud.
+  ///
+  /// The game had no keyboard until T083, and nothing on screen has ever said so.
+  /// A player who does not already know to try the arrow keys has no way to find
+  /// out, which makes the feature exist only for whoever implemented it.
+  static const _keys = [
+    ('arrows / WASD', 'move'),
+    ('space / Z', 'jump'),
+    ('X / C', 'carry'),
+    ('V / F', 'fire'),
+    ('tab / Q', 'swop'),
+  ];
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final dualState = ref.watch(dualCharacterProvider);
@@ -83,6 +96,34 @@ class HUD extends ConsumerWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  /// The key hints, under the HUD.
+  ///
+  /// Five pairs of glyphs and no new screen. A player has to be told the keys
+  /// exist before they can find them, and a feature nobody can discover is a
+  /// feature with no users.
+  static Widget keyHints() {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Opacity(
+        opacity: 0.55,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            spacing: AppSpacing.md,
+            children: [
+              for (final (keys, what) in _keys)
+                Text(
+                  '$keys $what',
+                  style: const TextStyle(fontSize: 10, color: Colors.white),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

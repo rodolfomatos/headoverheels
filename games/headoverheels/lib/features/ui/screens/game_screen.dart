@@ -126,6 +126,15 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                 child: SafeArea(child: HUD()),
               ),
 
+              // The keys, said out loud. A feature nobody can discover is a
+              // feature with no users.
+              const Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: SafeArea(child: KeyHints()),
+              ),
+
               // Touch controls
               Positioned(
                 bottom: AppSpacing.lg,
@@ -289,20 +298,42 @@ class _KeyboardControls extends ConsumerStatefulWidget {
 
 class _KeyboardControlsState extends ConsumerState<_KeyboardControls> {
   final Set<LogicalKeyboardKey> _held = {};
-  final FocusNode _focus = FocusNode();
+
+  /// A hardware-level handler rather than a `Focus`.
+  ///
+  /// `Focus` only sees a key while it holds the focus, and this screen is a
+  /// canvas and some buttons, so the keyboard worked by accident of being the only
+  /// focusable thing. The moment anything else took focus -- the pause overlay, a
+  /// route, a text field in a future dialog -- a player holding the right arrow
+  /// would get nothing, with no indication the key was ever received.
+  ///
+  /// `HardwareKeyboard.addHandler` does not care who holds focus. It cannot be
+  /// "taken away", so the failure mode is removed rather than reported.
+  late final VoidCallback _register;
+  bool _handling = false;
 
   @override
   void initState() {
     super.initState();
-    // The keys only arrive if something holds focus, and nothing in this screen
-    // does by default: it is a Stack of a canvas and some buttons.
-    _focus.requestFocus();
+    final keyboard = HardwareKeyboard.instance;
+    keyboard.addHandler(_onKeyEvent);
+    _register = () => keyboard.removeHandler(_onKeyEvent);
   }
 
   @override
   void dispose() {
-    _focus.dispose();
+    _register();
     super.dispose();
+  }
+
+  bool _onKeyEvent(KeyEvent event) {
+    if (_handling) return false;
+    _handling = true;
+    try {
+      return _onKey(event);
+    } finally {
+      _handling = false;
+    }
   }
 
   void _applyDirection() {
@@ -326,20 +357,20 @@ class _KeyboardControlsState extends ConsumerState<_KeyboardControls> {
     }
   }
 
-  KeyEventResult _onKey(KeyEvent event) {
+  bool _onKey(KeyEvent event) {
     if (event is! KeyDownEvent && event is! KeyUpEvent) {
       // A repeat is the OS saying "still held", and the direction already says
       // so. Acting on it would re-fire every action key at the key-repeat rate.
-      return KeyEventResult.ignored;
+      return false;
     }
     final key = event.logicalKey;
     final action = InputSystem.actionForKey(key);
 
     if (event is KeyDownEvent && action != null) {
       _act(action);
-      return KeyEventResult.handled;
+      return true;
     }
-    if (!InputSystem.isDirectionKey(key)) return KeyEventResult.ignored;
+    if (!InputSystem.isDirectionKey(key)) return false;
 
     if (event is KeyDownEvent) {
       _held.add(key);
@@ -347,16 +378,50 @@ class _KeyboardControlsState extends ConsumerState<_KeyboardControls> {
       _held.remove(key);
     }
     _applyDirection();
-    return KeyEventResult.handled;
+    return true;
   }
 
   @override
+  Widget build(BuildContext context) => widget.child;
+}
+
+/// The key hints, said out loud.
+///
+/// A player has to be told the keys exist before they can find them, and a
+/// feature nobody can discover is a feature with no users. The game had no
+/// keyboard until T083 and nothing on screen has ever said so.
+class KeyHints extends StatelessWidget {
+  const KeyHints({super.key});
+
+  static const _keys = [
+    ('arrows / WASD', 'move'),
+    ('space / Z', 'jump'),
+    ('X / C', 'carry'),
+    ('V / F', 'fire'),
+    ('tab / Q', 'swop'),
+  ];
+
+  @override
   Widget build(BuildContext context) {
-    return Focus(
-      focusNode: _focus,
-      autofocus: true,
-      onKeyEvent: (node, event) => _onKey(event),
-      child: widget.child,
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Opacity(
+        opacity: 0.5,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 4),
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 16,
+            children: [
+              for (final (keys, what) in _keys)
+                Text(
+                  '$keys $what',
+                  style: const TextStyle(fontSize: 10, color: Colors.white),
+                ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

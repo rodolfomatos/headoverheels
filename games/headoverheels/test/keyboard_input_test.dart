@@ -239,6 +239,7 @@ void partyFollowsTheKeys() {
     // has lived in all three over this project's history.
     final head = game.party.first;
     final start = head.gridPosition.clone();
+    final startExact = head.exactPosition.clone();
 
     // --- a held key moves it the way the key points -------------------------
     await withLoop(tester, game.game, () async {
@@ -247,9 +248,27 @@ void partyFollowsTheKeys() {
       );
     });
     game.game.resumeEngine();
-    // Many frames, not one: `gridPosition` is integral, so a single 16ms frame
-    // does not cross a tile boundary and a working key would look like a dead
-    // one.
+    // Six frames, and this is the precision D011 bought. At one tile a second a
+    // tile takes sixty frames, so a whole-tile assertion needs sixty whatever the
+    // position's type -- the sixty was never the cost of a float, it is the cost
+    // of a tile. What the float made impossible was asserting anything smaller:
+    // `gridPosition` moved 0.001 per frame and rounded back to the same integer,
+    // so "it moved" was only observable once a whole tile had gone by.
+    //
+    // So the sub-tile claim is asserted here, on `exactPosition`, and the
+    // whole-tile claim sixty frames later.
+    await settle(tester, frames: 6);
+    final nudged = head.exactPosition;
+    expect(
+      nudged.x > startExact.x,
+      isTrue,
+      reason:
+          'six frames after the right arrow went down the party had not '
+          'moved at all: ${startExact.x} -> ${nudged.x}',
+    );
+    game.game.resumeEngine();
+    // A whole tile takes a second at this walk speed, so this is the cost of a
+    // tile and not of a float position.
     await settle(tester, frames: 60);
     freeze(game.game);
 

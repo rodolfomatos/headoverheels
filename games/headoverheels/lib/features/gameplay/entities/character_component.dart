@@ -102,8 +102,34 @@ class CharacterComponent extends PositionComponent with CollisionCallbacks {
     // The sprite sheet row is determined by FacingDirection.spriteRow
   }
 
-  /// Get the grid position of this character.
+  /// The tile this character is on.
+  ///
+  /// Integral, deliberately. It used to return `position`, a `Vector3` of doubles,
+  /// so a single frame moved 0.001 tiles and rounded to the same integer -- which
+  /// is why every movement test needed sixty frames to see anything, and why an
+  /// assertion of "x increased" would have passed for a hundredth of a tile of
+  /// drift as readily as for a tile of movement.
+  ///
+  /// `position` keeps the fraction and is what the renderer draws with. A tile
+  /// index and a fraction of a tile are two different values and the name was
+  /// disagreeing with the one it returned. See D011.
   Vector3 get gridPosition {
+    final exact = exactPosition;
+    return Vector3(
+      exact.x.roundToDouble(),
+      exact.y.roundToDouble(),
+      exact.z.roundToDouble(),
+    );
+  }
+
+  /// Where this character actually is, to the pixel.
+  ///
+  /// For rendering and for animation. Anything that asks "which tile" wants
+  /// [gridPosition]; anything that asks "how far along the tile" wants this.
+  ///
+  /// Named `exactPosition` because `position` is already Flame's own `Vector2`
+  /// on this component, and shadowing it would break the transform.
+  Vector3 get exactPosition {
     final provider = type == CharacterType.head ? headProvider : heelsProvider;
     return ref.read(provider).position;
   }

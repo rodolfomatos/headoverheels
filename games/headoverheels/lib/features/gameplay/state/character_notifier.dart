@@ -25,6 +25,8 @@ class CharacterStateNotifier extends StateNotifier<CharacterState> {
   void stop() {
     state = state.copyWith(
       velocity: Vector2.zero(),
+      // Not the vertical: a party in the air keeps falling whether or not the
+      // player is holding a direction.
       animation: AnimationState.idle,
     );
   }
@@ -37,10 +39,10 @@ class CharacterStateNotifier extends StateNotifier<CharacterState> {
       jumpPhase: 1, // Rising
       jumpFramesRemaining: state.jumpDurationFrames,
       animation: AnimationState.jumpRise,
-      velocity: Vector2(
-        state.velocity.x,
-        -state.jumpHeight / (state.jumpDurationFrames / 60.0),
-      ),
+      // Upward, on z. It used to be a negative y velocity, on a plane where y
+      // is a tile row, so jumping moved the party north and gravity moved it
+      // south. Both were the same mistake in the same place.
+      verticalVelocity: state.jumpHeight / (state.jumpDurationFrames / 60.0),
     );
   }
 
@@ -128,22 +130,30 @@ class CharacterStateNotifier extends StateNotifier<CharacterState> {
   void _fixedUpdate(double dt) {
     final currentState = state;
 
-    // Apply gravity
-    final velocity = Vector2(
-      currentState.velocity.x,
-      currentState.velocity.y + (9.8 * dt * 60.0), // Gravity scaled to tiles
-    );
+    // Gravity acts on z and nowhere else. It acted on y, which is a tile row,
+    // so the party was pushed south every frame at an accelerating rate and
+    // `stop()` could not clear it: the velocity was zeroed and gravity put it
+    // back on the next tick. The tile plane is flat, and nothing in this game
+    // moves the party along a row because it fell.
+    final vertical = currentState.verticalVelocity - (9.8 * dt * 60.0);
 
-    // Update position
+    // Walk across the tile plane, which is x and y only.
     final newPosition = Vector3(
-      currentState.position.x + velocity.x * dt,
-      currentState.position.y + velocity.y * dt,
-      currentState.position.z,
+      currentState.position.x + currentState.velocity.x * dt,
+      currentState.position.y + currentState.velocity.y * dt,
+      currentState.position.z + vertical * dt,
     );
 
-    // Ground check (simplified - real impl checks collision)
+    // Grounded means on the floor, which is z == 0. Landing clamps it, so a
+    // party that overshoots does not keep sinking through the room.
     final isGrounded = newPosition.z <= 0;
-    final newVelocity = isGrounded ? Vector2(velocity.x, 0) : velocity;
+    // Landing clears the *vertical*, never the walk. It used to be
+    // `isGrounded ? Vector2.zero() : velocity`, which zeroed both axes, so a
+    // party standing on the floor could not walk at all: every tick found it
+    // grounded and threw its walk velocity away.
+    final newVelocity = currentState.velocity;
+    final clampedZ = isGrounded ? 0.0 : newPosition.z;
+    final newVertical = isGrounded ? 0.0 : vertical;
 
     // Jump phase update
     int jumpPhase = currentState.jumpPhase;
@@ -154,9 +164,12 @@ class CharacterStateNotifier extends StateNotifier<CharacterState> {
       if (jumpFramesRemaining <= 0) {
         jumpPhase = 0;
         jumpFramesRemaining = 0;
-      } else if (velocity.y > 0 && jumpPhase == 1) {
-        jumpPhase = 2; // Peak
-      } else if (velocity.y < 0 && jumpPhase == 1) {
+      } else if (vertical <= 0 && jumpPhase == 1) {
+        // Upward speed has run out: the apex. It read `velocity.y > 0`, which
+        // on a tile row is "moving south", so the party reached its peak while
+        // falling and started falling while rising.
+        jumpPhase = 2;
+      } else if (jumpPhase == 2 && vertical < 0) {
         jumpPhase = 3; // Falling
       }
     }
@@ -174,8 +187,9 @@ class CharacterStateNotifier extends StateNotifier<CharacterState> {
     }
 
     state = currentState.copyWith(
-      position: newPosition,
+      position: Vector3(newPosition.x, newPosition.y, clampedZ),
       velocity: newVelocity,
+      verticalVelocity: newVertical,
       isGrounded: isGrounded,
       jumpPhase: jumpPhase,
       jumpFramesRemaining: jumpFramesRemaining,

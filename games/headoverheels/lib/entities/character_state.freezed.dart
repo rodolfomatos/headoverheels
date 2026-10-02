@@ -1274,6 +1274,15 @@ mixin _$CharacterState {
   Vector2 get velocity => throw _privateConstructorUsedError;
   AnimationState get animation => throw _privateConstructorUsedError;
   FacingDirection get facing => throw _privateConstructorUsedError;
+
+  /// Vertical speed, in tiles per second, positive upward.
+  ///
+  /// It is separate from [velocity] because [velocity] is the walk across the
+  /// tile plane and this is the only thing off it. They used to be the same
+  /// axis, which put gravity on the tile rows: the party slid south every
+  /// frame, and `stop()` could not clear it because gravity put it straight
+  /// back. See aes/tickets/T090.
+  double get verticalVelocity => throw _privateConstructorUsedError;
   bool get isGrounded => throw _privateConstructorUsedError;
   int get jumpPhase => throw _privateConstructorUsedError;
   int get jumpFramesRemaining => throw _privateConstructorUsedError;
@@ -1319,6 +1328,7 @@ abstract class $CharacterStateCopyWith<$Res> {
     @Vector2Converter() Vector2 velocity,
     AnimationState animation,
     FacingDirection facing,
+    double verticalVelocity,
     bool isGrounded,
     int jumpPhase,
     int jumpFramesRemaining,
@@ -1353,6 +1363,7 @@ class _$CharacterStateCopyWithImpl<$Res, $Val extends CharacterState>
     Object? velocity = null,
     Object? animation = null,
     Object? facing = null,
+    Object? verticalVelocity = null,
     Object? isGrounded = null,
     Object? jumpPhase = null,
     Object? jumpFramesRemaining = null,
@@ -1387,6 +1398,10 @@ class _$CharacterStateCopyWithImpl<$Res, $Val extends CharacterState>
                 ? _value.facing
                 : facing // ignore: cast_nullable_to_non_nullable
                       as FacingDirection,
+            verticalVelocity: null == verticalVelocity
+                ? _value.verticalVelocity
+                : verticalVelocity // ignore: cast_nullable_to_non_nullable
+                      as double,
             isGrounded: null == isGrounded
                 ? _value.isGrounded
                 : isGrounded // ignore: cast_nullable_to_non_nullable
@@ -1460,6 +1475,7 @@ abstract class _$$CharacterStateImplCopyWith<$Res>
     @Vector2Converter() Vector2 velocity,
     AnimationState animation,
     FacingDirection facing,
+    double verticalVelocity,
     bool isGrounded,
     int jumpPhase,
     int jumpFramesRemaining,
@@ -1494,6 +1510,7 @@ class __$$CharacterStateImplCopyWithImpl<$Res>
     Object? velocity = null,
     Object? animation = null,
     Object? facing = null,
+    Object? verticalVelocity = null,
     Object? isGrounded = null,
     Object? jumpPhase = null,
     Object? jumpFramesRemaining = null,
@@ -1528,6 +1545,10 @@ class __$$CharacterStateImplCopyWithImpl<$Res>
             ? _value.facing
             : facing // ignore: cast_nullable_to_non_nullable
                   as FacingDirection,
+        verticalVelocity: null == verticalVelocity
+            ? _value.verticalVelocity
+            : verticalVelocity // ignore: cast_nullable_to_non_nullable
+                  as double,
         isGrounded: null == isGrounded
             ? _value.isGrounded
             : isGrounded // ignore: cast_nullable_to_non_nullable
@@ -1586,6 +1607,7 @@ class _$CharacterStateImpl implements _CharacterState {
     @Vector2Converter() required this.velocity,
     required this.animation,
     required this.facing,
+    required this.verticalVelocity,
     required this.isGrounded,
     required this.jumpPhase,
     required this.jumpFramesRemaining,
@@ -1616,6 +1638,16 @@ class _$CharacterStateImpl implements _CharacterState {
   final AnimationState animation;
   @override
   final FacingDirection facing;
+
+  /// Vertical speed, in tiles per second, positive upward.
+  ///
+  /// It is separate from [velocity] because [velocity] is the walk across the
+  /// tile plane and this is the only thing off it. They used to be the same
+  /// axis, which put gravity on the tile rows: the party slid south every
+  /// frame, and `stop()` could not clear it because gravity put it straight
+  /// back. See aes/tickets/T090.
+  @override
+  final double verticalVelocity;
   @override
   final bool isGrounded;
   @override
@@ -1674,7 +1706,7 @@ class _$CharacterStateImpl implements _CharacterState {
 
   @override
   String toString() {
-    return 'CharacterState(type: $type, position: $position, velocity: $velocity, animation: $animation, facing: $facing, isGrounded: $isGrounded, jumpPhase: $jumpPhase, jumpFramesRemaining: $jumpFramesRemaining, carriedItem: $carriedItem, hasBag: $hasBag, bagItems: $bagItems, doughnutCount: $doughnutCount, activePowerUps: $activePowerUps, isControllable: $isControllable, isInvulnerable: $isInvulnerable, lives: $lives)';
+    return 'CharacterState(type: $type, position: $position, velocity: $velocity, animation: $animation, facing: $facing, verticalVelocity: $verticalVelocity, isGrounded: $isGrounded, jumpPhase: $jumpPhase, jumpFramesRemaining: $jumpFramesRemaining, carriedItem: $carriedItem, hasBag: $hasBag, bagItems: $bagItems, doughnutCount: $doughnutCount, activePowerUps: $activePowerUps, isControllable: $isControllable, isInvulnerable: $isInvulnerable, lives: $lives)';
   }
 
   @override
@@ -1690,6 +1722,8 @@ class _$CharacterStateImpl implements _CharacterState {
             (identical(other.animation, animation) ||
                 other.animation == animation) &&
             (identical(other.facing, facing) || other.facing == facing) &&
+            (identical(other.verticalVelocity, verticalVelocity) ||
+                other.verticalVelocity == verticalVelocity) &&
             (identical(other.isGrounded, isGrounded) ||
                 other.isGrounded == isGrounded) &&
             (identical(other.jumpPhase, jumpPhase) ||
@@ -1722,6 +1756,7 @@ class _$CharacterStateImpl implements _CharacterState {
     velocity,
     animation,
     facing,
+    verticalVelocity,
     isGrounded,
     jumpPhase,
     jumpFramesRemaining,
@@ -1757,6 +1792,7 @@ abstract class _CharacterState implements CharacterState {
     @Vector2Converter() required final Vector2 velocity,
     required final AnimationState animation,
     required final FacingDirection facing,
+    required final double verticalVelocity,
     required final bool isGrounded,
     required final int jumpPhase,
     required final int jumpFramesRemaining,
@@ -1785,6 +1821,15 @@ abstract class _CharacterState implements CharacterState {
   AnimationState get animation;
   @override
   FacingDirection get facing;
+  @override
+  /// Vertical speed, in tiles per second, positive upward.
+  ///
+  /// It is separate from [velocity] because [velocity] is the walk across the
+  /// tile plane and this is the only thing off it. They used to be the same
+  /// axis, which put gravity on the tile rows: the party slid south every
+  /// frame, and `stop()` could not clear it because gravity put it straight
+  /// back. See aes/tickets/T090.
+  double get verticalVelocity;
   @override
   bool get isGrounded;
   @override

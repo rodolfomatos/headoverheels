@@ -1,6 +1,6 @@
 ---
 id: T090
-status: open
+status: done
 severity: blocker
 found_by: aes-peer-review follow-up while closing T083
 ---
@@ -55,28 +55,51 @@ The conveyor is not involved. Measured with `conveyor_1` removed from the room:
 the party still walks, at the same rate. That rules out the hypothesis this ticket
 opened with.
 
-## Why it is not a one-line fix
+## Closed: z is the height, and the tile plane is flat
 
-`jump()` writes the jump into the same axis:
+Decided rather than guessed. `position` was already a `Vector3`, `isGrounded`
+already tested `z`, `gridPosition` and the render layer already treated x and y as
+tile coordinates, and `jumpPhase`, `jumpHeight` and `jumpFramesRemaining` all
+described a height axis. `z` was the axis the model meant and the one nothing
+integrated.
 
-```dart
-velocity: Vector2(state.velocity.x, -state.jumpHeight / (state.jumpDurationFrames / 60.0)),
-```
+**`verticalVelocity` is a new field on `CharacterState`, separate from
+`velocity`.** `velocity` is the walk across the tile plane and the plane is flat:
+nothing in this game moves the party along a row because it fell.
 
-A negative **y** velocity, on a plane where `y` is a tile row. So gravity and jump
-both operate on the tile plane, while `isGrounded`, `jumpPhase` and `position.z`
-all describe a height axis that is never integrated.
+- Gravity subtracts from `verticalVelocity` and integrates `position.z`.
+- `isGrounded = position.z <= 0` clamps `z` to zero and clears the vertical, so a
+  party that overshoots does not sink through the room.
+- `jump()` sets an upward `verticalVelocity` instead of a negative `y`.
+- The jump phases read the vertical: rising while it is positive, apex when it
+  runs out, falling when it is negative. They used to read `velocity.y > 0` for
+  the apex, which on a tile row means "moving south", so the party reached its
+  peak while falling and began falling while rising.
 
-The model does not say which axis is up. Deciding that is a design question, not a
-patch: either gravity and jump move to `z` and the tile plane is genuinely flat,
-or `z` is dropped and jumping is expressed some other way. Whichever it is, the
-two have to agree, and right now they do not.
+`stop()` still clears only the walk, deliberately: a party in the air keeps
+falling whether or not the player is holding a direction.
 
-Until then the party cannot stop, and T083 made that reachable by a key.
+## One bug of my own, on the way
 
-## The discriminator that remains
+Landing was first written as `isGrounded ? Vector2.zero() : velocity`, which zeroed
+both axes, so a party standing on the floor could not walk: every tick found it
+grounded and threw its walk velocity away. The east test caught it immediately —
+the party moved 0.03 tiles instead of 1.87. Landing clears the vertical and
+nothing else.
 
-Whichever axis is chosen as height, the test is the same and it is cheap: hold a
-key, release it, settle a second, and require the party's grid position to be
-unchanged. That test fails today, in the way it should — it is written for the fix,
-not for the diagnosis, and shipping it now would mean shipping a red suite.
+## Measured
+
+    key east:      1.0,1.0 -> 2.87,1.0
+    released at    2.87,1.0
+    a second later 2.87,1.0
+
+y holds at 1.0 while walking east, which is the claim that was false before: the
+party used to slide south at an accelerating rate with nothing pressing anything.
+
+## One widget test, not three
+
+This harness boots the world through `loadRealGame`, and a second `testWidgets` in
+the same file reports "the game never finished loading" for reasons unrelated to
+the game — the registry is a singleton and the teardown must take the widget down
+before it disposes. So the sequence runs in one game, which is also the better
+test: it is the same party throughout.

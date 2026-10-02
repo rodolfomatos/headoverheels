@@ -19,7 +19,6 @@
 // focus tree and a real key event stream; the mapping is where the arithmetic
 // lives, and arithmetic is where this can be wrong in a way nobody notices.
 
-import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter_test/flutter_test.dart';
@@ -210,14 +209,20 @@ void directionFromHeldKeys() {
 /// The party follows a key, measured through the real input path.
 ///
 /// `room_render_test.dart` sets the position on the notifier directly, so it
-/// never touches the input path -- which is the path this ticket is about.
+/// never touches the input path -- which is the path this file is about.
 ///
-/// The release half is deliberately absent. The party does not stop; that is
-/// T090, with the measurement. Writing the assertion anyway would have meant
-/// either a failing suite or a weaker claim than the one that turned out to be
-/// true.
+/// All three of these failed before T090 was fixed. Gravity was integrated on the
+/// tile plane, so `stop()` cleared a velocity that gravity put straight back and
+/// the party walked south for as long as the room was running. The third one needs
+/// no key pressed at all.
 void partyFollowsTheKeys() {
-  testWidgets('holding a key moves the party the way the key points', (
+  // One widget test, not three. This harness boots the world through
+  // `loadRealGame`, and a second `testWidgets` in the same file reports "the game
+  // never finished loading" for reasons that have nothing to do with the game:
+  // the registry is a singleton and the teardown has to take the widget down
+  // before it disposes. So the sequence runs in one game, which is also a better
+  // test -- the party is the same party throughout.
+  testWidgets('a held key moves the party, a released key stops it', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(1280, 800);
@@ -235,6 +240,7 @@ void partyFollowsTheKeys() {
     final head = game.party.first;
     final start = head.gridPosition.clone();
 
+    // --- a held key moves it the way the key points -------------------------
     await withLoop(tester, game.game, () async {
       input.onJoystickDirection(
         InputSystem.directionFromKeys({LogicalKeyboardKey.arrowRight})!,
@@ -250,13 +256,50 @@ void partyFollowsTheKeys() {
     final moved = head.gridPosition;
     // ignore: avoid_print
     print('key east: ${start.x},${start.y} -> ${moved.x},${moved.y}');
-
     expect(
       moved.x > start.x,
       isTrue,
       reason:
           'the right arrow was held and the party did not go east: '
           '${start.x},${start.y} -> ${moved.x},${moved.y}',
+    );
+
+    // --- and a released key stops it -----------------------------------------
+    await withLoop(tester, game.game, () async {
+      input.onJoystickDirection(Offset.zero);
+    });
+    game.game.resumeEngine();
+    // A second for a coast to decay, but not a minute: a party still walking
+    // after a full second has not coasted, it has been driven.
+    await settle(tester, frames: 60);
+    final stoppedAt = head.gridPosition.clone();
+    await settle(tester, frames: 60);
+    freeze(game.game);
+
+    // ignore: avoid_print
+    print(
+      'released at ${stoppedAt.x},${stoppedAt.y}; '
+      'a second later ${head.gridPosition.x},${head.gridPosition.y}',
+    );
+    expect(
+      head.gridPosition.x == stoppedAt.x && head.gridPosition.y == stoppedAt.y,
+      isTrue,
+      reason:
+          'the party is still moving a second after the key was released, '
+          'at ${head.gridPosition.x},${head.gridPosition.y}. Gravity is being '
+          'integrated on the tile plane, so stop() cannot clear it.',
+    );
+
+    // --- and it does not drift when nothing is pressed at all ----------------
+    // Gravity acted on the tile row, so a party nobody was touching slid down the
+    // room for as long as the room was loaded. The party is stopped right now,
+    // so this is that claim stated directly.
+    expect(
+      head.gridPosition.y == stoppedAt.y,
+      isTrue,
+      reason:
+          'the party drifted south to ${head.gridPosition.y} with nothing '
+          'pressed',
     );
   });
 }

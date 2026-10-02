@@ -84,6 +84,7 @@ const _$TriggerTypeEnumMap = {
   TriggerType.hushPuppy: 'hushPuppy',
   TriggerType.monster: 'monster',
   TriggerType.guardian: 'guardian',
+  TriggerType.dispensary: 'dispensary',
 };
 
 _$RoomDefinitionImpl _$$RoomDefinitionImplFromJson(Map<String, dynamic> json) =>

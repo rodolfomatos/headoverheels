@@ -118,6 +118,15 @@ abstract class CharacterState with _$CharacterState {
     @Vector2Converter() required Vector2 velocity,
     required AnimationState animation,
     required FacingDirection facing,
+
+    /// Vertical speed, in tiles per second, positive upward.
+    ///
+    /// It is separate from [velocity] because [velocity] is the walk across the
+    /// tile plane and this is the only thing off it. They used to be the same
+    /// axis, which put gravity on the tile rows: the party slid south every
+    /// frame, and `stop()` could not clear it because gravity put it straight
+    /// back. See aes/tickets/T090.
+    required double verticalVelocity,
     required bool isGrounded,
     required int jumpPhase,
     required int jumpFramesRemaining,
@@ -157,6 +166,7 @@ abstract class CharacterState with _$CharacterState {
       type: type,
       position: startPosition,
       velocity: Vector2.zero(),
+      verticalVelocity: 0,
       animation: AnimationState.idle,
       facing: FacingDirection.south,
       isGrounded: true,

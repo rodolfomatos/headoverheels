@@ -177,6 +177,7 @@ current_ticket: "T050"
 | T082 | HoH drew the room in a different coordinate space | done |
 | T084 | HoH entities are drawn as bars, not sprites | open |
 | T087 | Room change is untestable in a widget test; needs an integration test | open |
+| T089 | The render guard measured a room the test had rearranged | done |
 | T088 | `switch_1` is drawn under the ConveyorEntity at the same y | done |
 | T086 | The entity generator wrote to the repository root, not the game | done |
 | T085 | HoH rendered an empty room after a joystick drag, once | open |

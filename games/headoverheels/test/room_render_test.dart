@@ -171,21 +171,49 @@ void main() {
       await pinArtToFirstFrame(game.room.entities);
       final drawn = <String, int>{};
       final entities = game.room.entities;
-      final takenOut = <PuzzleEntity>[];
+      // The whole child list comes out and goes back in its original order, once
+      // per entity.
+      //
+      // Two conventions met here and both were wrong. The loop used to collect
+      // removals and restore them at the end, so by the third entity the first
+      // two were gone and every number described a room that had been emptied
+      // around the thing being measured. Restoring each entity on its own fixed
+      // that and broke the draw order instead: `add` appends, `children` is a
+      // ReadOnlyOrderedSet with no insert-at-index, so by the time `switch_1` was
+      // measured the 1024-wide conveyor had been re-appended *after* it and the
+      // switch read 0px while standing plainly visible.
+      //
+      // So the room under test is always rebuilt exactly as the game built it:
+      // every child out, render, every child back in order. A measurement of a
+      // room the test has rearranged is not a measurement of the room.
+      final children = game.room.children.toList();
       for (final entity in entities) {
         final before = await renderFrame(tester, game);
-        takenOut.add(entity);
+
+        // The room without this entity: everything out, then everything back in
+        // order except this one. Removing all of them and comparing would measure
+        // the floor, and every entity would read the same number.
         await withLoop(tester, game.game, () async {
-          entity.removeFromParent();
+          for (final child in children) {
+            child.removeFromParent();
+          }
         });
+        await withLoop(tester, game.game, () async {
+          for (final child in children) {
+            if (child != entity) await game.room.add(child);
+          }
+        });
+
         final after = await renderFrame(tester, game);
         drawn[entity.id] = before.pixelsDifferentFrom(after);
+
+        // And back to exactly as the game built it.
+        await withLoop(tester, game.game, () async {
+          for (final child in children) {
+            if (child.parent == null) await game.room.add(child);
+          }
+        });
       }
-      await withLoop(tester, game.game, () async {
-        for (final entity in takenOut) {
-          await game.room.add(entity);
-        }
-      });
       for (final entry in drawn.entries) {
         // ignore: avoid_print
         print('entity ${entry.key}: ${entry.value}px');

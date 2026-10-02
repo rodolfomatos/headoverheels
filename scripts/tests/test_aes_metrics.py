@@ -581,3 +581,64 @@ def test_every_shadow_document_names_the_work_it_came_from():
     for record in aes.shadow_docs():
         assert record["provenance"], f"{record['id']} has no provenance"
         assert record["last_verified"], f"{record['id']} was never verified"
+
+
+# --- the causality check on a stale basis ----------------------------------
+
+def test_a_done_ticket_whose_decision_says_otherwise_is_a_blocker(
+        tmp_path, monkeypatch):
+    """T087 was closed while D006 still said the work was not established.
+
+    A ticket marked done whose governing decision holds a negative verdict is a
+    contradiction the board cannot show: the work reads as finished and the
+    reason it was needed reads as unmet. It passed because the decision file is
+    not the ticket, and nothing joined them.
+    """
+    monkeypatch.setattr(aes, "DECISIONS", tmp_path / "decisions")
+    monkeypatch.setattr(aes, "TICKETS", tmp_path / "tickets")
+    monkeypatch.setattr(aes, "SHADOW", tmp_path / "shadow")
+    write(tmp_path / "decisions" / "D006.md",
+          "---\nid: D006\ndate: 2026-09-30\nquestion: why\n"
+          "verdict: NÃO-SUPORTADA\nticket: T087\n---\n\nnot established\n")
+    write(tmp_path / "tickets" / "T087-x.md",
+          "---\nid: T087\nstatus: done\n---\n\nbody\n")
+    write(tmp_path / "shadow" / "access.log", "D006 2026-09-30\n")
+
+    report = aes.conflict(TODAY)
+
+    violations = [f for f in report["findings"]
+                  if f["class"] == "causality violation"]
+    assert violations, "a closed ticket with a negative basis must be a blocker"
+    assert report["verdict"] == "FAIL"
+
+
+def test_the_projects_closed_tickets_all_have_an_established_basis():
+    """Runs against the real tree.
+
+    This is the assertion that would have caught D006 when T087 was closed, and
+    it is the one that has to keep passing as tickets get closed.
+    """
+    stale = [f["where"] for f in aes.conflict(TODAY)["findings"]
+             if f["class"] == "causality violation"]
+
+    assert stale == [], (
+        f"closed tickets whose decision record still says the work is not "
+        f"established: {stale}")
+
+
+def test_every_decision_this_project_made_about_the_move_has_a_record():
+    """Three design decisions were taken in one session and none was recorded.
+
+    They lived in commits and tickets, which is where a record stops being
+    findable. `superpower_up` on the height axis, `floor_first` on draw order and
+    `rebuild_to_measure` on instrumentation are all decisions, and all three now
+    have a decision record with a ticket and a verdict.
+    """
+    bodies = "\n".join(
+        path.read_text() for path in aes.DECISIONS.glob("*.md"))
+
+    for marker, decision in [("z is the height", "D007"),
+                             ("floor treatment is drawn", "D008"),
+                             ("rebuild the scene exactly", "D009"),
+                             ("cannot wait for a room change", "D010")]:
+        assert marker in bodies, f"{decision} is missing or was renamed"

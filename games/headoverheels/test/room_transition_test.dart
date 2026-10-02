@@ -73,9 +73,14 @@ void main() {
       }),
     );
 
-    // Step the engine a while and watch the party the whole time.
+    // Step the engine a while and watch the party the whole time -- and the room,
+    // because "the party is in a tree" and "the room is drawn" are different
+    // claims and a transition can satisfy one while failing the other.
+    var blank = 0;
     for (var step = 0; step < 40; step++) {
       await withLoop(tester, game.game, () async {});
+      final frame = await renderFrame(tester, game);
+      if (frame.inkCount == 0) blank++;
       final found = findable();
       expect(
         found,
@@ -113,6 +118,29 @@ void main() {
       reason:
           'the party is in no room after a door, and no tree but the '
           "game's own is drawn, so it is invisible",
+    );
+    // T085's mechanism, and the claim the sight of an empty room was made of.
+    //
+    // `_loadRoom` adds the new room and sets `_currentRoom`, and `world.add`
+    // resolves before the tileset has decoded, so for a few frames after every
+    // door the room is mounted, interactive, and paints nothing. It was never
+    // visible before because transitions were broken in a louder way -- the party
+    // vanished -- and fixing that removed the bigger symptom and left this one.
+    //
+    // Sampled from the first frame of the transition, in the same boot: a second
+    // `testWidgets` in this file cannot load the world at all, because the
+    // registry is a singleton and the teardown has to take the widget down
+    // before it disposes.
+    // ignore: avoid_print
+    print('blank frames across the transition: $blank of 40');
+    expect(
+      blank,
+      lessThanOrEqualTo(2),
+      reason:
+          'the room was blank for $blank frames of a door transition. The '
+          'game is interactive from the first frame and the tileset is not '
+          'decoded yet, so a player walks out of a door into an empty room. Two '
+          'frames is the ceiling; more than that is a blank room, not a slow one.',
     );
   });
 }

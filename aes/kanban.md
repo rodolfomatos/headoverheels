@@ -181,7 +181,7 @@ current_ticket: "T050"
 | T089 | The render guard measured a room the test had rearranged | done |
 | T088 | `switch_1` is drawn under the ConveyorEntity at the same y | done |
 | T086 | The entity generator wrote to the repository root, not the game | done |
-| T085 | HoH rendered an empty room after a joystick drag, once | open |
+| T085 | HoH rendered an empty room after a joystick drag, once | done |
 | T083 | Head over Heels has no keyboard at all | done |
 | T080 | Correction: the page was blamed for the game's own transform | finding |
 | T081 | The render guard skips the camera, so it cannot see placement | done |

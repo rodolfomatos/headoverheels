@@ -177,6 +177,7 @@ current_ticket: "T050"
 | T082 | HoH drew the room in a different coordinate space | done |
 | T084 | HoH entities are drawn as bars, not sprites | done |
 | T090 | The party does not stop when the control is released | done |
+| T091 | Nothing in the gate drives the game | done |
 | T093 | The party is on a tile grid and its position is a float | done |
 | T092 | The art pipeline CLI had never been run | done |
 | T094 | The keyboard depends on focus, and nothing says the keys exist | done |

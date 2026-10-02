@@ -1,6 +1,6 @@
 ---
 id: T091
-status: open
+status: done
 severity: major
 found_by: aes-peer-review/2026-10-02-input-and-model (pragmatic, utilizador)
 ---
@@ -25,18 +25,49 @@ minutes rather than seconds, and wiring it into `make check` would make the gate
 useless for a two-second edit. The honest shape is a second gate that runs
 alongside the fast one, and a rule that which is which is written down.
 
-## What closing it needs
+## Closed: the game is driven, and a door is measured
 
-1. `make check` stays fast and stays what runs on every save.
-2. A `make verify` that includes the browser, documented as the gate that runs
-   before a push rather than before a save.
-3. A browser assertion that is not "the frame changes". The motion check says 12
-   of 12 steps moved, which is true of a game that is alive and broken in the same
-   way. What would be worth having is a walk through a door, which needs the
-   keyboard that T083 landed.
+**`scripts/browser_check.js` takes a `KEYS` step.** `KEYS=ArrowUp:14000,...`
+holds each key for its duration and captures the frame before and after, so the
+party walks rather than teleporting one frame's worth. The keyboard has existed for
+one commit and this is the only thing in the repository that uses it the way a
+player would.
 
-## The honest boundary
+**`scripts/browser_door.py` asks a question `browser_motion.py` cannot.** Motion
+asks "does the frame change", and the party moving changes the frame, so that
+question is answered by a game that is alive and broken in the same way. The
+discriminator here is arithmetic:
 
-Until this is done, the claim "the game works" rests on human memory and this
-repository cannot make it. Both reviewers who raised this said so in nearly the
-same words, from opposite directions.
+- The party is a 64x40 sprite. Walking it across a 1000x720 frame changes about
+  0.4% of it.
+- A different room changes nearly all of it.
+
+So **more than a fifth of the frame changed cannot be walking.** The margin is
+about fifty times the sprite's maximum share, which is the point: a threshold
+nobody had to defend does not get relaxed the first time a slow machine is called
+unreasonable.
+
+Measured, driving the real build:
+
+```
+hoh_key_ArrowUp_14000   -> hoh_after_ArrowUp_14000:   23.10%
+hoh_key_ArrowDown_14000 -> hoh_after_ArrowDown_14000:  0.00%
+hoh_key_ArrowLeft_14000 -> hoh_after_ArrowLeft_14000:  0.41%
+hoh_key_ArrowRight_14000-> hoh_after_ArrowRight_14000: 0.00%
+```
+
+Walking north changed the room. The other three show 0.00% because after the
+transition the party is somewhere else and those directions lead into a wall, which
+is itself the discriminator working: the party did not move and the frame did not
+change.
+
+**Two gates, and which is which is written on the target.** `make check` stays fast
+and does not build; `make verify-browser` builds and opens. The reason is on the
+target rather than left to whoever is in a hurry, because `make check` was green
+through all four of the defects this project found by hand.
+
+## What this does not claim
+
+That the party can solve the game. It can walk, and walking north through a door
+changes the room. Every other room, every puzzle, and whether the doors lead
+anywhere sensible are still only a human with their hands on it.

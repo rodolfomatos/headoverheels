@@ -114,6 +114,29 @@ function serve() {
         + `${dx0 + ddx},${dy0 + ddy} at ${Date.now() - started}ms`);
     }
 
+    // Optional keyboard walk. The game has had a keyboard since T083, and this is
+    // the only thing in the repository that can drive the game the way a player
+    // does -- every other measurement here counts pixels or queries a component
+    // tree.
+    //
+    // KEYS is "key:ms,key:ms"; each key is held for its duration, so the party
+    // walks rather than teleporting one frame's worth.
+    const keys = process.env.KEYS;
+    if (keys) {
+      for (const step of keys.split(',')) {
+        const [key, ms] = step.split(':');
+        const before = `build/browser/${name}_key_${key}_${ms}.png`;
+        await page.screenshot({ path: before });
+        await page.keyboard.down(key);
+        await page.waitForTimeout(Number(ms));
+        await page.keyboard.up(key);
+        await page.waitForTimeout(250);
+        const after = `build/browser/${name}_after_${key}_${ms}.png`;
+        await page.screenshot({ path: after });
+        report.steps.push(`held ${key} for ${ms}ms: ${before} -> ${after}`);
+      }
+    }
+
     // Take a capture every two seconds so "the room was never there" and "the
     // room arrived at 30 seconds" are different pictures rather than a claim.
     let firstBusy = null;

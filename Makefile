@@ -127,6 +127,10 @@ assets-preview:
 # Not part of `make check`, which does not build: this target builds two release
 # web builds first, which is most of the cost. One run is about 40 seconds of
 # driving plus the builds.
+# The gate that drives the game. `make check` is fast and does not build; this
+# builds two web bundles and opens them. It runs before a push, not before a save,
+# and the reason is written here rather than left to whoever is in a hurry:
+# `make check` was green through the party vanishing on every door.
 verify-browser:
 	@echo "Building the release web builds a player would load..."
 	@$(MAKE) build-headoverheels build-knightlore
@@ -135,12 +139,19 @@ verify-browser:
 	@echo "Head over Heels: click into the game, then hold the virtual joystick."
 	@DRAG=86,714,55,0 DRAG_AFTER=8000 node scripts/browser_check.js \
 		games/headoverheels/build/web hoh 638,363 24000 8105 >/dev/null
+	@echo "Head over Heels: walk with the keyboard, and ask whether a door works."
+	@KEYS=ArrowUp:14000,ArrowRight:14000,ArrowDown:14000,ArrowLeft:14000 \
+		DRAG_AFTER=8000 node scripts/browser_check.js \
+		games/headoverheels/build/web hoh 638,363 2000 8107 >/dev/null
 	@echo "Knight Lore: click the title."
 	@node scripts/browser_check.js games/knightlore/build/web kl 640,400 12000 8106 >/dev/null
 	@echo ""
 	@python3 scripts/browser_motion.py --fail-under 200 build/browser/hoh_*.png
 	@echo ""
 	@python3 scripts/browser_motion.py --report-only build/browser/kl_*.png
+	@echo ""
+	@echo ""
+	@python3 scripts/browser_door.py
 	@echo ""
 	@python3 scripts/browser_motion.py --fail-under 200 build/browser/hoh_*.png >/dev/null \
 		&& echo "Head over Heels: the frame changes, so the game is alive." \

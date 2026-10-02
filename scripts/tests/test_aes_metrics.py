@@ -312,7 +312,10 @@ def test_absent_knowledge_base_is_undefined_not_zero(tmp_path, monkeypatch):
     for name in ("omission_rate", "pinning_bias", "access_concentration",
                  "synthesis_coverage", "score_clustering"):
         assert name in metrics["undefined"]
-        assert "does not exist" in metrics["undefined"][name]
+        # The reason has to travel with the metric, or "undefined" reads as
+        # "zero, and zero is fine".
+        assert "no documents" in metrics["undefined"][name] or \
+               "does not exist" in metrics["undefined"][name]
     assert report["verdict"] == "WARN"
 
 
@@ -421,3 +424,160 @@ def test_a_mark_against_an_older_record_is_a_blocker(tmp_path, monkeypatch):
 
     assert [f for f in report["findings"]
             if f["class"] == "backwards supersession"]
+
+
+# --- aes-narrative: the five metrics, computed and not merely counted -------
+
+def make_shadow(root, docs, index_lines=(), access=True):
+    shadow = root / "shadow"
+    shadow.mkdir(parents=True, exist_ok=True)
+    for name, fields in docs.items():
+        front = "\n".join(f"{k}: {v}" for k, v in fields.items())
+        write(shadow / f"{name}.md", f"---\n{front}\n---\n\n# {name}\n\nThe rule.\n")
+    write(shadow / "INDEX.md", "# index\n\n" + "\n".join(index_lines) + "\n")
+    if access:
+        # By the document's own id, which is what the log records and what the
+        # metrics look up. Writing the filename here made every count miss, and
+        # the metric that depended on it reported zero rather than saying it
+        # could not be computed.
+        lines = []
+        for fields in docs.values():
+            if fields.get("access_count"):
+                for _ in range(int(fields["access_count"])):
+                    lines.append(f"{fields['id']} 2026-10-02 abc123 why")
+        write(shadow / "access.log", "\n".join(lines) + "\n")
+    return shadow
+
+
+def narrative_with(tmp_path, monkeypatch, docs, index_lines, access=True):
+    monkeypatch.setattr(aes, "SHADOW", tmp_path / "shadow")
+    monkeypatch.setattr(aes, "DECISIONS", tmp_path / "decisions")
+    shadow = make_shadow(tmp_path, docs, index_lines, access)
+    assert shadow.exists()
+    return aes.narrative(TODAY)
+
+
+def doc(name, score, accesses, state="SUPPORTED"):
+    return {
+        "id": name,
+        "score": score,
+        "epistemic_state": state,
+        "access_count": accesses,
+        "provenance": "T001",
+        "last_verified": "2026-10-02",
+    }
+
+
+def test_omission_rate_counts_documents_the_index_does_not_carry(
+        tmp_path, monkeypatch):
+    report = narrative_with(
+        tmp_path, monkeypatch,
+        {"a": doc("SD-A", "1.0", 3), "b": doc("SD-B", "0.9", 2)},
+        index_lines=["SD-A"])
+
+    metrics = report["metrics"]["defined"]
+    assert metrics["shadow_documents"] == 2
+    assert metrics["omission_rate"] == 0.5, "one of two documents is not indexed"
+    assert any(f["class"] == "omission rate" for f in report["findings"])
+
+
+def test_synthesis_coverage_is_the_share_of_read_documents_carrying_a_rule(
+        tmp_path, monkeypatch):
+    report = narrative_with(
+        tmp_path, monkeypatch,
+        {"a": doc("SD-A", "1.0", 5), "b": doc("SD-B", "0.9", 0)},
+        index_lines=["SD-A", "SD-B"])
+
+    defined = report["metrics"]["defined"]
+    # SD-B was never read, so it is not in the denominator.
+    assert defined["synthesis_coverage"] == 1.0
+    assert defined["documents_never_read"] == ["SD-B"]
+
+
+def test_identical_scores_are_reported_as_carrying_no_information(
+        tmp_path, monkeypatch):
+    """The project's own documents first all scored 1.0.
+
+    An index that sorts by score and cannot distinguish anything is an index
+    sorted by nothing, and saying so is the only thing that distinguishes a
+    curated index from a broken one.
+    """
+    report = narrative_with(
+        tmp_path, monkeypatch,
+        {"a": doc("SD-A", "1.0", 2), "b": doc("SD-B", "1.0", 2),
+         "c": doc("SD-C", "1.0", 2)},
+        index_lines=["SD-A", "SD-B", "SD-C"])
+
+    defined = report["metrics"]["defined"]
+    assert defined["distinct_scores"] == 1
+    assert any(f["class"] == "score clustering" for f in report["findings"])
+
+
+def test_an_index_with_no_scores_is_pinning_bias(tmp_path, monkeypatch):
+    # Hand-placed entries with nothing to rank them by.
+    unscored = {"a": {"id": "SD-A", "access_count": 2, "provenance": "T1",
+                      "last_verified": "2026-10-02"}}
+    report = narrative_with(tmp_path, monkeypatch, unscored,
+                            index_lines=["SD-A"])
+
+    assert report["metrics"]["defined"]["pinning_bias"] == 1.0
+    assert any(f["class"] == "pinning bias" for f in report["findings"])
+
+
+def test_access_concentration_is_undefined_without_a_log(tmp_path, monkeypatch):
+    report = narrative_with(
+        tmp_path, monkeypatch,
+        {"a": doc("SD-A", "1.0", 3)}, index_lines=["SD-A"], access=False)
+
+    assert "access_concentration" in report["metrics"]["undefined"]
+    assert "access.log" in report["metrics"]["undefined"]["access_concentration"]
+
+
+def test_concentrated_access_is_reported(tmp_path, monkeypatch):
+    docs = {"a": doc("SD-A", "1.0", 2), "b": doc("SD-B", "0.9", 1),
+            "c": doc("SD-C", "0.8", 1), "d": doc("SD-D", "0.7", 1)}
+    report = narrative_with(tmp_path, monkeypatch, docs,
+                            index_lines=list(docs))
+
+    defined = report["metrics"]["defined"]
+    assert defined["access_concentration"] > 0.0
+    assert isinstance(defined["access_concentration"], float)
+
+
+def test_a_document_missing_the_fields_the_metrics_need_is_flagged(
+        tmp_path, monkeypatch):
+    """A doc with no score must not be scored as zero.
+
+    Otherwise a knowledge base where nobody wrote the metadata looks perfectly
+    evenly distributed, which is the exact opposite of what it is.
+    """
+    report = narrative_with(
+        tmp_path, monkeypatch,
+        {"a": {"id": "SD-A", "access_count": 1}},
+        index_lines=["SD-A"])
+
+    assert any(f["class"] == "incomplete shadow record"
+               for f in report["findings"])
+    assert report["metrics"]["defined"]["shadow_documents"] == 1
+
+
+# --- the project's own shadow layer -----------------------------------------
+
+def test_the_projects_shadow_layer_is_measurable():
+    report = aes.narrative(TODAY)
+
+    defined = report["metrics"]["defined"]
+    assert defined.get("shadow_documents", 0) >= 1
+    assert defined["omission_rate"] == 0.0, (
+        "every shadow document should be in the hot index; one that is not is "
+        "a document nobody will read")
+    assert defined["documents_never_read"] == [], (
+        "the access log claims every document was read, or it is wrong")
+    assert defined["distinct_scores"] >= 2, (
+        "if every document scores the same, the index is sorted by nothing")
+
+
+def test_every_shadow_document_names_the_work_it_came_from():
+    for record in aes.shadow_docs():
+        assert record["provenance"], f"{record['id']} has no provenance"
+        assert record["last_verified"], f"{record['id']} was never verified"

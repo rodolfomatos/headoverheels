@@ -376,8 +376,8 @@ def conflict(today: datetime.date) -> dict:
     # 5. Orphan access entries: the access log is the audit trail; entries that
     #    name nothing are fiction.
     orphans = 0
-    if ACCESS_LOG.exists():
-        for line in ACCESS_LOG.read_text().splitlines():
+    if (SHADOW / "access.log").exists():
+        for line in (SHADOW / "access.log").read_text().splitlines():
             if line.strip() and len(line.split()) < 2:
                 orphans += 1
     else:
@@ -438,57 +438,194 @@ def _gini(values: list[float]) -> float:
     return (2 * cumulative) / (n * total) - (n + 1) / n
 
 
-def narrative(today: datetime.date) -> dict:
-    """Five ways the story the project tells can differ from what it did.
+SHADOW_FIELDS = ("id", "score", "epistemic_state", "access_count", "provenance")
 
-    Most of these cannot be computed here, and the reason is reported instead of
-    a number. There is no shadow directory: no shadow documents, no access log,
-    no scores. An omission rate of zero would mean the project had a perfect
-    knowledge base. It has no knowledge base at all.
+
+def shadow_docs() -> list[dict]:
+    """The shadow layer, with the fields a doc has to carry to be measurable.
+
+    A doc missing `score` or `access_count` is not silently scored as zero: it is
+    returned with `complete: False`, because the alternative is a knowledge base
+    that looks evenly distributed because none of its documents say.
     """
-    records = decisions(today)
-    findings = []
-    metrics: dict = {}
-
     if not SHADOW.exists():
-        undefined = [
-            "omission_rate", "pinning_bias", "access_concentration",
-            "synthesis_coverage", "score_clustering",
-        ]
-        metrics["defined"] = {}
-        metrics["undefined"] = {
-            name: "aes/shadow/ does not exist: there are no shadow documents "
-                   "to omit, pin, cluster or synthesise"
-            for name in undefined
-        }
+        return []
+    docs = []
+    for path in sorted(SHADOW.glob("*.md")):
+        if path.name == "INDEX.md":
+            continue
+        text = path.read_text()
+        meta = _parse_front_matter(text)
+        docs.append({
+            "path": path,
+            "id": meta.get("id") or path.stem,
+            "score": float(meta["score"]) if meta.get("score") else None,
+            "access_count": int(meta["access_count"]) if meta.get("access_count") else None,
+            "last_verified": meta.get("last_verified"),
+            "provenance": meta.get("provenance"),
+            "state": meta.get("epistemic_state"),
+            "has_rule": "# " in text,
+            "complete": all(meta.get(f) for f in SHADOW_FIELDS if f != "state"),
+        })
+    return docs
+
+
+def access_counts() -> dict:
+    """How often each document was actually read, from the audit log.
+
+    An absent log means the count is unknown, not zero, and the metrics that
+    depend on it say so.
+    """
+    # Derived from SHADOW rather than from the module constant, so that moving
+    # SHADOW moves the log with it. Reading the constant meant a caller that
+    # pointed the tool at another shadow layer got this project's real access
+    # counts mixed into its own numbers, which is worse than getting none.
+    log = SHADOW / "access.log"
+    if not log.exists():
+        return {}
+    counts: dict = {}
+    for line in log.read_text().splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        parts = line.split()
+        if len(parts) >= 2:
+            counts[parts[0]] = counts.get(parts[0], 0) + 1
+    return counts
+
+
+def narrative(today: datetime.date) -> dict:
+    """Five ways the story this project tells can differ from what it did.
+
+    Every metric names the input it needs. An absent input yields an undefined
+    metric with the reason attached, never a zero: this project had no shadow
+    directory at all, and an omission rate of 0% would have read as a complete
+    index where there was no index at all.
+    """
+    docs = shadow_docs()
+    records = decisions(today)
+    findings: list = []
+    metrics: dict = {"defined": {}, "undefined": {}}
+
+    metrics["defined"].update({
+        "shadow_documents": len(docs),
+        "decisions": len(records),
+        "decisions_with_re_runnable_evidence": sum(
+            1 for r in records if r["evidence"]),
+    })
+
+    if not docs:
+        for name in ("omission_rate", "pinning_bias", "access_concentration",
+                     "synthesis_coverage", "score_clustering"):
+            metrics["undefined"][name] = (
+                "aes/shadow/ has no documents, so there is nothing to omit, "
+                "pin, cluster or synthesise")
         findings.append({
             "class": "no narrative to measure",
-            "detail":
-                "aes/shadow/ is absent, so all five narrative metrics are "
-                "undefined. They are not zero: a zero omission rate would be "
-                "read as a complete index, and there is no index.",
+            "detail": "aes/shadow/ is empty. These five metrics are undefined, "
+                      "not zero.",
             "severity": "major",
         })
     else:
-        docs = list(SHADOW.glob("*.md"))
-        metrics["defined"] = {"shadow_documents": len(docs)}
-        metrics["undefined"] = {}
+        counts = access_counts()
+        index = (SHADOW / "INDEX.md")
+        index_text = index.read_text() if index.exists() else ""
 
-    # Of what does exist: is the record set load-bearing, or is it decoration?
-    load_bearing = [r for r in records if r["evidence"]]
-    metrics["defined"]["decisions"] = len(records)
-    metrics["defined"]["decisions_with_re_runnable_evidence"] = len(load_bearing)
+        # 1. Omission rate: documents the hot index does not carry.
+        listed = {d["id"] for d in docs if d["id"] in index_text}
+        omitted = [d["id"] for d in docs if d["id"] not in listed]
+        metrics["defined"]["omission_rate"] = round(len(omitted) / len(docs), 4)
+        if len(omitted) / len(docs) > NARRATIVE_MAX_OMISSION:
+            findings.append({
+                "class": "omission rate",
+                "detail": f"{len(omitted)} of {len(docs)} documents are not in "
+                          f"aes/shadow/INDEX.md: {omitted}",
+                "severity": "minor",
+            })
+
+        # 2. Pinning bias: how much of the index is hand-placed rather than
+        #    selected by score. A hand-written index is a curated one, which is
+        #    not a fault -- but an index that claims to be sorted by score and
+        #    is not is a different thing.
+        pinned = sum(1 for d in docs if d["id"] in index_text and d["score"] is None)
+        by_score = sum(
+            1 for d in docs
+            if d["id"] in index_text and d["score"] is not None)
+        metrics["defined"]["pinned_entries"] = pinned
+        metrics["defined"]["score_ranked_entries"] = by_score
+        if listed and by_score == 0 and pinned:
+            metrics["defined"]["pinning_bias"] = 1.0
+            findings.append({
+                "class": "pinning bias",
+                "detail": "every indexed document is hand-placed and none "
+                          "carries a score, so nothing about the index can be "
+                          "checked against the thing it claims to rank by",
+                "severity": "minor",
+            })
+        else:
+            metrics["defined"]["pinning_bias"] = (
+                round(pinned / (pinned + by_score), 4) if (pinned + by_score) else 0.0)
+
+        # 3. Access concentration: Gini over how often each document was read.
+        if not counts:
+            metrics["undefined"]["access_concentration"] = (
+                "aes/shadow/access.log does not exist, so how often anything "
+                "was read is unknown rather than zero")
+        else:
+            known = [d for d in docs if d["id"] in counts]
+            gini = _gini([float(counts[d["id"]]) for d in known])
+            metrics["defined"]["access_concentration"] = round(gini, 4)
+            metrics["defined"]["documents_never_read"] = [
+                d["id"] for d in docs if counts.get(d["id"], 0) == 0]
+            if gini > NARRATIVE_MAX_GINI and len(known) > 1:
+                findings.append({
+                    "class": "access concentration",
+                    "detail": f"Gini {gini:.2f} over {len(known)} documents: a "
+                              f"few lessons are read and the rest are not",
+                    "severity": "minor",
+                })
+
+        # 4. Synthesis coverage: accessed documents that carry a rule someone can
+        #    act on, rather than a narrative of what happened.
+        accessed = [d for d in docs if counts.get(d["id"], 0) > 0]
+        with_rule = [d for d in accessed if d["has_rule"]]
+        if accessed:
+            metrics["defined"]["synthesis_coverage"] = round(
+                len(with_rule) / len(accessed), 4)
+        else:
+            # Not zero. Zero would say "nothing read carries a rule", which is a
+            # claim about quality; the truth is that nothing was read, which is a
+            # claim about the log.
+            metrics["defined"].pop("synthesis_coverage", None)
+            metrics["undefined"]["synthesis_coverage"] = (
+                "no document appears in aes/shadow/access.log, so the share of "
+                "what is read that carries a rule cannot be computed")
+
+        # 5. Score clustering: are the scores spread or all the same?
+        scored = sorted(d["score"] for d in docs if d["score"] is not None)
+        metrics["defined"]["score_range"] = (
+            [scored[0], scored[-1]] if scored else None)
+        metrics["defined"]["distinct_scores"] = len(set(scored))
+        if len(scored) > 2 and len(set(scored)) == 1:
+            findings.append({
+                "class": "score clustering",
+                "detail": f"every document scores {scored[0]}, so the score "
+                          f"carries no information and the index order is "
+                          f"arbitrary",
+                "severity": "minor",
+            })
+
+        incomplete = [d["id"] for d in docs if not d["complete"]]
+        if incomplete:
+            findings.append({
+                "class": "incomplete shadow record",
+                "detail": f"these documents are missing fields the metrics need: "
+                          f"{incomplete}",
+                "severity": "minor",
+            })
 
     concentration = _gini([1.0 if r["evidence"] else 0.0 for r in records])
     metrics["defined"]["evidence_gini"] = round(concentration, 4)
-    if concentration > NARRATIVE_MAX_GINI and records:
-        findings.append({
-            "class": "evidence concentration",
-            "detail": f"Gini {concentration:.2f} over decisions with "
-                      f"re-runnable evidence: the record set is not evenly "
-                      f"load-bearing",
-            "severity": "minor",
-        })
 
     blockers = [f for f in findings if f["severity"] == "blocker"]
     return {

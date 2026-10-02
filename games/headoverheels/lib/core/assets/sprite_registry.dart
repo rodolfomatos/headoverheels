@@ -165,7 +165,19 @@ class SpriteRegistry {
       );
     }
 
-    _sprites[entry.id] = Sprite(image);
+    final cellWidth = entry.width;
+    final cellHeight = entry.height;
+    if (cellWidth <= 0 || cellHeight <= 0) {
+      throw StateError(
+        '${entry.id} has no runtime_size, so no frame of it can be cut out. '
+        'runtime_size is {width, height} in cell coordinates.',
+      );
+    }
+    _sprites[entry.id] = Sprite(
+      image,
+      srcPosition: Vector2.zero(),
+      srcSize: Vector2(cellWidth.toDouble(), cellHeight.toDouble()),
+    );
     _loaded.add(entry.id);
     final prop = entry.prop;
     if (prop != null) {
@@ -186,15 +198,16 @@ class SpriteRegistry {
       // picture. The manifest says how many, and the width of the file agrees,
       // which `sprite_load_test` checks by reading the PNG's header.
       final frames = (entry.frames ?? 1)
-          .clamp(1, image.width ~/ entry.width)
+          .clamp(1, image.width ~/ cellWidth)
           .toInt();
       if (frames > 1) {
-        final frameWidth = image.width ~/ frames;
+        final frameWidth = cellWidth;
         _entityAnimations[entity] = SpriteAnimation.spriteList([
           for (var frame = 0; frame < frames; frame++)
             Sprite(
               image,
               srcPosition: Vector2((frame * frameWidth).toDouble(), 0),
+              srcSize: Vector2(frameWidth.toDouble(), cellHeight.toDouble()),
             ),
         ], stepTime: 0.14);
       }

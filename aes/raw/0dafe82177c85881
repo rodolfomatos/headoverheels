@@ -1,0 +1,6 @@
+Room children, read at runtime:
+  0 TiledComponent   pos=[-480,0]   size=[1024,512]
+  2 SwitchEntity     pos=[0,96]     size=[64,32]
+  5 ConveyorEntity   pos=[-192,96]  size=[1024,32]
+The floor is child 0 and covers nothing. The belt is added after the
+switch, is 1024 wide, and is at the same y.

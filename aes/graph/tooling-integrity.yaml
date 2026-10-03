@@ -1,0 +1,133 @@
+# Island Graph — the epistemic tooling's own claims.
+#
+# Every gate in this project has, at some point, reported success while proving
+# nothing. That is not bad luck; it is the default failure mode of a check that
+# was written once and trusted. This island records the three cases where the
+# *skill's* own instrumentation did it, because a gate that cannot fail is worse
+# than no gate -- it manufactures green and is trusted exactly when nobody is
+# looking.
+#
+# It is satisfiable. Each claim below is falsified *and* replaced by a working
+# gate, which is the only honest way to close one: assert what is now true, with
+# the measurement that made the old claim false in `source_chunks`.
+
+artifact: tooling-integrity
+version: 1
+notes: >
+  Claims about the gates themselves. Validated by `make gmif-check`, which is
+  scripts/gmif_check.py and not the skill's gmif-check.sh -- for the reason
+  C-001 records.
+
+nodes:
+  - id: C-001
+    kind: claim
+    category: 1-axiomatic
+    state: FALSIFIED
+    validation_type: logical
+    validation_confidence: 0.99
+    extraction_confidence: 0.99
+    extractor: manual
+    logical_form: "C-001"
+    source_chunks: ["raw/fa52dc05a43c5a7e"]
+    last_verified: "2026-10-03T00:00:00Z"
+    verification_method: logical
+    anchor: scripts/gmif_check.py
+    note: >
+      The skill's gmif-check.sh reports SAT on files Z3 rejects. FALSIFIED and
+      replaced: any output that is not exactly sat or unsat is a failure, so Z3
+      printing an error can no longer be mistaken for a pass. Nineteen tests,
+      each one a route to a false pass.
+
+  - id: C-002
+    kind: claim
+    category: 1-axiomatic
+    state: FALSIFIED
+    validation_type: logical
+    validation_confidence: 0.99
+    extraction_confidence: 0.99
+    extractor: manual
+    logical_form: "C-002"
+    source_chunks: ["raw/d2ff8f4786451cdd"]
+    last_verified: "2026-10-03T00:00:00Z"
+    verification_method: logical
+    anchor: ~/.config/opencode/skills/aes-epistemics/scripts/gmif-staleness-check.sh
+    note: >
+      gmif-staleness-check.sh reported "No STALE GMIF shadows" while iterating zero
+      files, because it globs SD-GMIF-* and this project's documents are SD-CI-*
+      and SD-META-*. The gate is in the pipeline and it passes; what it passes is
+      not yet recorded.
+
+  - id: C-003
+    kind: claim
+    category: 1-axiomatic
+    state: FALSIFIED
+    validation_type: logical
+    validation_confidence: 0.98
+    extraction_confidence: 0.95
+    extractor: manual
+    logical_form: "C-003"
+    source_chunks: ["raw/3e2f0d8fe8bad5ed"]
+    last_verified: "2026-10-03T00:00:00Z"
+    verification_method: logical
+    anchor: templates/island.yaml
+    note: >
+      An island written to the skill's own template could not be validated. The
+      template documents `id: C-001` and the script emits
+      `(declare-const C-001 Bool)`, which SMT-LIB rejects. FALSIFIED and replaced:
+      ids stay as documented and the solver takes a derived constant, and a form
+      the parser cannot read in full is refused rather than truncated.
+
+  # --- what replaced them ---------------------------------------------------
+  - id: C-004
+    kind: conclusion
+    category: 2-conditioned
+    state: SUPPORTED
+    validation_type: logical
+    validation_confidence: 0.99
+    extraction_confidence: 0.9
+    extractor: manual
+    logical_form: "C-004"
+    source_chunks: ["raw/fa52dc05a43c5a7e", "raw/3e2f0d8fe8bad5ed"]
+    last_verified: "2026-10-03T00:00:00Z"
+    verification_method: logical
+    anchor: scripts/gmif_check.py
+    note: >
+      The installed gate refuses what it cannot read: unknown output is a failure,
+      an unparseable claim is PARTIAL and fails, and an island that loses no
+      character of any form is a precondition rather than a hope.
+
+  - id: C-005
+    kind: interpretation
+    category: 2-conditioned
+    state: SUPPORTED
+    validation_type: logical
+    validation_confidence: 0.95
+    extraction_confidence: 0.9
+    extractor: manual
+    logical_form: "C-005"
+    source_chunks: ["raw/d2ff8f4786451cdd"]
+    last_verified: "2026-10-03T00:00:00Z"
+    verification_method: logical
+    anchor: aes/decisions/D001.md
+    note: >
+      The recurring failure of this project is a comparison that cannot come out
+      the wrong way -- a gate that cannot fail, a guard that cannot fail, a union
+      box that cannot fail, a measurement of a scene the test had rearranged, and
+      a parser that dropped the characters it did not understand. It is worth
+      naming as a pattern rather than filing six times.
+
+connectors:
+  - type: implies
+    from: [C-001, C-003]
+    to: C-004
+  - type: implies
+    from: [C-001, C-002, C-003]
+    to: C-005
+
+edges:
+  - from: [C-001, C-003]
+    to: C-004
+    type: implies
+  - from: [C-001, C-002, C-003]
+    to: C-005
+    type: implies

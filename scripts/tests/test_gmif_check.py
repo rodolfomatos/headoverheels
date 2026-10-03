@@ -189,14 +189,22 @@ def test_a_non_logical_claim_is_skipped(tmp_path):
     assert "validation_type" in reasons["human"]
 
 
-def test_an_id_that_is_not_an_smt_symbol_is_skipped(tmp_path):
+def test_a_hyphenated_id_is_no_longer_skipped(tmp_path):
+    """This used to be asserted in the other direction.
+
+    The gate skipped any id that was not a bare SMT symbol, which meant an island
+    written to the skill's own schema template -- `id: C-001` -- was silently not
+    validated. A check that cannot come out the other way is not a check, and this
+    one was defending a rule the documentation contradicted.
+    """
     result = run(tmp_path, island([
         node("a"),
-        node("has-dash"),
+        node("C-001"),
     ]))
 
-    reasons = {s["id"]: s["reason"] for s in result["skipped"]}
-    assert "SMT-LIB symbol" in reasons["has-dash"]
+    skipped = {s["id"] for s in result["skipped"]}
+    assert "C-001" not in skipped
+    assert result["verdict"] == "PASS"
 
 
 # --- the rewrite ------------------------------------------------------------
@@ -281,3 +289,45 @@ def test_the_island_carries_no_claim_the_gate_could_not_read():
                    if n.get("validation_type") == "logical"
                    and (gmif.is_validated(n)[0] is False)]
     assert uncheckable == [], f"claims the gate would skip: {uncheckable}"
+
+# --- the schema's own id format, and a parser that loses input --------------
+
+def test_a_hyphenated_claim_id_validates(tmp_path):
+    """The schema documents `id: C-001`; SMT-LIB has no hyphen in a symbol.
+
+    `(declare-const C-001 Bool)` is a file Z3 rejects. The id stays as documented
+    and the solver gets a derived name, so an island written to the skill's own
+    template can actually be validated rather than skipped.
+    """
+    result = run(tmp_path, island([node("C-001"), node("C-002")]))
+
+    assert result["result"] == "SAT", result
+    assert result["verdict"] == "PASS"
+
+
+def test_a_form_with_an_unexpected_character_is_refused_not_truncated():
+    """`findall` skips characters it cannot match, and the parser said nothing.
+
+    "C-001" used to parse as the token "C": the "-001" was dropped and the claim
+    was accepted as `C`, which was already declared by another node. The island
+    validated, the form was wrong, and nothing said so. A parser that loses input
+    is worse than one that refuses.
+    """
+    with pytest.raises(gmif.UnsupportedForm) as error:
+        gmif.s_expr("C-001 &", {"C-001"})
+
+    assert "'&'" in str(error.value)
+
+
+def test_whitespace_is_not_an_unexpected_character():
+    # The character-conservation check must not fire on ordinary spacing.
+    assert gmif.s_expr(" C_001 and C_002 ", {"C_001", "C_002"}) == \
+        "(and C_001 C_002)"
+
+
+def test_a_bare_claim_id_is_an_atom():
+    assert gmif.s_expr("C-001", {"C-001"}) == "C-001"
+    assert gmif.symbol("C-001") == "C_001"
+    assert gmif.symbol("every_entity_visible") == "every_entity_visible"
+
+

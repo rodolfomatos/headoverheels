@@ -81,12 +81,14 @@ def is_validated(node: dict) -> tuple[bool, str]:
         value = node.get(field, 0.0)
         if value <= floor:
             return False, f"{field} is {value}, needs > {floor}"
-    if node_state(node) not in LIVE_STATES:
-        return False, f"state is {node_state(node)!r}, needs one of {LIVE_STATES}"
+    # A falsified claim is history, and history belongs in the graph. The
+    # solver is told it is false rather than being left out; skipping it
+    # would let an island full of refuted gates pass unchecked.
+    if node_state(node) not in LIVE_STATES and node_state(node) != "FALSIFIED":
+        return False, (f"state is {node_state(node)!r}, needs one of "
+                      f"{LIVE_STATES} or FALSIFIED")
     if not node.get("logical_form"):
         return False, "no logical_form"
-    if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", str(node.get("id", ""))):
-        return False, f"id {node.get('id')!r} is not a valid SMT-LIB symbol"
     return True, ""
 
 
@@ -96,7 +98,25 @@ class UnsupportedForm(ValueError):
 
 # `=>` first: an identifier pattern would happily match the `=` on its own and
 # leave the `>` unparsed, so `a => b` was not an implication at all.
-TOKEN = re.compile(r"=>|[()]|[A-Za-z_][A-Za-z0-9_]*")
+# Claim ids are `C-001`, so the hyphen has to be in the token. It was not, and
+# `findall` skips characters it cannot match rather than failing: the parser read
+# "C-001" as the token "C", dropped "-001", and accepted it. A parser that loses
+# input and says nothing is worse than one that refuses.
+TOKEN = re.compile(r"=>|[()]|[A-Za-z_][A-Za-z0-9_-]*")
+
+
+def symbol(node_id: str) -> str:
+    """The SMT-LIB constant for a claim id.
+
+    The schema documents `id: C-001`, with a hyphen, and SMT-LIB has no hyphen in
+    a symbol. Writing `(declare-const C-001 Bool)` produces a file Z3 rejects, so
+    an island written to the documentation could not be validated at all -- and
+    the skill's own `gmif-check.sh` skips such a node silently, which is how a
+    schema-conforming island ends up validating nothing.
+
+    So the id stays as documented and the solver gets a derived name.
+    """
+    return re.sub(r"[^A-Za-z0-9_]", "_", str(node_id))
 
 
 def s_expr(form: str, declared: set[str]) -> str:
@@ -115,9 +135,19 @@ def s_expr(form: str, declared: set[str]) -> str:
     Parenthesised grouping is accepted, because writing `(and a b)` by hand is
     the natural thing to do and rejecting it would be pedantry rather than rigour.
     """
-    tokens = TOKEN.findall(str(form).strip())
+    source = str(form).strip()
+    tokens = TOKEN.findall(source)
     if not tokens:
         raise UnsupportedForm("empty logical_form")
+
+    # Every character of the form has to end up in a token. `findall` skips what
+    # it cannot match, so a form with an unexpected character used to parse
+    # cleanly and quietly lose the part it did not understand.
+    if "".join(tokens) != re.sub(r"\s+", "", source):
+        lost = re.sub(r"\s+", "", source).replace("".join(tokens), "", 1)
+        raise UnsupportedForm(
+            f"{form!r} contains {lost!r}, which is not an operator, a "
+            f"parenthesis or a claim id; the parser would have dropped it")
 
     pos = 0
 
@@ -149,7 +179,7 @@ def s_expr(form: str, declared: set[str]) -> str:
             if take() != ")":
                 raise UnsupportedForm(f"unbalanced parenthesis in {form!r}")
             return inner
-        if token is None or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", token):
+        if token is None or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_-]*", token):
             raise UnsupportedForm(f"unexpected token {token!r} in {form!r}")
         take()
         return token
@@ -190,14 +220,16 @@ def build_smt2(island: dict) -> tuple[str, list[dict]]:
             skipped.append({"id": node.get("id"), "reason": why})
 
     declared = {str(n["id"]) for n in valid}
+    # Claim ids as they appear in a logical_form, and the constants they stand for.
+    to_symbol = {str(n["id"]): symbol(n["id"]) for n in valid}
     lines = ["(set-logic QF_UF)", "(set-option :produce-unsat-cores true)"]
 
-    for name in sorted(declared):
-        lines.append(f"(declare-const {name} Bool)")
+    for name in sorted(to_symbol):
+        lines.append(f"(declare-const {to_symbol[name]} Bool)")
 
     emitted = []
     for node in valid:
-        symbol = f"a_{node['id']}"
+        named = f"a_{symbol(node['id'])}"
         try:
             body = s_expr(node["logical_form"], declared)
         except UnsupportedForm as error:
@@ -206,7 +238,12 @@ def build_smt2(island: dict) -> tuple[str, list[dict]]:
             skipped.append({"id": node["id"],
                             "reason": f"unsupported logical_form: {error}"})
             continue
-        lines.append(f"(assert (! {body} :named {symbol}))")
+        for claim_id, constant in sorted(
+                to_symbol.items(), key=lambda kv: -len(kv[0])):
+            body = re.sub(rf"\b{re.escape(claim_id)}\b", constant, body)
+        if node_state(node) == "FALSIFIED":
+            body = f"(not {body})"
+        lines.append(f"(assert (! {body} :named {named}))")
         emitted.append(node["id"])
     declared = set(emitted)
 
@@ -221,18 +258,25 @@ def build_smt2(island: dict) -> tuple[str, list[dict]]:
             continue
         if not all(source in declared for source in sources):
             continue
+        if target not in declared:
+            continue
         premise = (sources[0] if len(sources) == 1
                    else f"(and {' '.join(sources)})")
         key = (kind, tuple(sources), target)
         if key in seen:
             continue
         seen.add(key)
-        symbol = f"e_{'_'.join(sources)}_to_{target}".replace("-", "_")
+        for claim_id, constant in sorted(
+                to_symbol.items(), key=lambda kv: -len(kv[0])):
+            premise = re.sub(rf"\b{re.escape(claim_id)}\b", constant, premise)
+        premise = premise.replace(target, to_symbol[target])
+        named = f"e_{'_'.join(symbol(x) for x in sources)}_to_{symbol(target)}"
         if kind == "implies":
-            lines.append(f"(assert (! (=> {premise} {target}) :named {symbol}))")
+            lines.append(f"(assert (! (=> {premise} "
+                         f"{to_symbol[target]}) :named {named}))")
         elif kind == "and":
             lines.append(
-                f"(assert (! (= {target} {premise}) :named {symbol}))")
+                f"(assert (! (= {to_symbol[target]} {premise}) :named {named}))")
 
     # `get-unsat-core` is only meaningful after an unsat answer, and asking for
     # it after sat is an error Z3 reports on stderr -- which this gate treats as a

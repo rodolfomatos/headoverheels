@@ -81,7 +81,8 @@ format:
 format-check:
 	@dart format --output=none --set-exit-if-changed games packages
 
-check: format-check lint test test-packages assets-check test-ai
+check: format-check lint test test-packages assets-check test-ai \
+	gmif-check gmif-staleness
 
 test-packages:
 	@cd packages/iso_core && flutter test
@@ -181,10 +182,18 @@ aes-check:
 
 # The satisfiability gate for aes/graph/*.yaml. The skill's own gmif-check.sh
 # reports SAT on islands Z3 rejected, so this one fails on anything that is not a
-# clean sat or unsat. It is not in `check`: it is expected to fail while T088 is
-# open, and a gate that fails for a known reason is information, not breakage.
+# clean sat or unsat. It used to stay out of `check` while T088 was open; with
+# both islands satisfiable it is a gate like any other.
 gmif-check:
 	python3 scripts/gmif_check.py
+
+# The skill's gmif-staleness-check.sh globs aes/shadow/SD-GMIF-*.md, which matches
+# nothing here -- its six documents are SD-CI-* and SD-META-* -- and it reported
+# "No STALE GMIF shadows" anyway. This one reads every dated shadow and treats
+# zero documents examined as a failure, because a gate that cannot tell "nothing
+# is stale" from "I read nothing" is not a gate.
+gmif-staleness:
+	python3 scripts/gmif_staleness.py
 
 assets-check:
 	@python3 scripts/validation_pipeline.py $(GAME)

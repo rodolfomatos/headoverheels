@@ -1,100 +1,158 @@
-# GMIF island: the render pipeline's claims about Head over Heels.
+# Island Graph — the render fidelity claims, in the GMIF v2 schema.
 #
-# Each node is a claim this project asserts. `logical_form` is an SMT-LIB
-# fragment over the other node ids; a base fact asserts its own name, which is
-# how a fact is stated here. Edges are the implications between them.
+# The plan is the map and the pixels decide. Every claim here is something a
+# measurement in this project produced, and the audit trail for each is a
+# content-addressed chunk under `aes/raw/`, so a claim cannot be reworded without
+# its evidence changing name.
 #
-# This island is not a summary of the design. It is the set of things that cannot
-# all be true at once, so that Z3 is asked the question instead of a reader
-# carrying it in their head. The unsat core it produced is what turned T088 from
-# "the switch looks wrong" into "the project's own intent is false".
-island: render-invariants
+# The island is satisfiable. It was not: it asserted the project's intent, "every
+# entity in a room draws something", and the measurement that refuted it, and Z3
+# returned the core `(a_every_entity_visible a_intent_is_false)`. The switch was
+# drawn under a conveyor; `PuzzleEntity.renderPriority` put the belt first. A node
+# that says a closed defect is still open would be the one thing this file exists
+# to prevent, so the refuting node is gone rather than demoted.
+
+artifact: render-invariants
 version: 2
+notes: >
+  Claims about how a Head over Heels room is drawn and ordered. Validated by
+  `make gmif-check`, which is `scripts/gmif_check.py` and not the skill's
+  `gmif-check.sh` — the skill's reports SAT on files Z3 rejects, which is recorded
+  in the tooling-integrity island.
+
 nodes:
-  # --- intent, stated by the project -------------------------------------
-  # room_render_test.dart: "A room with a bag nobody can see is a room with no
-  # bag." This is the standard the renderer is held to.
-  - id: every_entity_visible
+  # --- the intent the project holds itself to --------------------------------
+  - id: C-001
+    kind: claim
+    category: 2-conditioned
+    state: SUPPORTED
     validation_type: logical
     validation_confidence: 0.95
     extraction_confidence: 0.95
-    epistemic_state: INFERRED
-    state: INFERRED
-    logical_form: every_entity_visible
-    source: games/headoverheels/test/room_render_test.dart
+    extractor: manual
+    logical_form: "C-001"
+    source_chunks: ["raw/9886322e10c3809a"]
+    last_verified: "2026-10-02T00:00:00Z"
+    verification_method: logical
+    anchor: games/headoverheels/test/room_render_test.dart
     note: >
-      The project's stated intent: every entity present in a room draws something
-      on screen. Asserted as true because that is what the test says.
+      "A room with a bag nobody can see is a room with no bag", in the test's own
+      words. Held to by room_render_test, which measures every entity against the
+      room as the game built it.
 
-  # --- measurements, all taken in the real renderer ------------------------
-  - id: switch_visible_alone
+  # --- what was measured -----------------------------------------------------
+  - id: C-002
+    kind: evidence
+    category: 1-axiomatic
+    state: SUPPORTED
     validation_type: logical
     validation_confidence: 0.99
     extraction_confidence: 0.99
-    epistemic_state: SUPPORTED
-    state: SUPPORTED
-    logical_form: switch_visible_alone
-    source: room_render_test.dart
+    extractor: manual
+    logical_form: "C-002"
+    source_chunks: ["raw/9886322e10c3809a"]
+    last_verified: "2026-10-02T00:00:00Z"
+    verification_method: logical
+    anchor: games/headoverheels/test/room_render_test.dart
     note: >
-      Measured 3200px, identical to fish_1, with the room to itself. So the
-      switch is not absent and its art is not blank.
+      The switch measures 3200px in the room as it stands and 3200px with the room
+      to itself. Equal, which is what "not covered" looks like from the outside.
 
-  - id: switch_covered_by_conveyor
+  - id: C-003
+    kind: evidence
+    category: 1-axiomatic
+    state: SUPPORTED
     validation_type: logical
     validation_confidence: 0.98
     extraction_confidence: 0.95
-    epistemic_state: SUPPORTED
-    state: SUPPORTED
-    logical_form: switch_covered_by_conveyor
-    source: room_render_test.dart
+    extractor: manual
+    logical_form: "C-003"
+    source_chunks: ["raw/0dafe82177c85881"]
+    last_verified: "2026-10-02T00:00:00Z"
+    verification_method: logical
+    anchor: games/headoverheels/lib/features/gameplay/room/room_component.dart
     note: >
-      Room child order, read at runtime: the floor is child 0, SwitchEntity is
-      child 2 at y=96, ConveyorEntity is child 5 at y=96 with width 1024. The
-      belt is added after the switch and covers it for its whole length.
+      Room child order, read at runtime: the floor is child 0 and covers nothing;
+      the ConveyorEntity is child 5, 1024 wide, at the same y as the switch, and
+      added after it.
 
-  - id: strip_bug_gone
-    validation_type: logical
-    validation_confidence: 0.99
-    extraction_confidence: 0.99
-    epistemic_state: SUPPORTED
+  - id: C-004
+    kind: claim
+    category: 2-conditioned
     state: SUPPORTED
-    logical_form: strip_bug_gone
-    source: games/headoverheels/lib/core/assets/sprite_registry.dart
-    note: >
-      SpriteRegistry now cuts each frame with an explicit srcSize, so an entity
-      draws its own cell rather than the whole 384x192 master sheet.
-
-  # --- the consequence, which is what the island is for ---------------------
-  - id: switch_absent_or_covered
     validation_type: logical
     validation_confidence: 0.99
     extraction_confidence: 0.9
-    epistemic_state: SUPPORTED
-    state: SUPPORTED
-    logical_form: switch_covered_by_conveyor and switch_draws_in_room
-    source: T088
+    extractor: manual
+    logical_form: "C-004"
+    source_chunks: ["raw/48c9fa4f6d36fdee"]
+    last_verified: "2026-10-02T00:00:00Z"
+    verification_method: logical
+    anchor: games/headoverheels/lib/core/assets/sprite_registry.dart
     note: >
-      Used to be the contradiction: the switch was covered by the belt and drew
-      nothing, which refuted the intent above. The belt is now drawn first, as
-      floor treatment, and the switch measures 3200px in the room as it stands --
-      the same as it does alone. The island is satisfiable again, which is the
-      only honest thing to write about a defect that has been closed.
+      Every frame is cut with an explicit srcSize, so an entity draws its own cell
+      rather than the whole master sheet. Held by sprite_load_test against the
+      manifest rather than trusted.
 
-  - id: switch_draws_in_room
+  # --- the decision that resolved it ----------------------------------------
+  - id: C-005
+    kind: conclusion
+    category: 2-conditioned
+    state: SUPPORTED
     validation_type: logical
     validation_confidence: 0.99
-    extraction_confidence: 0.99
-    state: SUPPORTED
-    logical_form: switch_draws_in_room
-    source: room_render_test.dart
+    extraction_confidence: 0.9
+    extractor: manual
+    logical_form: "C-005"
+    source_chunks: ["raw/0dafe82177c85881", "raw/48c9fa4f6d36fdee"]
+    last_verified: "2026-10-02T00:00:00Z"
+    verification_method: logical
+    anchor: aes/decisions/D008.md
     note: >
-      Measured 3200px with the room intact and 3200px with the room to itself.
-      Equal, which is what "not covered" looks like from the outside.
+      Floor treatment is drawn before the objects on it. Recorded in D008, and the
+      sort carries the map index as a tiebreak so a room stays reproducible — which
+      is asserted in room_render_test, not just in the decision.
+
+  - id: C-006
+    kind: interpretation
+    category: 2-conditioned
+    state: SUPPORTED
+    validation_type: logical
+    validation_confidence: 0.9
+    extraction_confidence: 0.88
+    extractor: manual
+    logical_form: "C-006"
+    source_chunks: ["raw/48c9fa4f6d36fdee"]
+    last_verified: "2026-10-02T00:00:00Z"
+    verification_method: logical
+    anchor: aes/peer-reviews/2026-10-02-input-and-model/synthesis.md
+    note: >
+      A rendering bug was masking a z-order bug. The strip spilled ink across
+      uncovered tiles, so a switch under a conveyor looked present; cutting the
+      sprite to its real cell stopped the spill and left the switch where it had
+      always been.
+
+connectors:
+  - type: implies
+    from: [C-002, C-004]
+    to: C-005
+  - type: implies
+    from: [C-003, C-004]
+    to: C-005
+  - type: and
+    from: [C-003, C-004]
+    to: C-006
 
 edges:
-  - from: [switch_visible_alone, switch_draws_in_room]
-    to: switch_absent_or_covered
+  # `gmif-check.sh` reads top-level `edges`; the schema documents per-node
+  # `connectors`. Both are written, because the two halves of the skill disagree
+  # about where this lives and only one of them is what runs.
+  - from: [C-002, C-004]
+    to: C-005
     type: implies
-  - from: [switch_covered_by_conveyor, strip_bug_gone]
-    to: switch_absent_or_covered
+  - from: [C-003, C-004]
+    to: C-005
     type: implies
+  - from: [C-003, C-004]
+    to: C-006
+    type: and

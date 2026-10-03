@@ -1,0 +1,5 @@
+templates/island.yaml documents:  id: C-001
+gmif-check.sh emits:            (declare-const C-001 Bool)
+SMT-LIB has no hyphen in a symbol. An island written to the template is
+rejected by Z3, and the script skips the node without saying the island was
+not fully checked.

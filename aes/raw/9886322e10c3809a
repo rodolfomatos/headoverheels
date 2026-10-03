@@ -1,0 +1,7 @@
+room_render_test, cumulative-removal convention:
+  entity switch_1: 3200px
+per-entity loop, whole room present:
+  switch_1: NENHUMA
+with the room rebuilt exactly as the game built it:
+  entity switch_1: 3200px
+  alone switch_1: 3200px

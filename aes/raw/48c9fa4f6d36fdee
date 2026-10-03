@@ -1,0 +1,4 @@
+games/headoverheels/lib/core/assets/sprite_registry.dart, before:
+  _sprites[entry.id] = Sprite(image);
+A master sheet is 512x128 for entity.fish.swim with runtime_size
+{width: 64, height: 32}, so the whole sheet was one frame.

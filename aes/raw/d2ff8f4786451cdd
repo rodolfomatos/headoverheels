@@ -1,0 +1,4 @@
+gmif-staleness-check.sh line 23: for shadow in "$SHADOW_DIR"/SD-GMIF-*.md
+This project's six shadow documents are SD-CI-* and SD-META-*, so the loop
+iterated zero files and printed 'No STALE GMIF shadows'.
+A gate that examined nothing reported a clean bill.

@@ -33,7 +33,7 @@ party walks rather than teleporting one frame's worth. The keyboard has existed 
 one commit and this is the only thing in the repository that uses it the way a
 player would.
 
-**`scripts/browser_door.py` asks a question `browser_motion.py` cannot.** Motion
+**`scripts/browser_walk.py` asks a question `browser_motion.py` cannot.** Motion
 asks "does the frame change", and the party moving changes the frame, so that
 question is answered by a game that is alive and broken in the same way. The
 discriminator here is arithmetic:
@@ -56,10 +56,17 @@ hoh_key_ArrowLeft_14000 -> hoh_after_ArrowLeft_14000:  0.41%
 hoh_key_ArrowRight_14000-> hoh_after_ArrowRight_14000: 0.00%
 ```
 
-Walking north changed the room. The other three show 0.00% because after the
-transition the party is somewhere else and those directions lead into a wall, which
-is itself the discriminator working: the party did not move and the frame did not
-change.
+Walking north changed the room -- and that was **wrong**. It was the room arriving,
+not a door: the world had not finished loading when the key went down, and a fifth
+of the frame changed because a room appeared. The gate had no settle window and
+printed OK while proving nothing.
+
+That gate is deleted. `scripts/browser_walk.py` replaces it and cannot make the
+mistake: it waits for the frame to stop changing before it presses anything, and
+the evaluation refuses to call a room change unless the frame was stable
+beforehand. What it then found is T095 -- at about one frame per second under
+software GL, the party cannot cross a room in any wall-clock time this harness has,
+and no conclusion about the doors follows.
 
 **Two gates, and which is which is written on the target.** `make check` stays fast
 and does not build; `make verify-browser` builds and opens. The reason is on the
@@ -68,6 +75,7 @@ through all four of the defects this project found by hand.
 
 ## What this does not claim
 
-That the party can solve the game. It can walk, and walking north through a door
-changes the room. Every other room, every puzzle, and whether the doors lead
-anywhere sensible are still only a human with their hands on it.
+That the party can solve the game. It loads, the keyboard works and the party
+moves, all three measured in a real browser. Whether a door leads anywhere is not,
+and T095 says why in a number rather than in an assumption: this build renders at
+about one frame per second under software GL, so a walk is not reachable here.

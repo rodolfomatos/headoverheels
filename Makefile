@@ -127,6 +127,16 @@ assets-preview:
 # Not part of `make check`, which does not build: this target builds two release
 # web builds first, which is most of the cost. One run is about 40 seconds of
 # driving plus the builds.
+# Walks the game through its own map, in a real browser.
+#
+# Slow -- about four minutes of holding keys -- so it is not in `verify-browser`.
+# It exits 2 when the renderer is too slow here to tell a broken door from a
+# working one, which is what happens under software GL at about one frame per
+# second. That is neither a pass nor a failure and the script says so in as many
+# words. See T095.
+walk:
+	@python3 scripts/browser_walk.py
+
 # The gate that drives the game. `make check` is fast and does not build; this
 # builds two web bundles and opens them. It runs before a push, not before a save,
 # and the reason is written here rather than left to whoever is in a hurry:
@@ -139,10 +149,7 @@ verify-browser:
 	@echo "Head over Heels: click into the game, then hold the virtual joystick."
 	@DRAG=86,714,55,0 DRAG_AFTER=8000 node scripts/browser_check.js \
 		games/headoverheels/build/web hoh 638,363 24000 8105 >/dev/null
-	@echo "Head over Heels: walk with the keyboard, and ask whether a door works."
-	@KEYS=ArrowUp:14000,ArrowRight:14000,ArrowDown:14000,ArrowLeft:14000 \
-		DRAG_AFTER=8000 node scripts/browser_check.js \
-		games/headoverheels/build/web hoh 638,363 2000 8107 >/dev/null
+
 	@echo "Knight Lore: click the title."
 	@node scripts/browser_check.js games/knightlore/build/web kl 640,400 12000 8106 >/dev/null
 	@echo ""
@@ -150,12 +157,7 @@ verify-browser:
 	@echo ""
 	@python3 scripts/browser_motion.py --report-only build/browser/kl_*.png
 	@echo ""
-	@echo ""
-	@# A fixed-key walk, asking whether a door changed the room. Exit 2 means the
-	@# renderer is too slow here to tell a broken door from a working one, which is
-	@# what it currently is under software GL; it is not treated as a failure and
-	@# not treated as a pass.
-	@python3 scripts/browser_door.py; test $$? -le 2
+
 	@echo ""
 	@python3 scripts/browser_motion.py --fail-under 200 build/browser/hoh_*.png >/dev/null \
 		&& echo "Head over Heels: the frame changes, so the game is alive." \

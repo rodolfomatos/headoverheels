@@ -1,11 +1,11 @@
 ---
 id: T095
-status: open
+status: closed
 severity: major
 found_by: aes-peer-review follow-up while closing T091
 ---
 
-# T095 — a door cannot be told from a working door in this environment
+# T095 — CLOSED: the premise was wrong, and so was the first answer
 
 ## Statement
 
@@ -123,3 +123,80 @@ there, and the party crosses ten tiles when told to walk. Whether a door leads
 anywhere is still a human with their hands on it — now for a stated reason with two
 numbers attached: the map has no door positions, and the renderer is at four frames
 a second rather than the sixty a walk wants.
+
+
+## Closed: the map has the positions, and the walk was walking past them
+
+The statement above says `world.json` records "a direction and a destination, and
+no position", and concludes the obstacle is the map. **That is false.**
+
+```json
+{ "id": "door_east", "type": "door",
+  "position": { "x": 15, "y": 8, "z": 0 },
+  "size": { "width": 1, "height": 1 },
+  "exit": { "direction": "east", "room": "castle_cell", "entrance": "west" } }
+```
+
+Twenty rooms, **42 door triggers, every one with a `position` and a `size`.** The
+map said exactly where the doors were the whole time. `scripts/browser_walk.js`
+never asked: it read `rooms[id].exits` (lines 90, 105, 112) and no trigger.
+
+The reason that matters is not that the conclusion was wrong. It is that the
+conclusion was drawn from sixteen walks when **thirteen of them were incapable of
+touching a door**, so it was never evidence about doors at all.
+
+## What the walk was actually doing
+
+From `castle_start`'s spawn at (1,1), the walker's first hop holds **east**. East
+is the right direction for `castle_cell` -- but holding east walks the row y=1 to
+the east wall at x=15, while the east door is at **(15,8)**. Eight rows south of
+the line the walker holds. It walks the length of the room and stops against a
+wall, which is the same picture as a broken door.
+
+`scripts/door_reachability.py` settles it without a browser, by replaying the walk
+and asking whether a single straight hold ever passes through the door it means to
+use. The party does not arrive at a room's `spawnPoint` -- it arrives through the
+door it came in by, which `world.json` names as `exit.entrance`.
+
+```
+hops in the walk that cross a wall:                    16
+hops a single straight hold reaches the door for:       3 (18.8%)
+```
+
+Thirteen walks were the walker missing a door, including the first. The three that
+could have gone through one are the only results here that say anything about a
+door -- and this ticket does not claim they succeeded.
+
+## My first answer to this was wrong too
+
+The first run of that script reported **0 of 16** and printed "not one hop was
+geometrically capable of going through a door". That was the diagonal bug:
+`distance_along` compared the two signed distances, `sx == sy`, which holds only
+on a diagonal. It rejected every door on a wall and returned "never reachable" for
+all sixteen inputs.
+
+A predicate that answers "no" to everything is indistinguishable from a finding.
+It is the sixth time in this project that a check could not come out the other way
+(`SD-META-001`), and the only reason this one surfaced is that a test asserted the
+straight-line cases the function was supposed to get right. The number in the box
+above is the corrected one.
+
+## What this does and does not close
+
+Closed: the map-completeness question. Positions exist; nothing is missing; the
+walker was reading half the file.
+
+Not closed, and deliberately not claimed: **whether any door works.** That needs a
+walker that lines up with the door before crossing it, and at 4-6 fps with
+per-frame movement (`entity_factory.dart:281`, `speed / 60.0`) a leg of fifteen
+tiles costs about a minute of held key -- so it is a walker's problem, not a
+quick check. It is tracked as its own work, not as a claim here.
+
+Three other map facts found on the way, neither a fault:
+
+- `castle_start` and `castle_hall` each have a north door into the same room,
+  `castle_market`. Two doors, one target, both correct.
+- 8 `up`/`down` exits link entrance rooms to each other, and no trigger implements
+  them; the 4 ladder triggers that exist declare no `exit`. Whether that is a
+  problem depends on which of the two the engine treats as authoritative, which is
+  not answered here.

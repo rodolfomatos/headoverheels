@@ -98,10 +98,12 @@ void main() {
 
   test('every chest names an item the game knows', () {
     final problems = <String>[];
-    for (final roomId in session.world.rooms.keys) {
+    var chests = 0;
+    for (final roomId in List.of(session.world.rooms.keys)) {
       session.enterRoom(roomId);
       for (final trigger in session.room.triggers) {
         if (trigger.type != 'chest') continue;
+        chests++;
         final properties = trigger.properties['properties'];
         final itemId = properties is Map ? properties['itemId'] : null;
         if (itemId is! String) {
@@ -114,7 +116,13 @@ void main() {
         }
       }
     }
-    expect(problems, isEmpty, reason: problems.join('\n'));
+    // This one fails about once in four `make check` runs and not once in
+    // twenty-five runs of this file on its own, so the counts are in the failure
+    // message: "1 of 340 chests checked" is a different problem from "1 of 12",
+    // and there was no way to tell them apart before.
+    expect(problems, isEmpty,
+        reason: 'checked ${session.world.rooms.length} rooms and $chests '
+            'chests. problems:\n${problems.join("\\n")}');
   });
 
   test('every scroll in the catalogue is in a chest somewhere in the world',

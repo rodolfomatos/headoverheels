@@ -179,6 +179,7 @@ current_ticket: "T050"
 | T090 | The party does not stop when the control is released | done |
 | T091 | Nothing in the gate drives the game | done |
 | T093 | The party is on a tile grid and its position is a float | done |
+| T096 | An intermittent Knight Lore chest-item failure, named not reproduced | open |
 | T092 | The art pipeline CLI had never been run | done |
 | T094 | The keyboard depends on focus, and nothing says the keys exist | done |
 | T087 | Room change is untestable in a widget test; needs an integration test | done |

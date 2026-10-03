@@ -1,5 +1,12 @@
 // A chest is a place in the world, not a list entry.
 //
+// "every chest names an item the game knows" used to live here, and failed
+// about once in four `make check` runs. It did not need this file's game: it
+// walked rooms through `enterRoom` to reach data the world file already holds
+// outright. It is now `chest_catalogue_test.dart`, which reads the world
+// directly, has no session to be flaky about, and asserts its own room and
+// chest counts so it cannot pass by looking at nothing.
+//
 // A chest in a wall cannot be opened. A chest in a sealed corner cannot be
 // reached. A scroll that is in the catalogue but in no chest is a spell the game
 // offers and the world never gives: the party is told the wolf comes at night,
@@ -94,35 +101,6 @@ void main() {
 
     expect(chests, greaterThan(0));
     expect(problems, isEmpty, reason: problems.join('\n'));
-  });
-
-  test('every chest names an item the game knows', () {
-    final problems = <String>[];
-    var chests = 0;
-    for (final roomId in List.of(session.world.rooms.keys)) {
-      session.enterRoom(roomId);
-      for (final trigger in session.room.triggers) {
-        if (trigger.type != 'chest') continue;
-        chests++;
-        final properties = trigger.properties['properties'];
-        final itemId = properties is Map ? properties['itemId'] : null;
-        if (itemId is! String) {
-          problems.add('$roomId/${trigger.id}: no itemId');
-          continue;
-        }
-        if (KlItems.byId(itemId) == null) {
-          problems
-              .add('$roomId/${trigger.id}: "$itemId" is not in the catalogue');
-        }
-      }
-    }
-    // This one fails about once in four `make check` runs and not once in
-    // twenty-five runs of this file on its own, so the counts are in the failure
-    // message: "1 of 340 chests checked" is a different problem from "1 of 12",
-    // and there was no way to tell them apart before.
-    expect(problems, isEmpty,
-        reason: 'checked ${session.world.rooms.length} rooms and $chests '
-            'chests. problems:\n${problems.join("\\n")}');
   });
 
   test('every scroll in the catalogue is in a chest somewhere in the world',
